@@ -27,7 +27,7 @@ export default function CompanyStatusPage() {
     const allCompanies = [
       { id: 1, companyName: 'Tata Consultancy Services', phone: '+91 22 6778 9999', email: 'careers@tcs.com', status: 'Active' },
       { id: 2, companyName: 'Infosys Limited', phone: '+91 80 2852 0261', email: 'talent@infosys.com', status: 'Process' },
-      { id: 3, companyName: 'Tech Mahindra', phone: '+91 20 6601 8100', email: 'hr@techm.com', status: 'Non Active' },
+      { id: 3, companyName: 'Tech Mahindra', phone: '+91 20 6601 8100', email: 'hr@techm.com', status: 'Non Active' }, 
       { id: 4, companyName: 'Wipro Technologies', phone: '+91 80 2844 0011', email: 'reachus@wipro.com', status: 'Listed' },
       { id: 5, companyName: 'HCLTech', phone: '+91 120 436 1200', email: 'careers@hcl.com', status: 'Active' },
     ];

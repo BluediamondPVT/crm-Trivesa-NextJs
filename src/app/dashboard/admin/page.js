@@ -25,6 +25,9 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-[#092a49]">Dashboard</h1>
           <p className="text-gray-500 mt-1">Overview of your system performance</p>
         </div>
+        <button className="bg-[#0796fe] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#0680d9] shadow-sm">
+          + Add Company
+        </button>
       </div>
 
       {/* Metric Cards */}
@@ -68,7 +71,7 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-sm">
+            <tbody className="text-sm">  
               {recentCRM.map((post, index) => (
                 <tr key={post.id} className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group">
                   <td className="px-6 py-5 text-gray-500 font-medium">{index + 1}</td>

@@ -38,7 +38,7 @@ export default function CompanyDetailsPage() {
               replacementTime: '60 Days',
               commercials: '8.33% of CTC',
               paymentTerms: 'Post joining & invoice submission'
-            },
+            }, 
             contactPersons: [
               { id: 1, name: 'Rahul Sharma', designation: 'Senior HR Manager', phone: '+91 98765 43210', email: 'rahul.s@company.com' },
               { id: 2, name: 'Sneha Kapoor', designation: 'Talent Acquisition', phone: '+91 87654 32109', email: 'sneha.k@company.com' }

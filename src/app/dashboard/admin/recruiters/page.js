@@ -5,9 +5,10 @@ import { useState } from 'react';
 export default function RecruitersPage() {
   // Temporary Dummy Data for Recruiters
   const [recruiters] = useState([
-    { id: 1, name: 'Amit Sharma', email: 'amit@trivesa.com', phone: '+91 9876543210', activeCompanies: 12, status: 'Active' },
+    { id: 1, name: 'Abu Salim', email: 'abu@trivesa.com', phone: '+91 9822270773', activeCompanies: 20, status: 'Active' },
     { id: 2, name: 'Priya Patel', email: 'priya@trivesa.com', phone: '+91 8765432109', activeCompanies: 8, status: 'Active' },
-    { id: 3, name: 'Rahul Verma', email: 'rahul@trivesa.com', phone: '+91 7654321098', activeCompanies: 0, status: 'On Leave' },
+    { id: 3, name: 'Amit Sharma', email: 'amit@trivesa.com', phone: '+91 9876543210', activeCompanies: 3, status: 'On Leave' },
+    { id: 4, name: 'Rahul Verma', email: 'rahul@trivesa.com', phone: '+91 7654321098', activeCompanies: 0, status: 'On Leave' },
   ]);
 
   return (
@@ -17,9 +18,7 @@ export default function RecruitersPage() {
           <h1 className="text-3xl font-bold text-[#092a49]">Recruiters Team</h1>
           <p className="text-gray-500 mt-1">Manage your recruiting staff and their performance.</p>
         </div>
-        <button className="bg-[#0796fe] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#0680d9] shadow-sm">
-          + Add Recruiter
-        </button>
+        
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
