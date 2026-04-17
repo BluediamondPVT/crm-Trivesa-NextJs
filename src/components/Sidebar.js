@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout }) {
   // State to handle the "Recruiter" dropdown toggle
@@ -23,12 +24,13 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
     open: { height: 'auto', opacity: 1, transition: { duration: 0.3 } },
   };
 
-  const recruiterSubItems = [
-    { name: 'Recruiter', color: 'bg-yellow-700' },
-    { name: 'Active', color: 'bg-green-700' },
-    { name: 'Non Active', color: 'bg-red-700' },
-    { name: 'Process', color: 'bg-orange-700' },
-    { name: 'Listed', color: 'bg-blue-700' },
+ const recruiterSubItems = [
+    // href add kiya hai sabme
+    { name: 'All Recruiters', color: 'bg-yellow-700', href: '/dashboard/admin/recruiters' },
+    { name: 'Active', color: 'bg-green-700', href: '/dashboard/admin/companies/active' },
+    { name: 'Non Active', color: 'bg-red-700', href: '/dashboard/admin/companies/non-active' },
+    { name: 'Process', color: 'bg-orange-700', href: '/dashboard/admin/companies/process' },
+    { name: 'Listed', color: 'bg-blue-700', href: '/dashboard/admin/companies/listed' },
   ];
 
   return (
@@ -52,16 +54,19 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
         initial="hidden"
         animate={isSidebarOpen ? 'visible' : 'hidden'}
       >
-        {/* Logo Section */}
+      {/* Logo Section */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
-          <div className="flex items-center">
-            <div className="bg-white text-[#092a49] p-1.5 rounded-lg mr-3">
+          
+          {/* NAYA CODE: Yahan maine <Link> lagaya hai */}
+          <Link href="/dashboard/admin" className="flex items-center cursor-pointer group">
+            <div className="bg-white text-[#092a49] p-1.5 rounded-lg mr-3 group-hover:scale-105 transition-transform">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                 <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
               </svg>
             </div>
-            <span className="text-xl font-bold tracking-wide">Admin</span>
-          </div>
+            <span className="text-xl font-bold tracking-wide group-hover:text-gray-200 transition-colors">Admin</span>
+          </Link>
+          
           <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-300 hover:text-white p-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
           </button>
@@ -114,17 +119,20 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
                   exit="closed"
                   className="overflow-hidden ml-6 mt-1 space-y-1 border-l border-white/10"
                 >
-                  {recruiterSubItems.map((sub, idx) => (
-                    <motion.a
-                      key={idx}
-                      href="#"
-                      className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-r-lg transition-all"
-                      whileHover={{ x: 5 }}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${sub.color}`} />
-                      {sub.name}
-                    </motion.a>
-                  ))}
+                {recruiterSubItems.map((sub, idx) => (
+    <Link
+      key={idx}
+      href={sub.href}
+    >
+      <motion.div
+        className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-r-lg transition-all cursor-pointer"
+        whileHover={{ x: 5 }}
+      >
+        <span className={`w-1.5 h-1.5 rounded-full ${sub.color}`} />
+        {sub.name}
+      </motion.div>
+    </Link>
+  ))}
                 </motion.div>
               )}
             </AnimatePresence>
