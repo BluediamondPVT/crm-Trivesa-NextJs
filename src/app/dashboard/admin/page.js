@@ -25,9 +25,14 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-[#092a49]">Dashboard</h1>
           <p className="text-gray-500 mt-1">Overview of your system performance</p>
         </div>
-        <button className="bg-[#183e61] text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm">
+        
+        {/* NAYA CODE: Yahan Button ko Link bana diya hai */}
+        <Link 
+          href="/dashboard/admin/add-client"
+          className="bg-[#183e61] inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors"
+        >
           + Add Clients
-        </button>
+        </Link>
       </div>
 
       {/* Metric Cards */}
