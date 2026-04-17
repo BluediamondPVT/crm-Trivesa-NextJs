@@ -26,7 +26,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
 
  const recruiterSubItems = [
     // href add kiya hai sabme
-    { name: 'All Recruiters', color: 'bg-yellow-700', href: '/dashboard/admin/recruiters' },
+    { name: 'All Clients', color: 'bg-yellow-700', href: '/dashboard/admin/clientpage' },
     { name: 'Active', color: 'bg-green-700', href: '/dashboard/admin/companies/active' },
     { name: 'Non Active', color: 'bg-red-700', href: '/dashboard/admin/companies/non-active' },
     { name: 'Process', color: 'bg-orange-700', href: '/dashboard/admin/companies/process' },
@@ -75,18 +75,20 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
         {/* Navigation - Added overflow-y-auto so the menu scrolls if it gets too long, keeping the height intact */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {/* Dashboard Item */}
-          <motion.a
-            href="#"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-[#0796fe]"
-            variants={navItemVariants}
-            whileHover="hover"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
-            </svg>
-            <span className="font-medium text-sm">Dashboard</span>
-          </motion.a>
+       
+<Link href="/dashboard/admin">
+  <motion.div
+    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-[#0796fe] cursor-pointer"
+    variants={navItemVariants}
+    whileHover="hover"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+    </svg>
+    <span className="font-medium text-sm">Dashboard</span>
+  </motion.div>
+</Link>
 
           {/* Recruiter Dropdown Group */}
           <div>

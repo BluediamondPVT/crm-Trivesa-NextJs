@@ -1,5 +1,6 @@
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 // 1. Import and configure Outfit
 const outfit = Outfit({
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col font-sans">
         {children}
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

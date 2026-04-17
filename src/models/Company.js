@@ -1,43 +1,45 @@
 // src/models/Company.js
 import mongoose from 'mongoose';
 
-const CompanySchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Company name is required'],
-      trim: true,
-    },
-    phone: {
-      type: String,
-      required: [true, 'Phone number is required'],
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      lowercase: true,
-      trim: true,
-    },
-    address: {
-      type: String,
-      required: [true, 'Address is required'],
-    },
-    status: {
-      type: String,
-      enum: ['Active', 'Non Active', 'Process', 'Listed'],
-      default: 'Listed',
-    },
-    website: {
-      type: String,
-    },
-    description: {
-      type: String,
-    },
-    // Aap aage chalkar isme aur fields add kar sakte ho (e.g. HR Name, Vacancies)
+const ContactPersonSchema = new mongoose.Schema({
+  name: String,
+  designation: String,
+  phone: String,
+  email: String
+});
+
+const OpeningSchema = new mongoose.Schema({
+  title: String,
+  experience: String,
+  salary: String,
+  vacancies: Number,
+  expiryDate: Date,
+  description: String
+});
+
+const CompanySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  website: { type: String },
+  address: { type: String },
+  companyType: { type: String, enum: ['BPO', 'KPO', 'Non BPO', 'IT'], default: 'Non BPO' },
+  description: { type: String },
+  status: { type: String, default: 'Active' },
+  
+  // Payout Nested Object
+  payoutDetails: {
+    commercials: String,
+    payoutDuration: String,
+    replacementTime: String,
+    paymentTerms: String
   },
-  { timestamps: true }
-);
+
+  // Arrays for Multiple Contacts and Openings
+  contactPersons: [ContactPersonSchema],
+  openings: [OpeningSchema]
+
+}, { timestamps: true });
 
 const Company = mongoose.models.Company || mongoose.model('Company', CompanySchema);
-
 export default Company;

@@ -26,31 +26,73 @@ export default function AdminDashboard() {
           <p className="text-gray-500 mt-1">Overview of your system performance</p>
         </div>
         <button className="bg-[#183e61] text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm">
-          + Add Company
+          + Add Clients
         </button>
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-[#092a49] p-6 flex justify-between items-center">
+   {/* Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-10">
+        
+        {/* Card 1: Total (Non-clickable just for overall stats) */}
+        <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-[#092a49] p-5 flex justify-between items-center">
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Total Opening</p>
-            <h3 className="text-4xl font-bold text-gray-800">7</h3>
+            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Total</p>
+            <h3 className="text-3xl font-bold text-gray-800">42</h3>
           </div>
-          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-[#092a49]">
+          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-[#092a49] shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-orange-400 p-6 flex justify-between items-center">
+        {/* Card 2: Active (Clickable) */}
+        <Link href="/dashboard/admin/companies/active" className="bg-white rounded-2xl shadow-sm border-l-[6px] border-green-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Opening</p>
-            <h3 className="text-4xl font-bold text-gray-800">--</h3>
+            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Active</p>
+            <h3 className="text-3xl font-bold text-gray-800">18</h3>
           </div>
-          <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
+          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+            {/* Check/Bolt Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
           </div>
-        </div>
+        </Link>
+
+        {/* Card 3: Non Active (Clickable) */}
+        <Link href="/dashboard/admin/companies/non-active" className="bg-white rounded-2xl shadow-sm border-l-[6px] border-red-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div>
+            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Non Active</p>
+            <h3 className="text-3xl font-bold text-gray-800">5</h3>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+            {/* Pause/Cancel Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" /></svg>
+          </div>
+        </Link>
+
+        {/* Card 4: Process (Clickable) */}
+        <Link href="/dashboard/admin/companies/process" className="bg-white rounded-2xl shadow-sm border-l-[6px] border-orange-400 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div>
+            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Process</p>
+            <h3 className="text-3xl font-bold text-gray-800">7</h3>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+            {/* Clock/Refresh Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+          </div>
+        </Link>
+
+        {/* Card 5: Listed (Clickable) */}
+        <Link href="/dashboard/admin/companies/listed" className="bg-white rounded-2xl shadow-sm border-l-[6px] border-blue-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div>
+            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">Listed</p>
+            <h3 className="text-3xl font-bold text-gray-800">12</h3>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+            {/* Document/List Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
+          </div>
+        </Link>
+
       </div>
 
       {/* Recent CRM Table */}
