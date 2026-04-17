@@ -187,8 +187,10 @@ const recentPosts = [
     }
   ];
 
-  return (
-    <div className="flex min-h-screen bg-[#f8f6f4]">
+return (
+    // THE FIX: Changed 'min-h-screen' to 'h-screen w-full overflow-hidden'
+    // Yeh poore page ko screen ke barabar lock kar dega.
+    <div className="flex h-screen w-full overflow-hidden bg-[#f8f6f4]">
       
       {/* Sidebar Component */}
       <Sidebar 
@@ -198,6 +200,7 @@ const recentPosts = [
       />
 
       {/* Main Content Area */}
+      {/* overflow-hidden yahan ensure karta hai ki main layout break na ho */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         
         {/* Mobile Header (Only visible on small screens) */}
@@ -211,10 +214,10 @@ const recentPosts = [
             </button>
             <span className="text-lg font-bold text-[#092a49]">Trivesa CRM</span>
           </div>
-          {/* Optional: Add a user avatar or mini-menu here later if needed */}
         </header>
 
-        {/* Scrollable Content */}
+        {/* THE SCROLLABLE AREA */}
+        {/* flex-1 aur overflow-y-auto ki wajah se ab SIRF yeh hissa scroll hoga, sidebar nahi! */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto p-4 sm:p-8 md:p-10">
             
@@ -224,10 +227,9 @@ const recentPosts = [
                 <h1 className="text-3xl font-bold text-[#092a49]">Dashboard</h1>
                 <p className="text-gray-500 mt-1">Overview of your system performance</p>
               </div>
-             
             </div>
 
-            {/* Metric Cards matching the image */}
+            {/* Metric Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
               {/* Card 1 */}
               <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-[#092a49] p-6 flex justify-between items-center">
@@ -252,65 +254,50 @@ const recentPosts = [
               </div>
             </div>
 
-            {/* Recent Posts Table matching the image */}
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            {/* Recent Posts Table */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-10">
               <div className="px-6 py-5 border-b border-gray-100">
                 <h3 className="text-lg font-bold text-[#092a49]">Recent Posts</h3>
               </div>
               
               <div className="overflow-x-auto">
-         <table className="w-full text-left border-collapse min-w-[850px]">
-  <thead>
-    <tr className="bg-white border-b border-gray-100 text-xs text-gray-400 font-bold uppercase tracking-wider">
-      <th className="px-6 py-4 w-16">#</th>
-      <th className="px-6 py-4">Company Name</th>
-      <th className="px-6 py-4">Phone Number</th>
-      <th className="px-6 py-4">Email</th>
-      <th className="px-6 py-4">Address</th>
-      <th className="px-6 py-4 text-right">Actions</th>
-    </tr>
-  </thead>
-  <tbody className="text-sm">
-    {recentPosts.map((post, index) => (
-      <tr 
-        key={post.id} 
-        /* - even:bg-gray-50/50: Adds a subtle tint to every second row
-           - hover:bg-[#e6f4ff]: Changes color to a light version of your brand blue on hover
-           - transition-colors: Makes the hover effect smooth
-        */
-        className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group"
-      >
-        <td className="px-6 py-5 text-gray-500 font-medium">
-          {index + 1}
-        </td>
-        
-        <td className="px-6 py-5 font-medium text-gray-800">{post.companyName}</td>
-        <td className="px-3 py-5 text-gray-600">{post.phone}</td>
-        <td className="px-6 py-5 text-gray-600">{post.email}</td>
-        <td className="px-3 py-5 text-gray-500">{post.address}</td>
-        
-        <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
-          {/* View Button */}
-          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-            </svg>
-            <span className="hidden sm:inline">View</span>
-          </button>
-
-          {/* Manage Button */}
-          {/* <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-blue-200 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-            </svg>
-            <span className="hidden sm:inline">Manage</span>
-          </button> */}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+                <table className="w-full text-left border-collapse min-w-[850px]">
+                  <thead>
+                    <tr className="bg-white border-b border-gray-100 text-xs text-gray-400 font-bold uppercase tracking-wider">
+                      <th className="px-6 py-4 w-16">#</th>
+                      <th className="px-6 py-4">Company Name</th>
+                      <th className="px-6 py-4">Phone Number</th>
+                      <th className="px-6 py-4">Email</th>
+                      <th className="px-6 py-4">Address</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm">
+                    {recentPosts.map((post, index) => (
+                      <tr 
+                        key={post.id} 
+                        className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group"
+                      >
+                        <td className="px-6 py-5 text-gray-500 font-medium">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-5 font-medium text-gray-800">{post.companyName}</td>
+                        <td className="px-3 py-5 text-gray-600">{post.phone}</td>
+                        <td className="px-6 py-5 text-gray-600">{post.email}</td>
+                        <td className="px-3 py-5 text-gray-500">{post.address}</td>
+                        <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
+                          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <span className="hidden sm:inline">View</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
             

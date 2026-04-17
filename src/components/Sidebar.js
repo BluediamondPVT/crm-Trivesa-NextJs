@@ -46,13 +46,14 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
       </AnimatePresence>
 
       <motion.aside
-        className="fixed inset-y-0 left-0 z-50 w-64 bg-[#092a49] text-white flex flex-col shadow-2xl md:relative md:!transform-none md:!opacity-100"
+        // ADDED: h-screen to strictly enforce 100vh height
+        className="fixed inset-y-0 left-0 z-50 w-64 h-screen bg-[#092a49] text-white flex flex-col shadow-2xl md:relative md:!transform-none md:!opacity-100"
         variants={sidebarVariants}
         initial="hidden"
         animate={isSidebarOpen ? 'visible' : 'hidden'}
       >
         {/* Logo Section */}
-        <div className="h-20 flex items-center justify-between px-6 border-b border-white/10">
+        <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <div className="flex items-center">
             <div className="bg-white text-[#092a49] p-1.5 rounded-lg mr-3">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -66,8 +67,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        {/* Navigation - Added overflow-y-auto so the menu scrolls if it gets too long, keeping the height intact */}
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {/* Dashboard Item */}
           <motion.a
             href="#"
@@ -117,7 +118,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
                     <motion.a
                       key={idx}
                       href="#"
-                      className="flex items-center gap-3 px-6 py-2 text-s font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-r-lg transition-all"
+                      className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-r-lg transition-all"
                       whileHover={{ x: 5 }}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${sub.color}`} />
@@ -131,7 +132,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, handleLogout 
         </nav>
 
         {/* Logout Section */}
-        <div className="p-4 mb-4">
+        <div className="p-4 mb-4 shrink-0">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 text-gray-300 hover:bg-red-500/10 hover:text-red-400 px-4 py-3 rounded-xl transition-all border-l-4 border-transparent"

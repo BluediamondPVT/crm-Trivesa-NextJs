@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema(
   {
@@ -37,9 +37,6 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for email lookups
-// UserSchema.index({ email: 1 });
-
 // Pre-save middleware to hash password if modified
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
@@ -60,4 +57,11 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+// ==========================================
+// THE FIX FOR NEXT.JS SERVERLESS:
+// Yeh check karega ki agar 'User' model pehle se bana hua hai, 
+// toh purana use karo, warna naya banao.
+// ==========================================
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+
+export default User;
