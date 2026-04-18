@@ -1,14 +1,27 @@
-// Sirf key={person.id} ko key={person._id} kiya hai
 export default function ContactPersons({ contactPersons }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-      {/* ... header waisa hi rahega ... */}
+      
+      <div className="px-6 py-5 border-b border-gray-100 bg-white">
+        <h2 className="text-xl font-bold text-gray-800">Contact HR</h2>
+      </div>
+      
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[600px]">
-          {/* ... thead waisa hi rahega ... */}
+          
+          <thead className="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th className="px-6 py-3 font-medium">Name</th>
+              <th className="px-6 py-3 font-medium">Designation</th>
+              <th className="px-6 py-3 font-medium">Phone</th>
+              <th className="px-6 py-3 font-medium">Email</th>
+              {/* Empty header for the Edit button column */}
+              <th className="px-6 py-3"></th> 
+            </tr>
+          </thead>
+
           <tbody className="text-sm divide-y divide-gray-50">
             {contactPersons?.map((person) => (
-              // THE FIX: person._id use kiya
               <tr key={person._id} className="hover:bg-[#e6f4ff] transition-colors group">
                 <td className="px-6 py-4 font-bold text-gray-800">{person.name}</td>
                 <td className="px-6 py-4 font-medium text-gray-600">{person.designation}</td>
