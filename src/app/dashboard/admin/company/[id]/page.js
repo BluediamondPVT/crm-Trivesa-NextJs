@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios'; // Axios import kiya
+import axios from 'axios';
 
 // IMPORTING ALL OUR NEW COMPONENTS
 import CompanyHeader from '@/components/company/CompanyHeader';
@@ -22,26 +22,19 @@ export default function CompanyDetailsPage() {
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       try {
-        // DYNAMIC API CALL: ID ke basis pe database se data lana
         const response = await axios.get(`/api/companies/${id}`);
-        
         if (response.data.success) {
           setCompany(response.data.data);
         } else {
-          console.error("Company not found in DB");
           setCompany(null);
         }
       } catch (error) {
-        console.error("Failed to fetch client details from API:", error);
         setCompany(null);
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchCompanyDetails();
-    }
+    if (id) fetchCompanyDetails();
   }, [id]);
 
   if (loading) {
@@ -70,17 +63,25 @@ export default function CompanyDetailsPage() {
       {/* 1. Company Header */}
       <CompanyHeader company={company} />
 
-      {/* 2. Top Info Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      {/* 2. Company Info (Full Width) */}
+      <div className="mb-8">
         <CompanyInfo company={company} />
+      </div>
+
+      {/* 3. Payout Details (Full Width & Separate Section) */}
+      <div className="mb-8">
         <PayoutDetails payoutDetails={company.payoutDetails} />
       </div>
 
-      {/* 3. Contact Persons Table */}
-      <ContactPersons contactPersons={company.contactPersons} />
+      {/* 4. Contact Persons Table */}
+      <div className="mb-8">
+        <ContactPersons contactPersons={company.contactPersons} />
+      </div>
 
-      {/* 4. Current Openings */}
-      <CurrentOpenings openings={company.openings} />
+      {/* 5. Current Openings */}
+      <div className="mb-8">
+        <CurrentOpenings openings={company.openings} />
+      </div>
 
     </div>
   );

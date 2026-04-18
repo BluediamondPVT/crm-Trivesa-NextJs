@@ -1,6 +1,17 @@
 // src/models/Company.js
 import mongoose from 'mongoose';
 
+// 1. NAYA SCHEMA: Commercials ke Slabs ke liye
+const SlabSchema = new mongoose.Schema({
+  slabDetails: String
+});
+
+// 2. NAYA SCHEMA: Commercials ki Category ke liye
+const CommercialRuleSchema = new mongoose.Schema({
+  category: String,
+  slabs: [SlabSchema] // Us category ke andar multiple slabs ka array
+});
+
 const ContactPersonSchema = new mongoose.Schema({
   name: String,
   designation: String,
@@ -24,26 +35,23 @@ const CompanySchema = new mongoose.Schema({
   website: { type: String },
   address: { type: String },
   companyType: { type: String, enum: ['BPO', 'KPO', 'Non BPO', 'IT'], default: 'Non BPO' },
-  
-  // NAYA FIELD ADD KIYA:
   natureOfBusiness: { type: String }, 
-  
   description: { type: String },
   status: { type: String, default: 'Active' },
   
-  // Payout Nested Object
+  // Payout Nested Object (UPDATED)
   payoutDetails: {
-    commercials: String,
+    commercials: [CommercialRuleSchema], // THE FIX: Ye ab Array hai
     payoutDuration: String,
     replacementTime: String,
     paymentTerms: String
   },
 
-  // Arrays for Multiple Contacts and Openings
   contactPersons: [ContactPersonSchema],
   openings: [OpeningSchema]
 
 }, { timestamps: true });
 
+// Avoid OverwriteModelError
 const Company = mongoose.models.Company || mongoose.model('Company', CompanySchema);
 export default Company;
