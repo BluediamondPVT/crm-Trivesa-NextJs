@@ -3,13 +3,13 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Company from '@/models/Company';
 
-// GET request specific company fetch karne ke liye
 export async function GET(request, { params }) {
   try {
     await dbConnect();
     
-    // params.id URL se aayega (e.g. /api/companies/64abc123...)
-    const { id } = params;
+    // THE FIX: Next.js ke naye version mein params ko await karna padta hai
+    const resolvedParams = await params; 
+    const { id } = resolvedParams;
 
     const company = await Company.findById(id);
 

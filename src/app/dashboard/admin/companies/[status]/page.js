@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import axios from 'axios';
 
 export default function CompanyStatusPage() {
   const params = useParams();
@@ -22,22 +23,24 @@ export default function CompanyStatusPage() {
   const currentStatus = statusMap[rawStatus] || 'Active'; // Default to Active
 
   useEffect(() => {
-    // Ye wahi dashboard wala dummy data hai, abhi ke liye test karne ke liye
-    // Jab backend judega, tab hum direct /api/companies?status=currentStatus hit karenge
-    const allCompanies = [
-      { id: 1, companyName: 'Tata Consultancy Services', phone: '+91 22 6778 9999', email: 'careers@tcs.com', status: 'Active' },
-      { id: 2, companyName: 'Infosys Limited', phone: '+91 80 2852 0261', email: 'talent@infosys.com', status: 'Process' },
-      { id: 3, companyName: 'Tech Mahindra', phone: '+91 20 6601 8100', email: 'hr@techm.com', status: 'Non Active' }, 
-      { id: 4, companyName: 'Wipro Technologies', phone: '+91 80 2844 0011', email: 'reachus@wipro.com', status: 'Listed' },
-      { id: 5, companyName: 'HCLTech', phone: '+91 120 436 1200', email: 'careers@hcl.com', status: 'Active' },
-    ];
+    const fetchCompaniesByStatus = async () => {
+      try {
+        const response = await axios.get('/api/companies');
+        
+        if (response.data.success) {
+          const allCompanies = response.data.data;
+          // Filter data by current status
+          const filtered = allCompanies.filter(company => company.status === currentStatus);
+          setFilteredCompanies(filtered);
+        }
+      } catch (error) {
+        console.error("Failed to fetch companies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setTimeout(() => {
-      // Data ko filter kar rahe hain status ke hisaab se
-      const filtered = allCompanies.filter(company => company.status === currentStatus);
-      setFilteredCompanies(filtered);
-      setLoading(false);
-    }, 500);
+    fetchCompaniesByStatus();
   }, [currentStatus]);
 
   // Dynamic header color design
@@ -81,13 +84,13 @@ export default function CompanyStatusPage() {
             <tbody className="text-sm divide-y divide-gray-50">
               {filteredCompanies.length > 0 ? (
                 filteredCompanies.map((company, index) => (
-                  <tr key={company.id} className="hover:bg-[#e6f4ff] transition-colors group">
+                  <tr key={company._id} className="hover:bg-[#e6f4ff] transition-colors group">
                     <td className="px-6 py-5 font-medium text-gray-500">{index + 1}</td>
-                    <td className="px-6 py-5 font-bold text-gray-800">{company.companyName}</td>
+                    <td className="px-6 py-5 font-bold text-gray-800">{company.name}</td>
                     <td className="px-6 py-5 text-gray-600">{company.phone}</td>
                     <td className="px-6 py-5 text-gray-600">{company.email}</td>
                     <td className="px-6 py-5 text-right">
-                      <Link href={`/dashboard/admin/company/${company.id}`}>
+                      <Link href={`/dashboard/admin/company/${company._id}`}>
                         <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm cursor-pointer">
                           <span className="hidden sm:inline">View Details</span>
                         </button>

@@ -54,7 +54,6 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // Seedha Next.js ke API route par fetch request bhejein
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -68,12 +67,10 @@ export default function LoginForm() {
 
       const responseData = await res.json();
 
-      // Agar status 200 OK nahi hai, toh error throw karein
       if (!res.ok) {
         throw new Error(responseData.message || 'Invalid email or password');
       }
 
-      // Next.js route se data extract karein (jo pichle step mein banaya tha)
       const { token, role, userId } = responseData.data;
 
       if (!token || !role) {
