@@ -3,7 +3,7 @@ export default function ContactPersons({ contactPersons }) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
       
       <div className="px-6 py-5 border-b border-gray-100 bg-white">
-        <h2 className="text-xl font-bold text-gray-800">Contact HR</h2>
+        <h2 className="text-xl font-bold text-gray-800">Contact HR's</h2>
       </div>
       
       <div className="overflow-x-auto">

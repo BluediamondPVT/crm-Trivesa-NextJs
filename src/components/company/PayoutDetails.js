@@ -70,14 +70,14 @@ export default function PayoutDetails({ payoutDetails }) {
           <div className="space-y-6">
             <div>
               <p className="text-gray-500 text-xs font-semibold mb-1">Pay-out Duration</p>
-              <p className="text-gray-900 font-bold text-lg">{payoutDetails?.payoutDuration || 'N/A'}</p>
+              <p className="text-gray-900 font-bold text-lg">{payoutDetails?.payoutDuration || 'N/A'} Days</p>
             </div>
             
             <div className="w-full h-px bg-blue-100"></div>
             
             <div>
               <p className="text-gray-500 text-xs font-semibold mb-1">Replacement Time</p>
-              <p className="text-gray-900 font-bold text-lg">{payoutDetails?.replacementTime || 'N/A'}</p>
+              <p className="text-gray-900 font-bold text-lg">{payoutDetails?.replacementTime || 'N/A'} Days</p>
             </div>
 
             <div className="w-full h-px bg-blue-100"></div>
