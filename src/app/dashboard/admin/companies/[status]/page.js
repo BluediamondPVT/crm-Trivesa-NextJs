@@ -71,14 +71,15 @@ export default function CompanyStatusPage() {
         </div>
         
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+          <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
               <tr className="bg-white border-b border-gray-100 text-xs text-gray-400 font-bold uppercase tracking-wider">
-                <th className="px-6 py-4 w-16">#</th>
-                <th className="px-6 py-4">Company Name</th>
-                <th className="px-6 py-4">Phone Number</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4 w-12">#</th>
+                <th className="px-6 py-4 w-48">Company Name</th>
+                <th className="px-6 py-4 w-32">Phone Number</th>
+                <th className="px-6 py-4 w-40">Email</th>
+                <th className="px-6 py-4 min-w-[200px]">Address</th>
+                <th className="px-6 py-4 w-24 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-50">
@@ -86,12 +87,23 @@ export default function CompanyStatusPage() {
                 filteredCompanies.map((company, index) => (
                   <tr key={company._id} className="hover:bg-[#e6f4ff] transition-colors group">
                     <td className="px-6 py-5 font-medium text-gray-500">{index + 1}</td>
-                    <td className="px-6 py-5 font-bold text-gray-800">{company.name}</td>
-                    <td className="px-6 py-5 text-gray-600">{company.phone}</td>
-                    <td className="px-6 py-5 text-gray-600">{company.email}</td>
+                    
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-gray-800 line-clamp-1">{company.name}</div>
+                    </td>
+                    
+                    <td className="px-6 py-5 text-gray-600 whitespace-nowrap">{company.phone}</td>
+                    
+                    <td className="px-6 py-5 text-gray-600 truncate max-w-[160px]">{company.email}</td>
+                    
+                    {/* NEW ADDRESS COLUMN */}
+                    <td className="px-6 py-5 text-gray-500 text-xs line-clamp-2 mt-2">
+                      {company.address || 'N/A'}
+                    </td>
+                    
                     <td className="px-6 py-5 text-right">
                       <Link href={`/dashboard/admin/company/${company._id}`}>
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm cursor-pointer">
+                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm cursor-pointer whitespace-nowrap">
                           <span className="hidden sm:inline">View Details</span>
                         </button>
                       </Link>
@@ -100,7 +112,7 @@ export default function CompanyStatusPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-400 font-medium italic bg-gray-50/30">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-400 font-medium italic bg-gray-50/30">
                     No {currentStatus.toLowerCase()} companies found right now.
                   </td>
                 </tr>

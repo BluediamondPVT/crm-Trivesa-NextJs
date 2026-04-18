@@ -3,48 +3,75 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const [recentCRM, setRecentCRM] = useState([]);
   const [counts, setCounts] = useState({ total: 0, active: 0, nonActive: 0, process: 0, listed: 0 });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await axios.get('/api/companies');
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/companies');
+      
+      if (response.data.success) {
+        const allCompanies = response.data.data;
+
+        // 1. Calculate counts for cards dynamically
+        let active = 0, nonActive = 0, process = 0, listed = 0;
+        allCompanies.forEach(company => {
+          if (company.status === 'Active') active++;
+          if (company.status === 'Non Active') nonActive++;
+          if (company.status === 'Process') process++;
+          if (company.status === 'Listed') listed++;
+        });
         
-        if (response.data.success) {
-          const allCompanies = response.data.data;
+        setCounts({ total: allCompanies.length, active, nonActive, process, listed });
 
-          // 1. Calculate counts for cards dynamically
-          let active = 0, nonActive = 0, process = 0, listed = 0;
-          allCompanies.forEach(company => {
-            if (company.status === 'Active') active++;
-            if (company.status === 'Non Active') nonActive++;
-            if (company.status === 'Process') process++;
-            if (company.status === 'Listed') listed++;
-          });
-          
-          setCounts({ total: allCompanies.length, active, nonActive, process, listed });
-
-          // 2. Filter Recent CRM Table (Exclude Listed and Process)
-          const filteredForTable = allCompanies.filter(
-            (company) => company.status !== 'Listed' && company.status !== 'Process'
-          );
-          
-          // Optionally, limit to latest 10 records
-          setRecentCRM(filteredForTable.slice(0, 10));
-        }
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-      } finally {
-        setLoading(false);
+        // 2. Filter Recent CRM Table (Exclude Listed and Process)
+        const filteredForTable = allCompanies.filter(
+          (company) => company.status !== 'Listed' && company.status !== 'Process'
+        );
+        
+        // Optionally, limit to latest 10 records
+        setRecentCRM(filteredForTable.slice(0, 10));
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+      toast.error("Failed to load companies");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // --- DELETE FUNCTIONALITY ---
+  const handleDelete = async (id, companyName) => {
+    if (!window.confirm(`Are you sure you want to delete "${companyName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(`/api/companies/${id}`);
+      
+      if (response.data.success) {
+        toast.success(`Client "${companyName}" deleted successfully`);
+        // Remove from UI state immediately
+        setRecentCRM(recentCRM.filter(company => company._id !== id));
+        // Optionally, fetchDashboardData() again to update total counts
+        fetchDashboardData(); 
+      } else {
+        toast.error(response.data.message || "Failed to delete company");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("An error occurred while deleting");
+    }
+  };
 
   if (loading) {
     return <div className="p-10 flex justify-center font-bold text-[#092a49]">Loading Dashboard...</div>;
@@ -93,47 +120,70 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent CRM Table */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-10">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-10 border border-gray-100">
         <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-bold text-[#092a49]">Recent CRM (Active/Non-Active)</h3>
           <span className="text-xs bg-blue-50 text-blue-600 font-bold px-2 py-1 rounded">Excluding Process & Listed</span>
         </div>
         
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[850px]">
+          <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-white border-b border-gray-100 text-xs text-gray-400 font-bold uppercase tracking-wider">
-                <th className="px-6 py-4 w-16">#</th>
-                <th className="px-6 py-4">Company Name</th>
-                <th className="px-6 py-4">Phone Number</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+              <tr className="bg-gray-50/50 border-b border-gray-100 text-xs text-gray-500 font-bold uppercase tracking-wider">
+                <th className="px-6 py-4 w-12 text-center">#</th>
+                <th className="px-6 py-4 w-48">Company Name</th>
+                <th className="px-6 py-4 w-24">Status</th>
+                <th className="px-6 py-4 w-32">Phone</th>
+                <th className="px-6 py-4 min-w-[200px]">Address</th>
+                <th className="px-6 py-4 w-32 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-sm">  
+            <tbody className="text-sm divide-y divide-gray-50">  
               {recentCRM.length > 0 ? recentCRM.map((company, index) => (
-                <tr key={company._id} className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group">
-                  <td className="px-6 py-5 text-gray-500 font-medium">{index + 1}</td>
-                  <td className="px-6 py-5 font-bold text-gray-800">{company.name}</td>
-                  <td className="px-3 py-5 text-gray-600">{company.phone}</td>
-                  <td className="px-6 py-5 text-gray-600">{company.email}</td>
-                  <td className="px-6 py-5">
-                    <span className={`px-2 py-1 text-[10px] font-bold rounded-full ${company.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <tr key={company._id} className="hover:bg-[#e6f4ff] transition-colors duration-200 group">
+                  <td className="px-6 py-4 text-gray-400 font-medium text-center">{index + 1}</td>
+                  
+                  {/* Company Name */}
+                  <td className="px-6 py-4">
+                    <div className="font-bold text-gray-800 line-clamp-1">{company.name}</div>
+                    <div className="text-xs text-gray-500">{company.email}</div>
+                  </td>
+
+                  {/* Status (Compact) */}
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold rounded-md ${company.status === 'Active' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
                       {company.status}
                     </span>
                   </td>
-                  <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
+
+                  {/* Phone */}
+                  <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
+                    {company.phone}
+                  </td>
+                  
+                  {/* Address */}
+                  <td className="px-6 py-4 text-gray-500 text-xs line-clamp-2 mt-2">
+                    {company.address || 'N/A'}
+                  </td>
+                  
+                  {/* Actions (View & Delete) */}
+                  <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                     <Link href={`/dashboard/admin/company/${company._id}`}>
-                      <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 group-hover:bg-white rounded-md font-medium text-xs transition-all border border-green-200 shadow-sm cursor-pointer">
-                        <span className="hidden sm:inline">View</span>
+                      <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#0796fe] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
+                        View
                       </button>
                     </Link>
+                    <button 
+                      onClick={() => handleDelete(company._id, company.name)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-8 text-gray-400">No active or non-active companies found.</td>
+                  <td colSpan="6" className="text-center py-10 text-gray-400 font-medium bg-gray-50/30">No active or non-active companies found.</td>
                 </tr>
               )}
             </tbody>
@@ -142,4 +192,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-}
+} 
