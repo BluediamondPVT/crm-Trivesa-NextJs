@@ -21,7 +21,8 @@ export async function POST(request) {
     const body = await request.json();
 
     // Ab hum pura 'body' object directly DB mein pass kar rahe hain
-    // Jisse Payouts, ContactPersons aur Openings sab ek sath save ho jayenge!
+    
+    // POST function ke andar
     const company = await Company.create({
       name: body.name,
       phone: body.phone,
@@ -29,10 +30,12 @@ export async function POST(request) {
       address: body.address,
       website: body.website,
       companyType: body.companyType,
+      
+      // NAYA FIELD ADD KIYA:
+      natureOfBusiness: body.natureOfBusiness,
+      
       description: body.description,
       status: body.status || 'Active',
-      
-      // Ye 3 fields pichli baar miss ho gaye the!
       payoutDetails: body.payoutDetails,
       contactPersons: body.contactPersons,
       openings: body.openings 

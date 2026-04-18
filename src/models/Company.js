@@ -24,6 +24,10 @@ const CompanySchema = new mongoose.Schema({
   website: { type: String },
   address: { type: String },
   companyType: { type: String, enum: ['BPO', 'KPO', 'Non BPO', 'IT'], default: 'Non BPO' },
+  
+  // NAYA FIELD ADD KIYA:
+  natureOfBusiness: { type: String }, 
+  
   description: { type: String },
   status: { type: String, default: 'Active' },
   

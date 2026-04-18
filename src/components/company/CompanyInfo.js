@@ -13,6 +13,17 @@ export default function CompanyInfo({ company }) {
           <span className="text-gray-400 font-semibold w-24 shrink-0">Type:</span>
           <span className="bg-[#e6f4ff] text-[#0796fe] font-bold px-2.5 py-1 rounded-md text-xs tracking-wide">{company.companyType}</span>
         </div>
+
+        {/* NAYA KAMAAL: Agar natureOfBusiness DB se aayega, tabhi ye line dikhegi */}
+        {company.natureOfBusiness && (
+          <div className="flex items-start gap-3">
+            <span className="text-gray-400 font-semibold w-24 shrink-0">Nature:</span>
+            <span className="bg-purple-50 text-purple-600 font-bold px-2.5 py-1 rounded-md text-xs tracking-wide">
+              {company.natureOfBusiness}
+            </span>
+          </div>
+        )}
+
         <div className="flex items-start gap-3">
           <span className="text-gray-400 font-semibold w-24 shrink-0">Email:</span>
           <span className="text-gray-800 font-medium break-all">{company.email}</span>
@@ -23,7 +34,9 @@ export default function CompanyInfo({ company }) {
         </div>
         <div className="flex items-start gap-3">
           <span className="text-gray-400 font-semibold w-24 shrink-0">Website:</span>
-          <a href={`https://${company.website}`} target="_blank" className="text-[#0796fe] hover:underline font-medium break-all">{company.website}</a>
+          <a href={company.website?.startsWith('http') ? company.website : `https://${company.website}`} target="_blank" rel="noopener noreferrer" className="text-[#0796fe] hover:underline font-medium break-all">
+            {company.website}
+          </a>
         </div>
         <div className="flex items-start gap-3">
           <span className="text-gray-400 font-semibold w-24 shrink-0">Address:</span>
