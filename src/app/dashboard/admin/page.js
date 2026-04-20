@@ -123,7 +123,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-10">
         <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-[#092a49] p-5 flex justify-between items-center">
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+            <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
               Total
             </p>
             <h3 className="text-3xl font-bold text-gray-800">{counts.total}</h3>
@@ -136,6 +136,7 @@ export default function AdminDashboard() {
               strokeWidth={1.5}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
           className="bg-white rounded-2xl shadow-sm border-l-[6px] border-green-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200"
         >
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+            <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
               Active
             </p>
             <h3 className="text-3xl font-bold text-gray-800">
@@ -165,6 +166,7 @@ export default function AdminDashboard() {
               strokeWidth={2}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -179,7 +181,7 @@ export default function AdminDashboard() {
           className="bg-white rounded-2xl shadow-sm border-l-[6px] border-red-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200"
         >
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+            <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
               Non Active
             </p>
             <h3 className="text-3xl font-bold text-gray-800">
@@ -194,6 +196,7 @@ export default function AdminDashboard() {
               strokeWidth={2}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -208,7 +211,7 @@ export default function AdminDashboard() {
           className="bg-white rounded-2xl shadow-sm border-l-[6px] border-orange-400 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200"
         >
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+            <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
               Process
             </p>
             <h3 className="text-3xl font-bold text-gray-800">
@@ -223,6 +226,7 @@ export default function AdminDashboard() {
               strokeWidth={2}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -237,7 +241,7 @@ export default function AdminDashboard() {
           className="bg-white rounded-2xl shadow-sm border-l-[6px] border-blue-500 p-5 flex justify-between items-center cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200"
         >
           <div>
-            <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+            <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
               Listed
             </p>
             <h3 className="text-3xl font-bold text-gray-800">
@@ -252,6 +256,7 @@ export default function AdminDashboard() {
               strokeWidth={2}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -293,7 +298,7 @@ export default function AdminDashboard() {
                     key={company._id}
                     className="hover:bg-[#e6f4ff] transition-colors duration-200 group"
                   >
-                    <td className="px-6 py-4 text-gray-400 font-medium text-center">
+                    <td className="px-6 py-4 text-gray-600 font-medium text-center">
                       {index + 1}
                     </td>
 
@@ -332,7 +337,7 @@ export default function AdminDashboard() {
                       <Link
                         href={`/dashboard/admin/company/${company._id}`}
                         aria-label={`View details for ${company.name}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#0796fe] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#1d4ed8] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
                       >
                         View
                       </Link>
@@ -352,7 +357,7 @@ export default function AdminDashboard() {
                 <tr>
                   <td
                     colSpan="6"
-                    className="text-center py-10 text-gray-400 font-medium bg-gray-50/30"
+                    className="text-center py-10 text-gray-600 font-medium bg-gray-50/30"
                   >
                     No active or non-active companies found.
                   </td>

@@ -37,7 +37,7 @@ export default function ContactPersons({ contactPersons }) {
                   {person.email}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button className="text-[#0796fe] hover:text-[#0680d9] font-medium text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                  <button className="text-[#1d4ed8] hover:text-[#1e40af] font-medium text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors opacity-0 group-hover:opacity-100">
                     Edit
                   </button>
                 </td>

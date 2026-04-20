@@ -17,7 +17,7 @@ export default function CompanyHeader({ company }) {
             {company.description}
           </p>
         </div>
-        <button className="bg-[#0796fe] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0680d9] shadow-md transition-all flex items-center gap-2">
+        <button className="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1e40af] shadow-md transition-all flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -25,6 +25,7 @@ export default function CompanyHeader({ company }) {
             strokeWidth={2}
             stroke="currentColor"
             className="w-4 h-4"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"

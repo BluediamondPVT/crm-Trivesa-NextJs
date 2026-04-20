@@ -68,6 +68,7 @@ export default function CurrentOpenings({ openings }) {
                     strokeWidth={2}
                     stroke="currentColor"
                     className={`w-4 h-4 ${active ? "text-orange-500" : "text-red-500"}`}
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -87,7 +88,7 @@ export default function CurrentOpenings({ openings }) {
               {/* Job Meta Data Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-50">
                 <div>
-                  <p className="text-xs text-gray-400 font-semibold mb-1">
+                  <p className="text-xs text-gray-600 font-semibold mb-1">
                     Vacancies
                   </p>
                   <p className="text-sm font-bold text-gray-800">
@@ -95,7 +96,7 @@ export default function CurrentOpenings({ openings }) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-semibold mb-1">
+                  <p className="text-xs text-gray-600 font-semibold mb-1">
                     Experience
                   </p>
                   <p className="text-sm font-bold text-gray-800">
@@ -103,7 +104,7 @@ export default function CurrentOpenings({ openings }) {
                   </p>
                 </div>
                 <div className="col-span-2 sm:col-span-2">
-                  <p className="text-xs text-gray-400 font-semibold mb-1">
+                  <p className="text-xs text-gray-600 font-semibold mb-1">
                     Salary Range
                   </p>
                   <p className="text-sm font-bold text-gray-800">

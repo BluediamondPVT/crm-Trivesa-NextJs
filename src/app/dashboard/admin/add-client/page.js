@@ -189,7 +189,7 @@ export default function AddClientPage() {
         </div>
         <button
           onClick={() => router.back()}
-          className="text-gray-500 hover:text-[#0796fe] font-medium text-sm transition-colors"
+          className="text-gray-500 hover:text-[#1d4ed8] font-medium text-sm transition-colors"
         >
           Cancel & Go Back
         </button>
@@ -412,7 +412,7 @@ export default function AddClientPage() {
                     <button
                       type="button"
                       onClick={() => addSlab(catIdx)}
-                      className="text-xs text-[#0796fe] hover:text-[#0680d9] font-bold flex items-center gap-1"
+                      className="text-xs text-[#1d4ed8] hover:text-[#1e40af] font-bold flex items-center gap-1"
                     >
                       + Add Slab
                     </button>
@@ -438,7 +438,7 @@ export default function AddClientPage() {
                             onClick={() => removeSlab(catIdx, slabIdx)}
                             // Dynamic label: "Remove Slab 1", "Remove Slab 2", etc.
                             aria-label={`Remove slab ${slabIdx + 1}`}
-                            className="text-gray-400 hover:text-red-500 p-1.5 shrink-0 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full"
+                            className="text-gray-600 hover:text-red-500 p-1.5 shrink-0 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -710,7 +710,7 @@ export default function AddClientPage() {
             type="submit"
             aria-hidden="true"
             disabled={loading}
-            className="bg-[#0796fe] hover:bg-[#0680d9] text-white px-8 py-3 rounded-lg font-bold shadow-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="bg-[#1d4ed8] hover:bg-[#1e40af] text-white px-8 py-3 rounded-lg font-bold shadow-lg transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             {loading ? "Saving Client..." : "Save Complete Client Profile"}
           </button>

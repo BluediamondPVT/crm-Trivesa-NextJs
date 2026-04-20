@@ -105,7 +105,7 @@ export default function SuperAdminDashboard() {
               {/* Card 1 */}
               <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-blue-500 p-6 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+                  <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
                     Total Admins
                   </p>
                   <h3 className="text-4xl font-bold text-gray-800">5</h3>
@@ -118,6 +118,7 @@ export default function SuperAdminDashboard() {
                     strokeWidth={1.5}
                     stroke="currentColor"
                     className="w-6 h-6"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -131,7 +132,7 @@ export default function SuperAdminDashboard() {
               {/* Card 2 */}
               <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-green-500 p-6 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+                  <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
                     Total Employees
                   </p>
                   <h3 className="text-4xl font-bold text-gray-800">150</h3>
@@ -144,6 +145,7 @@ export default function SuperAdminDashboard() {
                     strokeWidth={1.5}
                     stroke="currentColor"
                     className="w-6 h-6"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -157,7 +159,7 @@ export default function SuperAdminDashboard() {
               {/* Card 3 */}
               <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-purple-500 p-6 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+                  <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
                     Active Projects
                   </p>
                   <h3 className="text-4xl font-bold text-gray-800">12</h3>
@@ -170,6 +172,7 @@ export default function SuperAdminDashboard() {
                     strokeWidth={1.5}
                     stroke="currentColor"
                     className="w-6 h-6"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -183,7 +186,7 @@ export default function SuperAdminDashboard() {
               {/* Card 4 */}
               <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-orange-500 p-6 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-gray-400 tracking-wider mb-2 uppercase">
+                  <p className="text-xs font-bold text-gray-600 tracking-wider mb-2 uppercase">
                     Open Positions
                   </p>
                   <h3 className="text-4xl font-bold text-gray-800">28</h3>
@@ -196,6 +199,7 @@ export default function SuperAdminDashboard() {
                     strokeWidth={1.5}
                     stroke="currentColor"
                     className="w-6 h-6"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -223,6 +227,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -242,6 +247,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -263,6 +269,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -286,6 +293,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -307,6 +315,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -328,6 +337,7 @@ export default function SuperAdminDashboard() {
                         strokeWidth={3}
                         stroke="currentColor"
                         className="w-4 h-4 text-green-600"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"

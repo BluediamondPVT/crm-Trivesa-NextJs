@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans", // Maps Outfit to your Tailwind/Shadcn sans font
+  display: "swap", // Performance: Avoid invisible text during font load
 });
 
 export const metadata = {

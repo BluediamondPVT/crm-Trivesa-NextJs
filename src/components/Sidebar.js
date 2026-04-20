@@ -114,6 +114,7 @@ export default function Sidebar({
 
           <button
             onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close sidebar menu"
             className="md:hidden text-gray-300 hover:text-white p-2"
           >
             <svg
@@ -140,7 +141,7 @@ export default function Sidebar({
 
           <Link href="/dashboard/admin">
             <motion.div
-              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-[#0796fe] cursor-pointer"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-[#1d4ed8] cursor-pointer"
               variants={navItemVariants}
               whileHover="hover"
             >
@@ -222,7 +223,7 @@ export default function Sidebar({
                   {recruiterSubItems.map((sub, idx) => (
                     <Link key={idx} href={sub.href}>
                       <motion.div
-                        className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-r-lg transition-all cursor-pointer"
+                        className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-600 hover:text-white hover:bg-white/5 rounded-r-lg transition-all cursor-pointer"
                         whileHover={{ x: 5 }}
                       >
                         <span

@@ -15,6 +15,7 @@ export default function PayoutDetails({ payoutDetails }) {
             strokeWidth={2}
             stroke="currentColor"
             className="w-6 h-6"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -37,7 +38,7 @@ export default function PayoutDetails({ payoutDetails }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Side: Dynamic Nested Commercials (Takes 2 columns) */}
         <div className="lg:col-span-2">
-          <span className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4 block">
+          <span className="text-gray-600 font-bold text-xs uppercase tracking-widest mb-4 block">
             Commercial Structure Slabs
           </span>
 
@@ -73,6 +74,7 @@ export default function PayoutDetails({ payoutDetails }) {
                             strokeWidth={2.5}
                             stroke="currentColor"
                             className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"
+                            aria-hidden="true"
                           >
                             <path
                               strokeLinecap="round"
@@ -86,7 +88,7 @@ export default function PayoutDetails({ payoutDetails }) {
                         </div>
                       ))}
                     {(!rule.slabs || rule.slabs.length === 0) && (
-                      <span className="text-gray-400 italic text-sm pl-2">
+                      <span className="text-gray-600 italic text-sm pl-2">
                         No slabs defined for this category.
                       </span>
                     )}
@@ -105,7 +107,7 @@ export default function PayoutDetails({ payoutDetails }) {
 
         {/* Right Side: Other Terms (Takes 1 column) */}
         <div className="bg-blue-50/30 rounded-xl p-6 border border-blue-100/50 h-fit">
-          <span className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-5 block">
+          <span className="text-gray-600 font-bold text-xs uppercase tracking-widest mb-5 block">
             Additional Terms
           </span>
 

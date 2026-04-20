@@ -119,7 +119,7 @@ export default function AdminDashboard() {
                     key={company._id}
                     className="hover:bg-[#e6f4ff] transition-colors duration-200 group"
                   >
-                    <td className="px-6 py-4 text-gray-400 font-medium text-center">
+                    <td className="px-6 py-4 text-gray-600 font-medium text-center">
                       {index + 1}
                     </td>
 
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                     {/* Actions (View & Delete) */}
                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                       <Link href={`/dashboard/admin/company/${company._id}`}>
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#0796fe] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
+                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#1d4ed8] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
                           View
                         </button>
                       </Link>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                 <tr>
                   <td
                     colSpan="6"
-                    className="text-center py-10 text-gray-400 font-medium bg-gray-50/30"
+                    className="text-center py-10 text-gray-600 font-medium bg-gray-50/30"
                   >
                     No active or non-active companies found.
                   </td>

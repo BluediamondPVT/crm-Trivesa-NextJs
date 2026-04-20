@@ -87,7 +87,7 @@ export default function CompanyStatusPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-225">
             <thead>
-              <tr className="bg-white border-b border-gray-100 text-xs text-gray-400 font-bold uppercase tracking-wider">
+              <tr className="bg-white border-b border-gray-100 text-xs text-gray-600 font-bold uppercase tracking-wider">
                 <th className="px-6 py-4 w-12">#</th>
                 <th className="px-6 py-4 w-48">Company Name</th>
                 <th className="px-6 py-4 w-32">Phone Number</th>
@@ -139,7 +139,7 @@ export default function CompanyStatusPage() {
                 <tr>
                   <td
                     colSpan="6"
-                    className="px-6 py-12 text-center text-gray-400 font-medium italic bg-gray-50/30"
+                    className="px-6 py-12 text-center text-gray-600 font-medium italic bg-gray-50/30"
                   >
                     No {currentStatus.toLowerCase()} companies found right now.
                   </td>

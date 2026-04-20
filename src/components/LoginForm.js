@@ -104,7 +104,7 @@ export default function LoginForm() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f8f6f4] p-4">
       <div className="w-full max-w-105">
-        <div className="bg-white rounded-xl shadow-xl overflow-hidden border-l-8 border-[#0796fe]">
+        <div className="bg-white rounded-xl shadow-xl overflow-hidden border-l-8 border-[#1d4ed8]">
           {/* Header Section */}
           <div className="pt-10 pb-6 px-8 flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-[#e6f4ff] rounded-full flex items-center justify-center mb-5">
@@ -112,7 +112,7 @@ export default function LoginForm() {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-8 h-8 text-[#0796fe]"
+                className="w-8 h-8 text-[#1d4ed8]"
               >
                 <path
                   fillRule="evenodd"
@@ -171,7 +171,7 @@ export default function LoginForm() {
                     placeholder="Enter your email"
                     required
                     disabled={loading}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0796fe] focus:border-transparent text-sm transition-all bg-gray-50/50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-all bg-gray-50/50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -205,17 +205,16 @@ export default function LoginForm() {
                     placeholder="••••••••"
                     required
                     disabled={loading}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0796fe] focus:border-transparent text-sm transition-all bg-gray-50/50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-all bg-gray-50/50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
-                    // Dynamic label: Jab password dikh raha ho toh "Hide password" aur jab chhupa ho toh "Show password"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none disabled:cursor-not-allowed"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-700 focus:outline-none disabled:cursor-not-allowed"
                   >
                     {showPassword ? (
                       <svg
@@ -241,7 +240,7 @@ export default function LoginForm() {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="w-5 h-5"
-                        aria-hidden="true" // SVG ko hide karein
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"

@@ -40,7 +40,7 @@ export default function CompanyDetailsPage() {
   if (loading) {
     return (
       <div className="p-10 flex flex-col items-center justify-center h-full">
-        <div className="w-8 h-8 border-4 border-[#0796fe] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="w-8 h-8 border-4 border-[#1d4ed8] border-t-transparent rounded-full animate-spin mb-4"></div>
         <div className="text-[#092a49] font-medium tracking-wide">
           Loading Company Details...
         </div>
@@ -60,7 +60,7 @@ export default function CompanyDetailsPage() {
       {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center text-sm font-semibold text-gray-500 hover:text-[#0796fe] transition-colors bg-white px-4 py-2 rounded-lg shadow-sm w-fit"
+        className="mb-6 flex items-center text-sm font-semibold text-gray-500 hover:text-[#1d4ed8] transition-colors bg-white px-4 py-2 rounded-lg shadow-sm w-fit"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
