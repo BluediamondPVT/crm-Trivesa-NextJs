@@ -367,7 +367,9 @@ export default function AddClientPage() {
                   <button
                     type="button"
                     onClick={() => removeCommercialCategory(catIdx)}
-                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 p-1.5 bg-white rounded-md shadow-sm border border-red-100"
+                    // Dynamic label se screen reader user ko pata chalega ki wo kaunsi category delete kar raha hai
+                    aria-label={`Remove category ${catIdx + 1}`}
+                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 p-1.5 bg-white rounded-md shadow-sm border border-red-100 focus:ring-2 focus:ring-red-500 transition-colors"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -376,6 +378,7 @@ export default function AddClientPage() {
                       strokeWidth={2}
                       stroke="currentColor"
                       className="w-4 h-4"
+                      aria-hidden="true" // Icon ko accessibility tree se hide karein
                     >
                       <path
                         strokeLinecap="round"
@@ -433,7 +436,9 @@ export default function AddClientPage() {
                           <button
                             type="button"
                             onClick={() => removeSlab(catIdx, slabIdx)}
-                            className="text-gray-400 hover:text-red-500 p-1.5 shrink-0"
+                            // Dynamic label: "Remove Slab 1", "Remove Slab 2", etc.
+                            aria-label={`Remove slab ${slabIdx + 1}`}
+                            className="text-gray-400 hover:text-red-500 p-1.5 shrink-0 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -442,6 +447,7 @@ export default function AddClientPage() {
                               strokeWidth={2}
                               stroke="currentColor"
                               className="w-5 h-5"
+                              aria-hidden="true" 
                             >
                               <path
                                 strokeLinecap="round"
@@ -702,6 +708,7 @@ export default function AddClientPage() {
         <div className="flex justify-end pt-4">
           <button
             type="submit"
+            aria-hidden="true"
             disabled={loading}
             className="bg-[#0796fe] hover:bg-[#0680d9] text-white px-8 py-3 rounded-lg font-bold shadow-lg transition-colors disabled:opacity-50 flex items-center gap-2"
           >

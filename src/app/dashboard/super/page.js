@@ -70,6 +70,7 @@ export default function SuperAdminDashboard() {
                 strokeWidth={2}
                 stroke="currentColor"
                 className="w-6 h-6"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"

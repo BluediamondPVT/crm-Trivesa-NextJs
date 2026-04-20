@@ -211,6 +211,10 @@ export default function LoginForm() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
+                    // Dynamic label: Jab password dikh raha ho toh "Hide password" aur jab chhupa ho toh "Show password"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none disabled:cursor-not-allowed"
                   >
                     {showPassword ? (
@@ -221,6 +225,7 @@ export default function LoginForm() {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="w-5 h-5"
+                        aria-hidden="true" // SVG ko hide karein
                       >
                         <path
                           strokeLinecap="round"
@@ -236,6 +241,7 @@ export default function LoginForm() {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="w-5 h-5"
+                        aria-hidden="true" // SVG ko hide karein
                       >
                         <path
                           strokeLinecap="round"
@@ -257,7 +263,8 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#0796fe] hover:bg-[#0680d9] disabled:bg-blue-300 text-white font-medium py-3 rounded-lg transition-all shadow-md mt-2 disabled:cursor-not-allowed"
+                // bg-[#057ec5] use karne se contrast ratio 4.5:1 ke upar chala jayega
+                className="w-full bg-[#057ec5] hover:bg-[#0680d9] disabled:bg-blue-300 text-white font-medium py-3 rounded-lg transition-all shadow-md mt-2 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>

@@ -328,13 +328,19 @@ export default function AdminDashboard() {
 
                     {/* Actions (View & Delete) */}
                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                      <Link href={`/dashboard/admin/company/${company._id}`}>
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#0796fe] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
-                          View
-                        </button>
+                      {/* Optimized View Link */}
+                      <Link
+                        href={`/dashboard/admin/company/${company._id}`}
+                        aria-label={`View details for ${company.name}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#0796fe] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                      >
+                        View
                       </Link>
+
+                      {/* Optimized Delete Button */}
                       <button
                         onClick={() => handleDelete(company._id, company.name)}
+                        aria-label={`Delete company ${company.name}`}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
                       >
                         Delete
