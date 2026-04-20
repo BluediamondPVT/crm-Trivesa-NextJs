@@ -264,7 +264,7 @@ export default function LoginForm() {
                 type="submit"
                 disabled={loading}
                 // bg-[#057ec5] use karne se contrast ratio 4.5:1 ke upar chala jayega
-                className="w-full bg-[#057ec5] hover:bg-[#0680d9] disabled:bg-blue-300 text-white font-medium py-3 rounded-lg transition-all shadow-md mt-2 disabled:cursor-not-allowed"
+                className="w-full bg-[#1d4ed8] hover:bg-[#1e40af] disabled:bg-blue-300 text-white font-medium py-3 rounded-lg transition-all shadow-md mt-2 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
@@ -273,7 +273,7 @@ export default function LoginForm() {
 
           {/* Footer Area */}
           <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
-            <p className="text-[11px] text-gray-400 font-medium tracking-wide mb-3">
+            <p className="text-[11px] text-gray-600 font-medium tracking-wide mb-3">
               PROTECTED BY TRIVESA SECURE SYSTEM © {new Date().getFullYear()}
             </p>
             <div className="flex justify-center gap-4 text-[11px] text-gray-500">
