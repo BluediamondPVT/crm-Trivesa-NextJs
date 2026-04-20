@@ -3,8 +3,8 @@
  * Handles all API requests with centralized error handling and configuration
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-const API_TIMEOUT = parseInt(process.env.API_TIMEOUT || '10000', 10);
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_TIMEOUT = parseInt(process.env.API_TIMEOUT || "10000", 10);
 
 class APIClient {
   constructor() {
@@ -23,11 +23,12 @@ class APIClient {
     try {
       // Add Authorization header if token exists
       const headers = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       };
 
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
@@ -42,8 +43,8 @@ class APIClient {
 
       // Handle non-JSON responses
       let data;
-      const contentType = response.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType?.includes("application/json")) {
         data = await response.json();
       } else {
         data = await response.text();
@@ -52,14 +53,13 @@ class APIClient {
       // Check if response is ok
       if (!response.ok) {
         throw new APIError(
-          data?.message || 'Request failed',
+          data?.message || "Request failed",
           response.status,
-          data
+          data,
         );
       }
 
       return { success: true, data, status: response.status };
-
     } catch (error) {
       clearTimeout(timeoutId);
 
@@ -67,15 +67,11 @@ class APIClient {
         throw error;
       }
 
-      if (error.name === 'AbortError') {
-        throw new APIError('Request timeout', 408);
+      if (error.name === "AbortError") {
+        throw new APIError("Request timeout", 408);
       }
 
-      throw new APIError(
-        error.message || 'Network error',
-        0,
-        error
-      );
+      throw new APIError(error.message || "Network error", 0, error);
     }
   }
 
@@ -84,7 +80,7 @@ class APIClient {
    */
   async post(endpoint, body, options = {}) {
     return this.request(endpoint, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(body),
       ...options,
     });
@@ -95,7 +91,7 @@ class APIClient {
    */
   async get(endpoint, options = {}) {
     return this.request(endpoint, {
-      method: 'GET',
+      method: "GET",
       ...options,
     });
   }
@@ -105,7 +101,7 @@ class APIClient {
    */
   async put(endpoint, body, options = {}) {
     return this.request(endpoint, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(body),
       ...options,
     });
@@ -116,7 +112,7 @@ class APIClient {
    */
   async delete(endpoint, options = {}) {
     return this.request(endpoint, {
-      method: 'DELETE',
+      method: "DELETE",
       ...options,
     });
   }
@@ -128,7 +124,7 @@ class APIClient {
 class APIError extends Error {
   constructor(message, status, details) {
     super(message);
-    this.name = 'APIError';
+    this.name = "APIError";
     this.status = status;
     this.details = details;
   }
@@ -140,10 +136,9 @@ export const apiClient = new APIClient();
 // Auth API methods
 export const authAPI = {
   login: (email, password) =>
-    apiClient.post('/api/auth/login', { email, password }),
-  
-  verify: () =>
-    apiClient.get('/api/auth/verify'),
+    apiClient.post("/api/auth/login", { email, password }),
+
+  verify: () => apiClient.get("/api/auth/verify"),
 };
 
 export { APIError };

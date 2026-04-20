@@ -1,45 +1,48 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const UserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please provide a valid email",
+      ],
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters'],
-      select: false // Don't return password by default
+      required: [true, "Password is required"],
+      minlength: [6, "Password must be at least 6 characters"],
+      select: false, // Don't return password by default
     },
     role: {
       type: String,
       enum: {
-        values: ['admin', 'superadmin'],
-        message: 'Role must be either admin or superadmin'
+        values: ["admin", "superadmin"],
+        message: "Role must be either admin or superadmin",
       },
-      default: 'admin'
+      default: "admin",
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: true,
     },
     lastLogin: {
       type: Date,
-      default: null
-    }
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Pre-save middleware to hash password if modified
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     return next();
   }
 
@@ -59,9 +62,9 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 
 // ==========================================
 // THE FIX FOR NEXT.JS SERVERLESS:
-// Yeh check karega ki agar 'User' model pehle se bana hua hai, 
+// Yeh check karega ki agar 'User' model pehle se bana hua hai,
 // toh purana use karo, warna naya banao.
 // ==========================================
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default User;

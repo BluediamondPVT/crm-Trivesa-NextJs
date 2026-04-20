@@ -23,7 +23,7 @@ export default function AdminLayout({ children }) {
       return;
     }
 
-    setLoading(false);
+    setTimeout(() => setLoading(false), 0);
   }, [router]);
 
   const handleLogout = () => {
