@@ -14,7 +14,7 @@ export default function ContactPersons({ contactPersons }) {
               <th className="px-6 py-3 font-medium">Phone</th>
               <th className="px-6 py-3 font-medium">Email</th>
               {/* Empty header for the Edit button column */}
-              <th className="px-6 py-3"></th>
+              {/* <th className="px-6 py-3"></th> */}
             </tr>
           </thead>
 
@@ -34,13 +34,13 @@ export default function ContactPersons({ contactPersons }) {
                   {person.phone}
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-600">
-                  {person.email}
+                  {person.email?.toLowerCase()}
                 </td>
-                <td className="px-6 py-4 text-right">
+                {/* <td className="px-6 py-4 text-right">
                   <button className="text-[#1d4ed8] hover:text-[#1e40af] font-medium text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors opacity-0 group-hover:opacity-100">
                     Edit
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

@@ -56,7 +56,7 @@ export default function CompanyInfo({ company }) {
           <span className="text-gray-600 font-semibold w-24 shrink-0">
             Phone:
           </span>
-          <span className="text-gray-800 font-medium">{company.phone}</span>
+          <span className="text-gray-800 font-medium">+91 {company.phone}</span>
         </div>
         <div className="flex items-start gap-3">
           <span className="text-gray-600 font-semibold w-24 shrink-0">

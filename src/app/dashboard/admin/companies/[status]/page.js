@@ -98,7 +98,7 @@ export default function CompanyStatusPage() {
       {/* Back Button */}
       <button
         onClick={() => window.history.back()}
-        className="mb-6 flex items-center text-sm font-semibold text-gray-500 hover:text-[#0796fe] transition-colors bg-white px-4 py-2 rounded-lg shadow-sm w-fit"
+        className="mb-6 flex items-center text-sm cursor-pointer font-semibold text-gray-500 hover:text-[#0796fe] transition-colors bg-white px-4 py-2 rounded-lg shadow-sm w-fit"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
