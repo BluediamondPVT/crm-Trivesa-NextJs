@@ -215,9 +215,9 @@ export default function AddEmployeePage() {
           </div>
         </div>
 
-        {/* Placement Details (Dynamic Dropdowns) */}
+        {/* Interview Details (Dynamic Dropdowns) */}
         <h2 className="text-lg font-bold text-[#092a49] border-b pb-2 pt-4">
-          Placement Details
+          Interview Details
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
           {/* Company Dropdown */}
