@@ -343,7 +343,7 @@ export default function AddEmployeePage() {
           </button>
 
           {/* Save / Submit Button */}
-          <a
+          <button
             type="submit"
             disabled={loading}
             className="w-full sm:w-auto px-10 py-3 bg-[#092a49] text-white font-bold rounded-xl shadow-lg hover:bg-[#1d4ed8] transition-all duration-300 disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
@@ -361,7 +361,7 @@ export default function AddEmployeePage() {
                 <span className="text-white">Save Employee</span>
               </>
             )}
-          </a>
+          </button>
           
         </div>
       </form>

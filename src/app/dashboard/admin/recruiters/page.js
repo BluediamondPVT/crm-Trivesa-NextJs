@@ -1,4 +1,3 @@
-// src/app/dashboard/admin/recruiters/page.js
 "use client";
 
 import Link from "next/link";
@@ -36,7 +35,6 @@ export default function RecruiterDashboard() {
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
     try {
-      // Create this delete route later just like you did for companies
       await axios.delete(`/api/employees/${id}`);
       setEmployees(employees.filter(emp => emp._id !== id));
       toast.success("Employee deleted");
@@ -46,7 +44,7 @@ export default function RecruiterDashboard() {
   };
 
   // Filter logic based on tab
-  const filteredData = activeTab === "LineUp" 
+  const filteredData = activeTab === "All" 
     ? employees 
     : employees.filter(emp => emp.status === activeTab);
 
@@ -59,7 +57,7 @@ export default function RecruiterDashboard() {
           <h1 className="text-3xl font-bold text-[#092a49]">Recruiters / LineUps</h1>
           <p className="text-gray-500 mt-1">Manage employee pipelines and attendance</p>
         </div>
-        <Link href="/dashboard/admin/recruiters/add" className="bg-[#183e61] text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-[#061a2e] shadow-sm">
+        <Link href="/dashboard/admin/recruiters/add" className="bg-[#183e61] text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-[#061a2e] shadow-sm transition-colors">
           + Add Employee
         </Link>
       </div>
@@ -86,7 +84,7 @@ export default function RecruiterDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-225">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-800 uppercase">
+              <tr className="bg-gray-50/80 border-b border-gray-100 text-xs text-gray-800 uppercase tracking-wider">
                 <th className="px-6 py-4">Employee Details</th>
                 <th className="px-6 py-4">Contact</th>
                 <th className="px-6 py-4">Placement Company</th>
@@ -95,40 +93,55 @@ export default function RecruiterDashboard() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="text-sm divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan="6" className="text-center py-10 font-bold">Loading...</td></tr>
+                <tr><td colSpan="6" className="text-center py-10 font-bold text-[#092a49]">Loading Employees...</td></tr>
               ) : filteredData.length > 0 ? (
                 filteredData.map(emp => (
-                  <tr key={emp._id} className="hover:bg-blue-50/50">
+                  <tr 
+                    key={emp._id} 
+                    // NAYA: Zebra (even:bg-gray-50/50) and Hover (hover:bg-[#e6f4ff]) Add kiya hai
+                    className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group"
+                  >
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800">{emp.name}</div>
-                      <div className="text-xs text-gray-600 mt-0.5">Exp: {emp.experience || 'N/A'}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">Exp: {emp.experience || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      <div>+91 {emp.phone}</div>
-                      <div className="text-xs">{emp.email || 'N/A'}</div>
+                    <td className="px-6 py-4 text-sm text-gray-800">
+                      <div className="font-medium whitespace-nowrap"> {emp.phone}</div>
+                      <div className="text-s mt-0.5 truncate max-w-37.5"> {emp.email || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-[#092a49]">{emp.assignedCompanyName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{emp.assignedProcess}</td>
+                    <td className="px-6 py-4 font-bold text-[#092a49]">{emp.assignedCompanyName}</td>
+                    <td className="px-6 py-4 text-sm text-gray-800">{emp.assignedProcess}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs font-bold rounded-full 
-                        ${emp.status === 'Selected' ? 'bg-green-100 text-green-700' : ''}
-                        ${emp.status === 'Rejected' ? 'bg-red-100 text-red-700' : ''}
-                        ${emp.status === 'Attendance' ? 'bg-orange-100 text-orange-700' : ''}
-                        ${emp.status === 'LineUp' ? 'bg-blue-100 text-blue-700' : ''}
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border 
+                        ${emp.status === 'Selected' ? 'bg-green-50 text-green-700 border-green-200' : ''}
+                        ${emp.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' : ''}
+                        ${emp.status === 'Attendance' ? 'bg-orange-50 text-orange-700 border-orange-200' : ''}
+                        ${emp.status === 'LineUp' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
                       `}>
                         {emp.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button className="px-3 py-1.5 cursor-pointer text-blue-600 bg-blue-50 rounded-md text-xs font-bold">View</button>
-                      <button onClick={() => handleDelete(emp._id, emp.name)} className="px-3 py-1.5 text-red-600 bg-red-50 rounded-md cursor-pointer text-xs font-bold">Edit</button>
+                    <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                      {/* Edit Button theek kiya aur Link banaya */}
+                      <Link href={`/dashboard/admin/recruiters/${emp._id}`}>
+                        <button className="px-3 py-1.5 cursor-pointer text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-md text-xs font-bold transition-colors">
+                          View 
+                        </button>
+                      </Link>
+                      {/* Delete Button theek kiya */}
+                      <button 
+                        onClick={() => handleDelete(emp._id, emp.name)} 
+                        className="px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-md cursor-pointer text-xs font-bold transition-colors"
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan="6" className="text-center py-10 text-gray-500 italic">No {activeTab} employees found.</td></tr>
+                <tr><td colSpan="6" className="text-center py-10 text-gray-400 italic">No {activeTab} employees found.</td></tr>
               )}
             </tbody>
           </table>
