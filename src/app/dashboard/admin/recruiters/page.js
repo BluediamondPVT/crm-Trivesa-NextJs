@@ -11,9 +11,9 @@ export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   
   // Tab State
-  const [activeTab, setActiveTab] = useState("All"); 
+  const [activeTab, setActiveTab] = useState("LineUp"); 
 
-  const tabs = ["All (LineUp)", "Attendance", "Selected", "Rejected"];
+  const tabs = ["All", "LineUp", "Attendance", "Selected", "Rejected"];
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -46,7 +46,7 @@ export default function RecruiterDashboard() {
   };
 
   // Filter logic based on tab
-  const filteredData = activeTab === "All" 
+  const filteredData = activeTab === "LineUp" 
     ? employees 
     : employees.filter(emp => emp.status === activeTab);
 
@@ -84,9 +84,9 @@ export default function RecruiterDashboard() {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[900px]">
+          <table className="w-full text-left border-collapse min-w-225">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase">
+              <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-800 uppercase">
                 <th className="px-6 py-4">Employee Details</th>
                 <th className="px-6 py-4">Contact</th>
                 <th className="px-6 py-4">Placement Company</th>
@@ -103,13 +103,13 @@ export default function RecruiterDashboard() {
                   <tr key={emp._id} className="hover:bg-blue-50/50">
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800">{emp.name}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">Exp: {emp.experience || 'N/A'}</div>
+                      <div className="text-xs text-gray-600 mt-0.5">Exp: {emp.experience || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      <div>📞 {emp.phone}</div>
-                      <div className="text-xs">✉️ {emp.email || 'N/A'}</div>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div>+91 {emp.phone}</div>
+                      <div className="text-xs">{emp.email || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-[#092a49]">{emp.assignedCompanyName}</td>
+                    <td className="px-6 py-4 font-medium text-[#092a49]">{emp.assignedCompanyName}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{emp.assignedProcess}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 text-xs font-bold rounded-full 
@@ -122,8 +122,8 @@ export default function RecruiterDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                      <button className="px-3 py-1.5 text-blue-600 bg-blue-50 rounded-md text-xs font-bold">View</button>
-                      <button onClick={() => handleDelete(emp._id, emp.name)} className="px-3 py-1.5 text-red-600 bg-red-50 rounded-md text-xs font-bold">Delete</button>
+                      <button className="px-3 py-1.5 cursor-pointer text-blue-600 bg-blue-50 rounded-md text-xs font-bold">View</button>
+                      <button onClick={() => handleDelete(emp._id, emp.name)} className="px-3 py-1.5 text-red-600 bg-red-50 rounded-md cursor-pointer text-xs font-bold">Edit</button>
                     </td>
                   </tr>
                 ))
