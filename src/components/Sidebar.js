@@ -3,14 +3,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar({
   isSidebarOpen,
   setIsSidebarOpen,
   handleLogout,
 }) {
-  // State to handle the "Recruiter" dropdown toggle
-  const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
+  const pathname = usePathname();
+
+  // State only for Client dropdown now
+  const [isClientOpen, setIsClientOpen] = useState(false);
 
   const sidebarVariants = {
     hidden: {
@@ -30,14 +33,12 @@ export default function Sidebar({
     hover: { x: 4, transition: { duration: 0.2, ease: "easeOut" } },
   };
 
-  // Sub-menu animation variants
   const subMenuVariants = {
     closed: { height: 0, opacity: 0, transition: { duration: 0.2 } },
     open: { height: "auto", opacity: 1, transition: { duration: 0.3 } },
   };
 
-  const recruiterSubItems = [
-    // href add kiya hai sabme
+  const clientSubItems = [
     {
       name: "All Clients",
       color: "bg-yellow-700",
@@ -65,6 +66,12 @@ export default function Sidebar({
     },
   ];
 
+  const handleMobileClose = () => {
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -80,17 +87,15 @@ export default function Sidebar({
       </AnimatePresence>
 
       <motion.aside
-        // ADDED: h-screen to strictly enforce 100vh height
         className="fixed inset-y-0 left-0 z-50 w-64 h-screen bg-[#092a49] text-white flex flex-col shadow-2xl md:relative md:transform-none! md:opacity-100!"
         variants={sidebarVariants}
         initial="hidden"
         animate={isSidebarOpen ? "visible" : "hidden"}
       >
-        {/* Logo Section */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
-          {/* NAYA CODE: Yahan maine <Link> lagaya hai */}
           <Link
             href="/dashboard/admin"
+            onClick={handleMobileClose}
             className="flex items-center cursor-pointer group"
           >
             <div className="bg-white text-[#092a49] p-1.5 rounded-lg mr-3 group-hover:scale-105 transition-transform">
@@ -114,7 +119,7 @@ export default function Sidebar({
 
           <button
             onClick={() => setIsSidebarOpen(false)}
-            aria-label="Close sidebar menu"
+            aria-label="Close sidebar"
             className="md:hidden text-gray-300 hover:text-white p-2"
           >
             <svg
@@ -124,7 +129,6 @@ export default function Sidebar({
               strokeWidth={2}
               stroke="currentColor"
               className="w-6 h-6"
-              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -135,13 +139,14 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Navigation - Added overflow-y-auto so the menu scrolls if it gets too long, keeping the height intact */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          {/* Dashboard Item */}
-
-          <Link href="/dashboard/admin">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <Link
+            href="/dashboard/admin"
+            onClick={handleMobileClose}
+            className="block"
+          >
             <motion.div
-              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white border-l-4 border-[#1d4ed8] cursor-pointer"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${pathname === "/dashboard/admin" ? "bg-white/10 text-white border-l-4 border-[#1d4ed8]" : "text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent"}`}
               variants={navItemVariants}
               whileHover="hover"
             >
@@ -168,11 +173,10 @@ export default function Sidebar({
             </motion.div>
           </Link>
 
-          {/* Recruiter Dropdown Group */}
           <div>
             <motion.button
-              onClick={() => setIsRecruiterOpen(!isRecruiterOpen)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all border-l-4 border-transparent hover:bg-white/5 text-gray-300 hover:text-white`}
+              onClick={() => setIsClientOpen(!isClientOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all border-l-4 border-transparent hover:bg-white/5 text-gray-300 hover:text-white"
               variants={navItemVariants}
               whileHover="hover"
             >
@@ -194,7 +198,7 @@ export default function Sidebar({
                 <span className="font-medium text-sm">Clients</span>
               </div>
               <motion.svg
-                animate={{ rotate: isRecruiterOpen ? 180 : 0 }}
+                animate={{ rotate: isClientOpen ? 180 : 0 }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -210,9 +214,8 @@ export default function Sidebar({
               </motion.svg>
             </motion.button>
 
-            {/* Animated Sub-menu */}
             <AnimatePresence>
-              {isRecruiterOpen && (
+              {isClientOpen && (
                 <motion.div
                   variants={subMenuVariants}
                   initial="closed"
@@ -220,10 +223,15 @@ export default function Sidebar({
                   exit="closed"
                   className="overflow-hidden ml-6 mt-1 space-y-1 border-l border-white/10"
                 >
-                  {recruiterSubItems.map((sub, idx) => (
-                    <Link key={idx} href={sub.href}>
+                  {clientSubItems.map((sub, idx) => (
+                    <Link
+                      key={idx}
+                      href={sub.href}
+                      onClick={handleMobileClose}
+                      className="block"
+                    >
                       <motion.div
-                        className="flex items-center gap-3 px-6 py-2 text-sm font-medium text-gray-600 hover:text-white hover:bg-white/5 rounded-r-lg transition-all cursor-pointer"
+                        className={`flex items-center gap-3 px-6 py-2 text-sm font-medium hover:text-white hover:bg-white/5 rounded-r-lg transition-all ${pathname === sub.href ? "text-white bg-white/5" : "text-gray-400"}`}
                         whileHover={{ x: 5 }}
                       >
                         <span
@@ -237,32 +245,58 @@ export default function Sidebar({
               )}
             </AnimatePresence>
           </div>
+
+          <Link
+            href="/dashboard/admin/recruiters"
+            onClick={handleMobileClose}
+            className="block"
+          >
+            <motion.div
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${pathname.includes("/dashboard/admin/recruiters") ? "bg-white/10 text-white border-l-4 border-[#1d4ed8]" : "text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent"}`}
+              variants={navItemVariants}
+              whileHover="hover"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+                />
+              </svg>
+              <span className="font-medium text-sm">Recruiter</span>
+            </motion.div>
+          </Link>
         </nav>
 
-        {/* Logout Section */}
         <div className="p-4 mb-4 shrink-0">
-        <button
-  onClick={handleLogout}
-  
-  className="w-full flex items-center gap-3 text-gray-300 hover:bg-red-500/10 hover:text-red-400 px-4 py-3 rounded-xl transition-all border-l-4 border-transparent focus:outline-none focus:ring-2 focus:ring-red-500/50"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-5 h-5"
-    aria-hidden="true" 
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
-    />
-  </svg>
-  <span className="font-medium text-sm">Logout</span>
-</button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 text-gray-300 hover:bg-red-500/10 hover:text-red-400 px-4 py-3 rounded-xl transition-all border-l-4 border-transparent focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+              />
+            </svg>
+            <span className="font-medium text-sm">Logout</span>
+          </button>
         </div>
       </motion.aside>
     </>
