@@ -1,4 +1,3 @@
-// src/app/dashboard/admin/recruiters/view/[id]/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -128,6 +127,7 @@ export default function ViewEmployeePage() {
             ${employee.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" : ""}
             ${employee.status === "Attendees" ? "bg-orange-50 text-orange-700 border-orange-200" : ""}
             ${employee.status === "LineUp" ? "bg-blue-50 text-blue-700 border-blue-200" : ""}
+            ${employee.status === "On Hold" ? "bg-yellow-50 text-yellow-700 border-yellow-300" : ""}
           `}
           >
             {employee.status}
@@ -310,6 +310,32 @@ export default function ViewEmployeePage() {
                 </p>
               </div>
             </div>
+
+            {/* Conditional Remark Viewer for On Hold */}
+            {employee.status === "On Hold" && employee.remark && (
+              <div className="md:col-span-3 mt-4 p-5 bg-yellow-50/80 border border-yellow-200 rounded-xl">
+                <p className="text-xs font-bold text-yellow-700 tracking-wider uppercase mb-2 flex items-center gap-1.5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z"
+                    />
+                  </svg>
+                  Hold Reason (Remark)
+                </p>
+                <p className="text-sm font-bold text-yellow-900">
+                  {employee.remark}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

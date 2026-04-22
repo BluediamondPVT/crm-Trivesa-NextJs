@@ -17,9 +17,10 @@ export default function RecruiterStatusPage() {
   // URL status ko Database status se match karne ka map
   const statusMap = {
     lineup: "LineUp",
-    attendees: "Attendees", // Fixed spelling
+    attendees: "Attendees",
     selected: "Selected",
     rejected: "Rejected",
+    "on-hold": "On Hold", 
   };
 
   const currentStatus = statusMap[rawStatus] || "LineUp";
@@ -64,6 +65,7 @@ export default function RecruiterStatusPage() {
     if (currentStatus === "Attendees") return "border-[#ea580c] text-[#ea580c]";
     if (currentStatus === "Selected") return "border-[#16a34a] text-[#16a34a]";
     if (currentStatus === "Rejected") return "border-[#dc2626] text-[#dc2626]";
+    if (currentStatus === "On Hold") return "border-[#eab308] text-[#eab308]"; // YELLOW
     return "border-[#092a49] text-[#092a49]";
   };
 

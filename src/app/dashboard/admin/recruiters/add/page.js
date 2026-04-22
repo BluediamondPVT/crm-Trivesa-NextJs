@@ -314,7 +314,7 @@ export default function AddEmployeePage() {
                   LineUp
                 </div>
 
-                {['Attendees', 'Selected', 'Rejected'].map((statusOption) => (
+                {['Attendees', 'On Hold', 'Selected', 'Rejected'].map((statusOption) => (
                   <div 
                     key={statusOption} 
                     className="flex items-center gap-2 p-1 bg-gray-50 opacity-60 cursor-not-allowed text-gray-500 border-t border-gray-100"
