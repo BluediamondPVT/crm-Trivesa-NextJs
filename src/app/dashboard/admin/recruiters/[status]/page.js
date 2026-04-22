@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export default function RecruiterStatusPage() {
   const params = useParams();
   const router = useRouter();
-  const rawStatus = params.status; // URL se aayega: 'lineup', 'attendance', 'selected', 'rejected'
+  const rawStatus = params.status;
 
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ export default function RecruiterStatusPage() {
   // URL status ko Database status se match karne ka map
   const statusMap = {
     lineup: "LineUp",
-    attendance: "Attendance",
+    attendees: "Attendees", // Fixed spelling
     selected: "Selected",
     rejected: "Rejected",
   };
@@ -60,10 +60,10 @@ export default function RecruiterStatusPage() {
 
   // Header Colors based on Status
   const getHeaderStyle = () => {
-    if (currentStatus === "LineUp") return "border-[#1d4ed8] text-[#1d4ed8]"; // Blue
-    if (currentStatus === "Attendance") return "border-[#ea580c] text-[#ea580c]"; // Orange
-    if (currentStatus === "Selected") return "border-[#16a34a] text-[#16a34a]"; // Green
-    if (currentStatus === "Rejected") return "border-[#dc2626] text-[#dc2626]"; // Red
+    if (currentStatus === "LineUp") return "border-[#1d4ed8] text-[#1d4ed8]";
+    if (currentStatus === "Attendees") return "border-[#ea580c] text-[#ea580c]";
+    if (currentStatus === "Selected") return "border-[#16a34a] text-[#16a34a]";
+    if (currentStatus === "Rejected") return "border-[#dc2626] text-[#dc2626]";
     return "border-[#092a49] text-[#092a49]";
   };
 
@@ -134,16 +134,18 @@ export default function RecruiterStatusPage() {
                       {emp.assignedProcess || 'N/A'}
                     </td>
                     
-                    <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
-                      <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-all border border-blue-200 shadow-sm cursor-pointer whitespace-nowrap">
-                        View
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(emp._id, emp.name)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-all border border-red-200 shadow-sm cursor-pointer whitespace-nowrap"
-                      >
-                        Delete
-                      </button>
+                   {/* // Sirf Actions wale <td> ko isse replace kar do table body mein */}
+                    <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                      <Link href={`/dashboard/admin/recruiters/view/${emp._id}`}>
+                        <button className="px-4 py-1.5 cursor-pointer text-[#092a49] bg-gray-100 hover:bg-gray-200 rounded-md text-xs font-bold transition-colors">
+                          View
+                        </button>
+                      </Link>
+                      <Link href={`/dashboard/admin/recruiters/edit/${emp._id}`}>
+                        <button className="px-4 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer text-xs font-bold transition-colors">
+                          Edit
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 ))

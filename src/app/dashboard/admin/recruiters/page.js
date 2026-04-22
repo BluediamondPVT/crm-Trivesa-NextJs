@@ -12,7 +12,7 @@ export default function RecruiterDashboard() {
   // Tab State
   const [activeTab, setActiveTab] = useState("LineUp"); 
 
-  const tabs = ["All", "LineUp", "Attendance", "Selected", "Rejected"];
+  const tabs = ["All", "LineUp", "Attendees", "Selected", "Rejected"];
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -55,7 +55,7 @@ export default function RecruiterDashboard() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#092a49]">Recruiters / LineUps</h1>
-          <p className="text-gray-500 mt-1">Manage employee pipelines and attendance</p>
+          <p className="text-gray-500 mt-1">Manage employee pipelines and Attendees</p>
         </div>
         <Link href="/dashboard/admin/recruiters/add" className="bg-[#183e61] text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-[#061a2e] shadow-sm transition-colors">
           + Add Employee
@@ -82,9 +82,11 @@ export default function RecruiterDashboard() {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-225">
+          <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-100 text-xs text-gray-800 uppercase tracking-wider">
+              <tr className="bg-gray-50/80 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
+                {/* NAYA: ID Column Header Add Kiya */}
+                <th className="px-6 py-4 w-12 text-center">ID</th>
                 <th className="px-6 py-4">Employee Details</th>
                 <th className="px-6 py-4">Contact</th>
                 <th className="px-6 py-4">Placement Company</th>
@@ -95,53 +97,54 @@ export default function RecruiterDashboard() {
             </thead>
             <tbody className="text-sm divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan="6" className="text-center py-10 font-bold text-[#092a49]">Loading Employees...</td></tr>
+                <tr><td colSpan="7" className="text-center py-10 font-bold text-[#092a49]">Loading Employees...</td></tr>
               ) : filteredData.length > 0 ? (
-                filteredData.map(emp => (
+                filteredData.map((emp, index) => (
                   <tr 
                     key={emp._id} 
-                    // NAYA: Zebra (even:bg-gray-50/50) and Hover (hover:bg-[#e6f4ff]) Add kiya hai
                     className="border-b border-gray-50 even:bg-gray-50/50 hover:bg-[#e6f4ff] transition-colors duration-200 group"
                   >
+                    {/* NAYA: Index Column Data (1, 2, 3...) */}
+                    <td className="px-6 py-4 font-bold text-gray-400 text-center">
+                      {index + 1}
+                    </td>
+                    
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800">{emp.name}</div>
                       <div className="text-xs text-gray-500 mt-0.5">Exp: {emp.experience || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-800">
-                      <div className="font-medium whitespace-nowrap"> {emp.phone}</div>
-                      <div className="text-s mt-0.5 truncate max-w-37.5"> {emp.email || 'N/A'}</div>
+                    <td className="px-6 py-4 text-m text-gray-800">
+                      <div className="font-medium whitespace-nowrap">{emp.phone}</div>
+                      <div className="text-xs mt-0.5 truncate max-w-37.5">{emp.email || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 font-bold text-[#092a49]">{emp.assignedCompanyName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-800">{emp.assignedProcess}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{emp.assignedProcess}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border 
                         ${emp.status === 'Selected' ? 'bg-green-50 text-green-700 border-green-200' : ''}
                         ${emp.status === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' : ''}
-                        ${emp.status === 'Attendance' ? 'bg-orange-50 text-orange-700 border-orange-200' : ''}
+                        ${emp.status === 'Attendees' ? 'bg-orange-50 text-orange-700 border-orange-200' : ''}
                         ${emp.status === 'LineUp' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
                       `}>
                         {emp.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                      {/* Edit Button theek kiya aur Link banaya */}
-                      <Link href={`/dashboard/admin/recruiters/${emp._id}`}>
-                        <button className="px-3 py-1.5 cursor-pointer text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-md text-xs font-bold transition-colors">
-                          View 
+                      <Link href={`/dashboard/admin/recruiters/view/${emp._id}`}>
+                        <button className="px-4 py-1.5 cursor-pointer text-[#092a49] bg-gray-100 hover:bg-gray-200 rounded-md text-xs font-bold transition-colors">
+                          View
                         </button>
                       </Link>
-                      {/* Delete Button theek kiya */}
-                      <button 
-                        onClick={() => handleDelete(emp._id, emp.name)} 
-                        className="px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 rounded-md cursor-pointer text-xs font-bold transition-colors"
-                      >
-                        Edit
-                      </button>
+                      <Link href={`/dashboard/admin/recruiters/edit/${emp._id}`}>
+                        <button className="px-4 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer text-xs font-bold transition-colors">
+                          Edit
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan="6" className="text-center py-10 text-gray-400 italic">No {activeTab} employees found.</td></tr>
+                <tr><td colSpan="7" className="text-center py-10 text-gray-400 italic">No {activeTab} employees found.</td></tr>
               )}
             </tbody>
           </table>

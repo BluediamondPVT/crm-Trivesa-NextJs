@@ -14,12 +14,13 @@ const EmployeeSchema = new mongoose.Schema(
     // Linked Company & Process
     assignedCompanyId: { type: String },
     assignedCompanyName: { type: String },
-    assignedProcess: { type: String }, // Ye opening ka title hoga
+    assignedProcess: { type: String },
+    interviewDate: { type: String },
     
     // Status Tabs ke liye
     status: { 
       type: String, 
-      enum: ["LineUp", "Attendance", "Selected", "Rejected"], 
+      enum: ["LineUp", "Attendees", "Selected", "Rejected"], 
       default: "LineUp" 
     },
   },

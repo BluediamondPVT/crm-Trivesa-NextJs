@@ -25,10 +25,10 @@ export default function AddEmployeePage() {
     assignedCompanyId: "",
     assignedCompanyName: "",
     assignedProcess: "",
+    interviewDate: "", // NAYA FIELD ADD KIYA
     status: "LineUp", // Default status is always LineUp on creation
   });
 
-  // Ye nayi state add kar form data ke theek neeche
   const [isStatusOpen, setIsStatusOpen] = useState(false);
 
   // 1. Fetch only ACTIVE companies on page load
@@ -51,7 +51,7 @@ export default function AddEmployeePage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- // 2. Magic Logic: Jab company select ho, toh uski details aur uske ACTIVE openings set karo
+  // 2. Magic Logic: Jab company select ho, toh uski details aur uske ACTIVE openings set karo
   const handleCompanyChange = (e) => {
     const compId = e.target.value;
     const selectedCompany = activeCompanies.find((c) => c._id === compId);
@@ -60,22 +60,17 @@ export default function AddEmployeePage() {
       ...formData,
       assignedCompanyId: compId,
       assignedCompanyName: selectedCompany ? selectedCompany.name : "",
-      assignedProcess: "", // Process clear kardo taaki purani job na reh jaye
+      assignedProcess: "", 
     });
 
-    // NAYA LOGIC: Filter only ACTIVE openings based on expiryDate
     if (selectedCompany && selectedCompany.openings) {
-      // Aaj ki date nikalo aur time zero kar do exact comparison ke liye
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       const activeOnlyOpenings = selectedCompany.openings.filter((op) => {
-        // Agar expiry date nahi daali hai, toh hum usko hamesha Active manenge
         if (!op.expiryDate) return true; 
-        
-        // Expiry date ko format karo aur check karo
         const expDate = new Date(op.expiryDate);
-        return expDate >= today; // Agar expiry aaj ya aage ki hai, toh hi dropdown mein dikhao
+        return expDate >= today; 
       });
 
       setAvailableOpenings(activeOnlyOpenings);
@@ -215,11 +210,13 @@ export default function AddEmployeePage() {
           </div>
         </div>
 
-        {/* Interview Details (Dynamic Dropdowns) */}
+        {/* Interview Details (Dynamic Dropdowns & Date) */}
         <h2 className="text-lg font-bold text-[#092a49] border-b pb-2 pt-4">
           Interview Details
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+        {/* NAYA: Grid ko md:grid-cols-2 kar diya taaki 4 items mast 2x2 layout mein baithein */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+          
           {/* Company Dropdown */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -230,7 +227,7 @@ export default function AddEmployeePage() {
               name="assignedCompanyId"
               value={formData.assignedCompanyId}
               onChange={handleCompanyChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
             >
               <option value="">-- Choose Active Client --</option>
               {activeCompanies.map((c) => (
@@ -252,7 +249,7 @@ export default function AddEmployeePage() {
               value={formData.assignedProcess}
               onChange={handleChange}
               disabled={!formData.assignedCompanyId}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 outline-none"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 outline-none bg-white"
             >
               <option value="">-- Select Opening --</option>
               {availableOpenings.map((op, idx) => (
@@ -263,20 +260,32 @@ export default function AddEmployeePage() {
             </select>
           </div>
 
-          {/* Status Dropdown (LOCKED FOR ADD MODE) */}
-        {/* Custom Status Dropdown (LOCKED FOR ADD MODE WITH SVGs) */}
+          {/* NAYA: Interview Date Field */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Interview Date *
+            </label>
+            <input
+              required
+              type="date"
+              name="interviewDate"
+              value={formData.interviewDate}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+            />
+          </div>
+
+          {/* Custom Status Dropdown (LOCKED FOR ADD MODE WITH SVGs) */}
           <div className="relative">
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Current Status
             </label>
             
-            {/* Dropdown Trigger Button */}
             <div
               onClick={() => setIsStatusOpen(!isStatusOpen)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 font-bold text-[#092a49] bg-white outline-none cursor-pointer flex justify-between items-center"
             >
               <div className="flex items-center gap-2">
-                {/* Green Check SVG for LineUp */}
                 {formData.status === "LineUp" && (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-green-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -285,20 +294,15 @@ export default function AddEmployeePage() {
                 <span>{formData.status}</span>
               </div>
               
-              {/* Arrow Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isStatusOpen ? 'rotate-180' : ''}`}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </svg>
             </div>
 
-            {/* Dropdown Options Menu */}
             {isStatusOpen && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
-                
-                {/* Active Option (LineUp) */}
                 <div
                   onClick={() => {
-                    // Custom handleChange trigger
                     handleChange({ target: { name: 'status', value: 'LineUp' } });
                     setIsStatusOpen(false);
                   }}
@@ -310,30 +314,24 @@ export default function AddEmployeePage() {
                   LineUp
                 </div>
 
-                {/* Locked Options */}
-                {['Attendance', 'Selected', 'Rejected'].map((statusOption) => (
+                {['Attendees', 'Selected', 'Rejected'].map((statusOption) => (
                   <div 
                     key={statusOption} 
                     className="flex items-center gap-2 p-1 bg-gray-50 opacity-60 cursor-not-allowed text-gray-500 border-t border-gray-100"
                   >
-                    {/* Lock SVG */}
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-gray-600">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                     </svg>
                     {statusOption} (Edit later)
                   </div>
                 ))}
-                
               </div>
             )}
           </div>
         </div>
 
-        {/* Submit Button Section */}
-      {/* Submit & Cancel Button Section */}
+        {/* Submit & Cancel Button Section */}
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-10 border-t border-gray-200 mt-12 pb-10">
-          
-          {/* Cancel Button */}
           <button
             type="button"
             onClick={() => router.back()}
@@ -342,7 +340,6 @@ export default function AddEmployeePage() {
             Cancel
           </button>
 
-          {/* Save / Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -362,7 +359,6 @@ export default function AddEmployeePage() {
               </>
             )}
           </button>
-          
         </div>
       </form>
     </div>
