@@ -10,17 +10,25 @@ const EmployeeSchema = new mongoose.Schema(
     experience: { type: String },
     lastSalary: { type: String },
     expectedSalary: { type: String },
-
+    actualSalary: { type: String },
+    
     assignedCompanyId: { type: String },
     assignedCompanyName: { type: String },
     assignedProcess: { type: String },
     interviewDate: { type: String },
-
     remark: { type: String },
 
+    // NAYA: "Joining" add kiya
     status: {
       type: String,
-      enum: ["LineUp", "Attendees", "Selected", "Rejected", "On Hold"],
+      enum: [
+        "LineUp",
+        "Attendees",
+        "Selected",
+        "Rejected",
+        "On Hold",
+        "Joining",
+      ],
       default: "LineUp",
     },
   },
