@@ -28,22 +28,30 @@ export default function RecruiterDashboard() {
     "Payout",
   ];
 
-  const fetchEmployees = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/api/employees");
-      if (response.data.success) {
-        setEmployees(response.data.data);
-      }
-    } catch (error) {
-      toast.error("Failed to load data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // NAYA: Ek hi solid useEffect jo sab handle karega (Fetch + Filter + Loading)
   useEffect(() => {
-    fetchEmployees();
+    const fetchData = async () => {
+      setLoading(true); // Fetch shuru hone se pehle loading ON
+      try {
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("role");
+
+        const res = await axios.get(
+          `/api/employees?userId=${userId}&role=${role}`,
+        );
+
+        if (res.data.success) {
+          setEmployees(res.data.data);
+        }
+      } catch (error) {
+        console.error("Data fetch error:", error);
+        toast.error("Failed to load candidates data");
+      } finally {
+        setLoading(false); // Data aane ke baad (ya error ke baad) loading OFF
+      }
+    };
+
+    fetchData();
   }, []);
 
   const filteredData =

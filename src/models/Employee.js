@@ -15,14 +15,15 @@ const EmployeeSchema = new mongoose.Schema(
     lastSalary: { type: String },
     expectedSalary: { type: String },
     actualSalary: { type: String },
-    
+
     assignedCompanyId: { type: String },
     assignedCompanyName: { type: String },
     assignedProcess: { type: String },
     interviewDate: { type: String },
     remark: { type: String },
 
-    // NAYA: "Joining" add kiya
+    addedBy: { type: String },
+
     status: {
       type: String,
       enum: [

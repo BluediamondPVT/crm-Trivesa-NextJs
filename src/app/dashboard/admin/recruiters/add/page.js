@@ -85,14 +85,25 @@ export default function AddEmployeePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const res = await axios.post("/api/employees", formData);
+      // NAYA: Local storage se current logged-in user ki ID nikaalo
+      const currentUserId = localStorage.getItem("userId");
+      
+      // Data bhejte waqt usme 'addedBy' field chipka do
+      const dataToSubmit = {
+        ...formData,
+        addedBy: currentUserId 
+      };
+
+      const res = await axios.post("/api/employees", dataToSubmit);
+      
       if (res.data.success) {
-        toast.success("Candidate Added to LineUp Successfully!");
+        toast.success("Candidate Added!");
         router.push("/dashboard/admin/recruiters");
       }
     } catch (error) {
-      toast.error("Network Error. Is Backend Running?");
+      toast.error("Failed to add candidate");
     } finally {
       setLoading(false);
     }
