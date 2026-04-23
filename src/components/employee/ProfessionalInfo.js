@@ -1,141 +1,88 @@
-// src/components/employee/ProfessionalInfo.js
-export default function ProfessionalInfo({ employee, formattedDate }) {
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Experience & Salary */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-sm font-bold text-gray-400 tracking-wider uppercase mb-6 border-b border-gray-50 pb-3">
-          Professional Details
-        </h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-            <span className="text-xs font-bold text-gray-500 uppercase">
-              Experience
-            </span>
-            <span className="font-bold text-[#092a49]">
-              {employee.experience || "Fresher / N/A"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-            <span className="text-xs font-bold text-gray-500 uppercase">
-              Last Salary
-            </span>
-            <span className="font-bold text-[#092a49]">
-              ₹ {employee.lastSalary || "N/A"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between bg-[#e6f4ff] p-3 rounded-lg border border-blue-100">
-            <span className="text-xs font-bold text-blue-800 uppercase">
-              Expected Salary
-            </span>
-            <span className="font-extrabold text-[#1d4ed8]">
-              ₹ {employee.expectedSalary || "N/A"}
-            </span>
-          </div>
+"use client";
 
-          {/* NAYA: Actual Salary Show karega agar Joining pe hai */}
-          {employee.status === "Joining" && employee.actualSalary && (
-            <div className="flex items-center justify-between bg-teal-50 p-3 rounded-lg border border-teal-200 mt-2">
-              <span className="text-xs font-bold text-teal-800 uppercase flex items-center gap-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-                Final / Actual Salary
-              </span>
-              <span className="font-extrabold text-teal-700 text-lg">
-                ₹ {employee.actualSalary}
-              </span>
-            </div>
-          )}
-        </div>
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
+import axios from "axios";
+
+// Components Import
+import ProfileHeader from "@/components/employee/ProfileHeader";
+import ContactInfo from "@/components/employee/ContactInfo";
+import ProfessionalDetailsView from "@/components/employee/ProfessionalDetailsView";
+import PlacementAssignmentView from "@/components/employee/PlacementAssignmentView";
+
+export default function ViewEmployeePage() {
+  const router = useRouter();
+  const { id } = useParams();
+
+  const [employee, setEmployee] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEmployee = async () => {
+      try {
+        const res = await axios.get(`/api/employees/${id}`);
+        if (res.data.success) {
+          setEmployee(res.data.data);
+        }
+      } catch (error) {
+        toast.error("Failed to load candidate details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchEmployee();
+  }, [id]);
+
+  if (loading) return <div className="p-10 text-center font-bold text-[#092a49] mt-20">Loading Candidate Profile...</div>;
+  if (!employee) return <div className="p-10 text-center font-bold text-red-500 mt-20">Candidate not found!</div>;
+
+  let formattedDate = "Not Scheduled";
+  if (employee.interviewDate) {
+    try {
+      const dateObj = new Date(employee.interviewDate);
+      if (!isNaN(dateObj)) formattedDate = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    } catch (e) {}
+  }
+
+  return (
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto mb-20">
+      {/* Top Navigation */}
+      <div className="flex items-center justify-between mb-6">
+        <button onClick={() => router.back()} className="flex items-center text-sm font-semibold text-gray-500 hover:text-[#1d4ed8] transition-colors bg-white px-4 py-2 rounded-lg shadow-sm cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 mr-2"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+          Back to List
+        </button>
+        <Link href={`/dashboard/admin/recruiters/edit/${employee._id}`}>
+          <button className="bg-[#1d4ed8] text-white cursor-pointer px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1e40af] shadow-md transition-all flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+            Edit Profile
+          </button>
+        </Link>
       </div>
 
-      {/* Placement Info */}
-      <div className="bg-[#f8fafc] rounded-2xl shadow-sm border border-blue-100 p-6">
-        <h2 className="text-sm font-bold text-blue-800 tracking-wider uppercase mb-6 border-b border-blue-200 pb-3">
-          Placement Assignment
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-              Target Company
-            </p>
-            <p className="text-xl font-extrabold text-[#092a49] leading-tight">
-              {employee.assignedCompanyName || "Not Assigned"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-              Process / Opening
-            </p>
-            <p className="text-lg font-bold text-gray-800 leading-tight">
-              {employee.assignedProcess || "N/A"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-              Interview Date
-            </p>
-            <div className="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5 text-blue-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-                />
-              </svg>
-              <p
-                className={`text-base font-bold ${employee.interviewDate ? "text-blue-700" : "text-gray-400 italic"}`}
-              >
-                {formattedDate}
-              </p>
-            </div>
-          </div>
+      {/* Main Profile Header */}
+      <ProfileHeader employee={employee} />
 
-          {/* Universal Remark Viewer */}
-          {employee.remark && (
-            <div className="sm:col-span-2 lg:col-span-3 mt-2 p-5 bg-gray-50 border border-gray-200 rounded-xl">
-              <p className="text-xs font-bold text-gray-500 tracking-wider uppercase mb-2 flex items-center gap-1.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
-                  />
-                </svg>
-                Remark / Notes
-              </p>
-              <p className="text-sm font-bold text-gray-800 whitespace-pre-wrap">
-                {employee.remark}
-              </p>
-            </div>
-          )}
+      {/* PERFECT GRID LAYOUT */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Left Box (Contact Info) - Equal Height via Flex */}
+        <div className="flex w-full">
+          <ContactInfo employee={employee} />
         </div>
+        
+        {/* Right Box (Professional Details) - Equal Height via Flex */}
+        <div className="flex w-full">
+          <ProfessionalDetailsView employee={employee} />
+        </div>
+
+        {/* Bottom Box (Placement) - 100% Full Width across both columns */}
+        <div className="lg:col-span-2 w-full">
+          <PlacementAssignmentView employee={employee} formattedDate={formattedDate} />
+        </div>
+
       </div>
     </div>
   );

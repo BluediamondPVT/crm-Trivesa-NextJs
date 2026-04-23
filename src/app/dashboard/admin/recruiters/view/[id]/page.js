@@ -9,7 +9,8 @@ import axios from "axios";
 // Components Import
 import ProfileHeader from "@/components/employee/ProfileHeader";
 import ContactInfo from "@/components/employee/ContactInfo";
-import ProfessionalInfo from "@/components/employee/ProfessionalInfo";
+import ProfessionalDetailsView from "@/components/employee/ProfessionalDetailsView";
+import PlacementAssignmentView from "@/components/employee/PlacementAssignmentView";
 
 export default function ViewEmployeePage() {
   const router = useRouter();
@@ -34,37 +35,30 @@ export default function ViewEmployeePage() {
     if (id) fetchEmployee();
   }, [id]);
 
-  if (loading) {
+  if (loading)
     return (
       <div className="p-10 text-center font-bold text-[#092a49] mt-20">
         Loading Candidate Profile...
       </div>
     );
-  }
-
-  if (!employee) {
+  if (!employee)
     return (
       <div className="p-10 text-center font-bold text-red-500 mt-20">
         Candidate not found!
       </div>
     );
-  }
 
-  // Date Formatting Logic
   let formattedDate = "Not Scheduled";
   if (employee.interviewDate) {
     try {
       const dateObj = new Date(employee.interviewDate);
-      if (!isNaN(dateObj)) {
+      if (!isNaN(dateObj))
         formattedDate = dateObj.toLocaleDateString("en-GB", {
           day: "2-digit",
           month: "short",
           year: "numeric",
         });
-      }
-    } catch (e) {
-      console.error("Date formatting error", e);
-    }
+    } catch (e) {}
   }
 
   return (
@@ -112,15 +106,26 @@ export default function ViewEmployeePage() {
         </Link>
       </div>
 
-      {/* Using Components */}
       <ProfileHeader employee={employee} />
 
+      {/* Grid Layout Fix: Top boxes equal height, Bottom box full width */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
+        {/* Left Column (Contact) - Flex ensure it stretches */}
+        <div className="lg:col-span-1 flex">
           <ContactInfo employee={employee} />
         </div>
+
+        {/* Right Column (Professional Details) - Flex ensure it stretches */}
+        <div className="lg:col-span-2 flex">
+          <ProfessionalDetailsView employee={employee} />
+        </div>
+
+        {/* Bottom Row (Placement Assignment) - Takes full width of the 3 columns */}
         <div className="lg:col-span-2">
-          <ProfessionalInfo employee={employee} formattedDate={formattedDate} />
+          <PlacementAssignmentView
+            employee={employee}
+            formattedDate={formattedDate}
+          />
         </div>
       </div>
     </div>
