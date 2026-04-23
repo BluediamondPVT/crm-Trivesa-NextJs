@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
 export default function AdminDashboard() {
-  const [recentCRM, setRecentCRM] = useState([]);
+  // 1. NAYE STATES INFINITE SCROLL KE LIYE
+  const [allFilteredCRM, setAllFilteredCRM] = useState([]); // Sara filtered data
+  const [visibleCount, setVisibleCount] = useState(10); // Shuru mein kitna dikhana hai
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  const loaderRef = useRef(null);
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -18,9 +23,11 @@ export default function AdminDashboard() {
         // Filter Recent CRM Table (Exclude Listed and Process)
         const filteredForTable = allCompanies.filter(
           (company) =>
-            company.status !== "Listed" && company.status !== "Process",
+            company.status !== "Listed" && company.status !== "Process"
         );
-        setRecentCRM(filteredForTable.slice(0, 10));
+        
+        // Pura data save karo, slice nahi karna hai yahan
+        setAllFilteredCRM(filteredForTable); 
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -34,25 +41,52 @@ export default function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
+  // 2. INTERSECTION OBSERVER LOGIC (Scroll detect karne ke liye)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        // Agar loader screen pe dikha aur aur data bacha hai, tabhi load karo
+        if (target.isIntersecting && visibleCount < allFilteredCRM.length && !isFetchingMore) {
+          loadMoreData();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [visibleCount, allFilteredCRM.length, isFetchingMore]);
+
+  // 3. LOAD MORE FUNCTION (Thoda fake delay for smooth UX)
+  const loadMoreData = () => {
+    setIsFetchingMore(true);
+    setTimeout(() => {
+      setVisibleCount((prev) => prev + 10); // Har scroll pe 10 naye records add honge
+      setIsFetchingMore(false);
+    }, 600);
+  };
+
   // NAYA DELETE FUNCTION
   const handleDelete = async (id, companyName) => {
-    // Basic confirmation
-    if (
-      !window.confirm(
-        `Are you sure you want to delete "${companyName}"? This cannot be undone.`,
-      )
-    ) {
+    if (!window.confirm(`Are you sure you want to delete "${companyName}"? This cannot be undone.`)) {
       return;
     }
 
     try {
-      // Backend ko delete request bhej rahe hain
       const response = await axios.delete(`/api/companies/${id}`);
 
       if (response.data.success) {
         toast.success(`${companyName} deleted successfully`);
-        // UI ko refresh karne ke liye table data dubara fetch karo ya array filter karo
-        setRecentCRM(recentCRM.filter((company) => company._id !== id));
+        // UI se turant hata do
+        setAllFilteredCRM(allFilteredCRM.filter((company) => company._id !== id));
       } else {
         toast.error("Failed to delete company");
       }
@@ -70,15 +104,16 @@ export default function AdminDashboard() {
     );
   }
 
+  // 4. SIRF VISIBLE DATA KO RENDER KARO
+  const visibleCRM = allFilteredCRM.slice(0, visibleCount);
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8 md:p-10">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4 mt-2 sm:mt-0">
         <div>
           <h1 className="text-3xl font-bold text-[#092a49]">Dashboard</h1>
-          <p className="text-gray-500 mt-1">
-            Overview of your system performance
-          </p>
+          <p className="text-gray-500 mt-1">Overview of your system performance</p>
         </div>
 
         <Link
@@ -113,61 +148,74 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-50">
-              {recentCRM.length > 0 ? (
-                recentCRM.map((company, index) => (
-                  <tr
-                    key={company._id}
-                    className="hover:bg-[#e6f4ff] transition-colors duration-200 group"
-                  >
-                    <td className="px-6 py-4 text-gray-600 font-medium text-center">
-                      {index + 1}
-                    </td>
+              {visibleCRM.length > 0 ? (
+                <>
+                  {visibleCRM.map((company, index) => (
+                    <tr
+                      key={company._id}
+                      className="hover:bg-[#e6f4ff] transition-colors duration-200 group"
+                    >
+                      <td className="px-6 py-4 text-gray-600 font-medium text-center">
+                        {index + 1}
+                      </td>
 
-                    {/* Company Name */}
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-gray-800 line-clamp-1">
-                        {company.name}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {company.email}
-                      </div>
-                    </td>
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-gray-800 line-clamp-1">
+                          {company.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {company.email}
+                        </div>
+                      </td>
 
-                    {/* Status (Compact) */}
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold rounded-md ${company.status === "Active" ? "bg-green-100 text-green-700 border border-green-200" : "bg-red-100 text-red-700 border border-red-200"}`}
-                      >
-                        {company.status}
-                      </span>
-                    </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold rounded-md ${
+                            company.status === "Active"
+                              ? "bg-green-100 text-green-700 border border-green-200"
+                              : "bg-red-100 text-red-700 border border-red-200"
+                          }`}
+                        >
+                          {company.status}
+                        </span>
+                      </td>
 
-                    {/* Phone */}
-                    <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
-                      {company.phone}
-                    </td>
+                      <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
+                        {company.phone}
+                      </td>
 
-                    {/* Address */}
-                    <td className="px-6 py-4 text-gray-500 text-xs line-clamp-2 mt-2">
-                      {company.address || "N/A"}
-                    </td>
+                      <td className="px-6 py-4 text-gray-500 text-xs line-clamp-2 mt-2">
+                        {company.address || "N/A"}
+                      </td>
 
-                    {/* Actions (View & Delete) */}
-                    <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                      <Link href={`/dashboard/admin/company/${company._id}`}>
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#1d4ed8] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
-                          View
+                      <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                        <Link href={`/dashboard/admin/company/${company._id}`}>
+                          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#1d4ed8] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer">
+                            View
+                          </button>
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(company._id, company.name)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                        >
+                          Delete
                         </button>
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(company._id, company.name)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  ))}
+                  
+                  {/* 5. LOADER ROW (Scroll Target) */}
+                  {visibleCount < allFilteredCRM.length && (
+                    <tr ref={loaderRef}>
+                      <td colSpan="6" className="text-center py-6">
+                        <div className="flex justify-center items-center gap-2 text-gray-500 font-medium text-sm">
+                          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                          Loading more clients...
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               ) : (
                 <tr>
                   <td
