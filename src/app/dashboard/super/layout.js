@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+// import Sidebar from "@/components/Sidebar";
 
 export default function SuperAdminLayout({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -37,11 +37,11 @@ export default function SuperAdminLayout({ children }) {
   return (
     <div className="flex h-screen bg-[#f8f6f4] overflow-hidden">
       {/* Sidebar Component */}
-      <Sidebar
+      {/* <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         handleLogout={handleLogout}
-      />
+      /> */}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
