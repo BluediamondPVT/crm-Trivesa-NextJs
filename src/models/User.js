@@ -23,8 +23,9 @@ const UserSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: {
-        values: ["admin", "superadmin"],
-        message: "Role must be either admin or superadmin",
+        // NAYA: "recruiter" ko is list mein daal diya
+        values: ["admin", "superadmin", "recruiter"],
+        message: "Role must be either admin, superadmin or recruiter",
       },
       default: "admin",
     },
@@ -41,18 +42,15 @@ const UserSchema = new mongoose.Schema(
 );
 
 // Pre-save middleware to hash password if modified
-UserSchema.pre("save", async function (next) {
+// FIX: Removed 'next' parameter entirely for Next.js async compatibility
+UserSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    return next();
+    return;
   }
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
+  // Mongoose automatically catches errors in async functions
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Method to compare passwords

@@ -24,8 +24,8 @@ export default function RecruiterDashboard() {
     "On Hold",
     "Selected",
     "Joining",
-    "Payout",
     "Rejected",
+    "Payout",
   ];
 
   const fetchEmployees = async () => {

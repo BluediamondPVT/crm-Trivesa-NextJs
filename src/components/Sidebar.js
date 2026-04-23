@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,8 +12,17 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
 
-  // State only for Client dropdown now
+  // State for Client dropdown
   const [isClientOpen, setIsClientOpen] = useState(false);
+  
+  // NAYA STATE: User ka role check karne ke liye
+  const [userRole, setUserRole] = useState(null);
+
+  // NAYA: Client-side par localStorage se role nikalna
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    setUserRole(role);
+  }, []);
 
   const sidebarVariants = {
     hidden: {
@@ -113,7 +122,8 @@ export default function Sidebar({
               </svg>
             </div>
             <span className="text-xl font-bold tracking-wide group-hover:text-gray-200 transition-colors">
-              Admin
+              {/* NAYA: Agar superadmin hai toh title change kar diya thoda premium feel ke liye */}
+              {userRole === "superadmin" ? "Super Admin" : "Admin"}
             </span>
           </Link>
 
@@ -122,57 +132,29 @@ export default function Sidebar({
             aria-label="Close sidebar"
             className="md:hidden text-gray-300 hover:text-white p-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          <Link
-            href="/dashboard/admin"
-            onClick={handleMobileClose}
-            className="block"
-          >
+          {/* Dashboard Link */}
+          <Link href="/dashboard/admin" onClick={handleMobileClose} className="block">
             <motion.div
               className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${pathname === "/dashboard/admin" ? "bg-white/10 text-white border-l-4 border-[#1d4ed8]" : "text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent"}`}
               variants={navItemVariants}
               whileHover="hover"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
               </svg>
               <span className="font-medium text-sm">Dashboard</span>
             </motion.div>
           </Link>
 
+          {/* Clients Dropdown */}
           <div>
             <motion.button
               onClick={() => setIsClientOpen(!isClientOpen)}
@@ -181,62 +163,23 @@ export default function Sidebar({
               whileHover="hover"
             >
               <div className="flex items-center gap-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                 </svg>
                 <span className="font-medium text-sm">Clients</span>
               </div>
-              <motion.svg
-                animate={{ rotate: isClientOpen ? 180 : 0 }}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                />
+              <motion.svg animate={{ rotate: isClientOpen ? 180 : 0 }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </motion.svg>
             </motion.button>
 
             <AnimatePresence>
               {isClientOpen && (
-                <motion.div
-                  variants={subMenuVariants}
-                  initial="closed"
-                  animate="open"
-                  exit="closed"
-                  className="overflow-hidden ml-6 mt-1 space-y-1 border-l border-white/10"
-                >
+                <motion.div variants={subMenuVariants} initial="closed" animate="open" exit="closed" className="overflow-hidden ml-6 mt-1 space-y-1 border-l border-white/10">
                   {clientSubItems.map((sub, idx) => (
-                    <Link
-                      key={idx}
-                      href={sub.href}
-                      onClick={handleMobileClose}
-                      className="block"
-                    >
-                      <motion.div
-                        className={`flex items-center gap-3 px-6 py-2 text-sm font-medium hover:text-white hover:bg-white/5 rounded-r-lg transition-all ${pathname === sub.href ? "text-white bg-white/5" : "text-gray-400"}`}
-                        whileHover={{ x: 5 }}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${sub.color}`}
-                        />
+                    <Link key={idx} href={sub.href} onClick={handleMobileClose} className="block">
+                      <motion.div className={`flex items-center gap-3 px-6 py-2 text-sm font-medium hover:text-white hover:bg-white/5 rounded-r-lg transition-all ${pathname === sub.href ? "text-white bg-white/5" : "text-gray-400"}`} whileHover={{ x: 5 }}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${sub.color}`} />
                         {sub.name}
                       </motion.div>
                     </Link>
@@ -246,33 +189,36 @@ export default function Sidebar({
             </AnimatePresence>
           </div>
 
-          <Link
-            href="/dashboard/admin/recruiters"
-            onClick={handleMobileClose}
-            className="block"
-          >
+          {/* Recruiter Tab */}
+          <Link href="/dashboard/admin/recruiters" onClick={handleMobileClose} className="block">
             <motion.div
               className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${pathname.includes("/dashboard/admin/recruiters") ? "bg-white/10 text-white border-l-4 border-[#1d4ed8]" : "text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent"}`}
               variants={navItemVariants}
               whileHover="hover"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
               </svg>
               <span className="font-medium text-sm">Recruiter</span>
             </motion.div>
           </Link>
+
+          {/* NAYA: Create Recruiter Tab - SIRF SUPER ADMIN KO DIKHEGA */}
+          {userRole === "superadmin" && (
+            <Link href="/dashboard/super/create-recruiter" onClick={handleMobileClose} className="block">
+              <motion.div
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${pathname === "/dashboard/super/create-recruiter" ? "bg-white/10 text-white border-l-4 border-purple-500" : "text-gray-300 hover:bg-white/5 hover:text-white border-l-4 border-transparent"}`}
+                variants={navItemVariants}
+                whileHover="hover"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                </svg>
+                <span className="font-medium text-sm">Add Recruiter</span>
+              </motion.div>
+            </Link>
+          )}
+
         </nav>
 
         <div className="p-4 mb-4 shrink-0">
@@ -280,20 +226,8 @@ export default function Sidebar({
             onClick={handleLogout}
             className="w-full flex items-center gap-3 text-gray-300 hover:bg-red-500/10 hover:text-red-400 px-4 py-3 rounded-xl transition-all border-l-4 border-transparent focus:outline-none focus:ring-2 focus:ring-red-500/50"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
             </svg>
             <span className="font-medium text-sm">Logout</span>
           </button>

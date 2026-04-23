@@ -18,8 +18,14 @@ export default function CompanyDetailsPage() {
 
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // NAYA: Role save karne ke liye state
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    // Page load hote hi local storage se role nikal lo
+    setUserRole(localStorage.getItem("role"));
+
     const fetchCompanyDetails = async () => {
       try {
         const response = await axios.get(`/api/companies/${id}`);
@@ -88,9 +94,12 @@ export default function CompanyDetailsPage() {
       </div>
 
       {/* 3. Payout Details (Full Width & Separate Section) */}
-      <div className="mb-8">
-        <PayoutDetails payoutDetails={company.payoutDetails} />
-      </div>
+      {/* NAYA FIX: Sirf tab dikhega jab userRole recruiter NAHI hoga */}
+      {userRole !== "recruiter" && (
+        <div className="mb-8">
+          <PayoutDetails payoutDetails={company.payoutDetails} />
+        </div>
+      )}
 
       {/* 4. Contact Persons Table */}
       <div className="mb-8">

@@ -19,8 +19,13 @@ export default function LoginForm() {
     const role = localStorage.getItem("role");
 
     if (token && role) {
-      const redirectPath =
-        role === "superadmin" ? "/dashboard/super" : "/dashboard/admin";
+      // SMART REDIRECT LOGIC
+      let redirectPath = "/dashboard/admin"; // Default fallback (for admin)
+      if (role === "superadmin") redirectPath = "/dashboard/super";
+      
+      // YAHAN FIX KIYA: Recruiter seedha apni tab pe jayega
+      if (role === "recruiter") redirectPath = "/dashboard/admin/recruiters"; 
+
       router.replace(redirectPath);
     }
   }, [router]);
@@ -72,7 +77,8 @@ export default function LoginForm() {
         throw new Error(responseData.message || "Invalid email or password");
       }
 
-      const { token, role, userId } = responseData.data;
+      // NAYA: resEmail variable add kiya backend se email nikalne ke liye
+      const { token, role, userId, email: resEmail } = responseData.data;
 
       if (!token || !role) {
         throw new Error("Missing authentication data");
@@ -82,13 +88,20 @@ export default function LoginForm() {
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId", userId);
+      
+      // YAHAN FIX KIYA: Email ko localStorage mein save kar rahe hain (Sidebar ke liye)
+      localStorage.setItem("email", resEmail || email.toLowerCase());
 
       setSuccess("Login successful! Redirecting...");
 
       // Redirect after short delay
       setTimeout(() => {
-        const redirectPath =
-          role === "superadmin" ? "/dashboard/super" : "/dashboard/admin";
+        let redirectPath = "/dashboard/admin"; 
+        if (role === "superadmin") redirectPath = "/dashboard/super";
+        
+        // YAHAN FIX KIYA: Recruiter ka path update kiya
+        if (role === "recruiter") redirectPath = "/dashboard/admin/recruiters"; 
+
         router.replace(redirectPath);
       }, 500);
     } catch (err) {
@@ -125,7 +138,7 @@ export default function LoginForm() {
               Welcome Back
             </h1>
             <p className="text-sm text-gray-500">
-              Please sign in to your admin dashboard
+              Please sign in to your dashboard
             </p>
           </div>
 
@@ -262,7 +275,6 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                // bg-[#057ec5] use karne se contrast ratio 4.5:1 ke upar chala jayega
                 className="w-full bg-[#1d4ed8] hover:bg-[#1e40af] disabled:bg-blue-300 text-white font-medium py-3 rounded-lg transition-all shadow-md mt-2 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing in..." : "Sign In"}

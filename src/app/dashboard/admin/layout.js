@@ -11,19 +11,17 @@ export default function AdminLayout({ children }) {
   const [loading, setLoading] = useState(true);
   const authChecked = useRef(false);
 
-  useEffect(() => {
-    if (authChecked.current) return;
-    authChecked.current = true;
-
+useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (!token || role !== "admin") {
+    // Agar token nahi hai, ya role in teeno mein se koi nahi hai, toh bahar pheko
+    if (!token || (role !== "admin" && role !== "superadmin" && role !== "recruiter")) {
       router.replace("/");
-      return;
+    } else {
+      // YAHAN FIX HAI: Apna sahi variable name use karo (jyadatar setLoading hota hai)
+      setLoading(false); 
     }
-
-    setTimeout(() => setLoading(false), 0);
   }, [router]);
 
   const handleLogout = () => {
