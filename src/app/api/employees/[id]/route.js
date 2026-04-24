@@ -40,12 +40,13 @@ export async function PUT(request, { params }) {
         { status: 404 },
       );
 
-    // 2. LOGIC: Agar Status, Company, Process ya Remark change hua hai, toh history banao
+    // 2. LOGIC: Agar Status, Company, Process, Remark YA INTERVIEW DATE change hua hai, toh history banao
     if (
       existingEmployee.status !== body.status ||
       existingEmployee.assignedCompanyId !== body.assignedCompanyId ||
       existingEmployee.assignedProcess !== body.assignedProcess ||
-      existingEmployee.remark !== body.remark
+      existingEmployee.remark !== body.remark ||
+      existingEmployee.interviewDate !== body.interviewDate // <--- NAYA LOGIC YAHAN HAI
     ) {
       const historyLog = {
         companyName:
@@ -53,6 +54,8 @@ export async function PUT(request, { params }) {
         process: body.assignedProcess || existingEmployee.assignedProcess,
         status: body.status || existingEmployee.status,
         remark: body.remark || "",
+        interviewDate:
+          body.interviewDate || existingEmployee.interviewDate || "", // <--- NAYA FIELD YAHAN SAVE HOGA
         date: new Date(),
       };
 
@@ -67,6 +70,7 @@ export async function PUT(request, { params }) {
     const updatedEmployee = await Employee.findByIdAndUpdate(id, body, {
       new: true,
     });
+
     if (!updatedEmployee)
       return NextResponse.json(
         { success: false, message: "Not found" },
