@@ -16,6 +16,16 @@ const EmployeeSchema = new mongoose.Schema(
     expectedSalary: { type: String },
     actualSalary: { type: String },
 
+    assignmentHistory: [
+    {
+      companyName: { type: String },
+      process: { type: String },
+      status: { type: String },
+      remark: { type: String },
+      date: { type: Date, default: Date.now }
+    }
+  ],
+
     assignedCompanyId: { type: String },
     assignedCompanyName: { type: String },
     assignedProcess: { type: String },

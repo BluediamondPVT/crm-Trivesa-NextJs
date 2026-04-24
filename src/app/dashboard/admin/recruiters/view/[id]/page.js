@@ -121,12 +121,68 @@ export default function ViewEmployeePage() {
         </div>
 
         {/* Bottom Row (Placement Assignment) - Takes full width of the 3 columns */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2">  {/* YAHAN 2 KI JAGAH 3 KARNA HAI */}
           <PlacementAssignmentView
             employee={employee}
             formattedDate={formattedDate}
           />
         </div>
+      </div>
+
+      <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+        <h2 className="text-xl font-bold text-[#092a49] border-b border-gray-100 pb-4 mb-6 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-blue-600">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          Placement History / Journey
+        </h2>
+
+        {employee.assignmentHistory && employee.assignmentHistory.length > 0 ? (
+          <div className="relative border-l-2 border-gray-200 ml-3 space-y-8 mt-4">
+            {/* Hum history ko ulta (reverse) karke dikhayenge taaki latest upar aaye */}
+            {[...employee.assignmentHistory].reverse().map((history, index) => (
+              <div key={index} className="relative pl-6">
+                {/* Timeline Dot */}
+                <span className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
+                  history.status === "Selected" || history.status === "Joining" ? "bg-green-500" :
+                  history.status === "Rejected" ? "bg-red-500" :
+                  "bg-blue-500"
+                }`}></span>
+
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                    <h3 className="font-bold text-gray-800 text-base">
+                      {history.companyName || "N/A"} <span className="text-gray-400 font-normal text-sm">| {history.process || "No Process Assigned"}</span>
+                    </h3>
+                    <span className={`px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide rounded-md w-fit
+                      ${history.status === "Selected" || history.status === "Joining" ? "bg-green-100 text-green-700" : 
+                        history.status === "Rejected" ? "bg-red-100 text-red-700" : 
+                        "bg-blue-100 text-blue-700"}`}
+                    >
+                      {history.status}
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 mb-2 font-medium flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25m-9 5.25v-1.5m3 1.5v-1.5m-6 1.5v-1.5" /></svg>
+                    {new Date(history.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                  
+                  {history.remark && (
+                    <div className="mt-2 bg-white p-3 rounded-lg border border-gray-200 text-sm text-gray-600">
+                      <span className="font-semibold text-gray-700">Remark:</span> {history.remark}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-10 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <p className="font-medium text-gray-500">No history available yet.</p>
+            <p className="text-xs mt-1">Future status or company assignment changes will be recorded here.</p>
+          </div>
+        )}
       </div>
     </div>
   );
