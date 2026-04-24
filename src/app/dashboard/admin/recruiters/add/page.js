@@ -27,10 +27,11 @@ export default function AddEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "", // NAYE FIELDS
+    expertise: "", 
     experience: "",
     lastSalary: "",
-    expectedSalary: "",
+    expectedSalary: "", 
+    source: "",
     assignedCompanyId: "",
     assignedCompanyName: "",
     assignedProcess: "",

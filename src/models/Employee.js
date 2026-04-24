@@ -15,6 +15,7 @@ const EmployeeSchema = new mongoose.Schema(
     lastSalary: { type: String },
     expectedSalary: { type: String },
     actualSalary: { type: String },
+    source: { type: String },
 
     assignmentHistory: [
     {
@@ -40,7 +41,7 @@ const EmployeeSchema = new mongoose.Schema(
         "LineUp",
         "Attendees",
         "Selected",
-        "Rejected",
+        "Rejected", 
         "On Hold",
         "Joining",
         "Payout",

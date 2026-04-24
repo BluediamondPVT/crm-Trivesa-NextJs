@@ -27,6 +27,7 @@ export default function PersonalDetailsForm({ formData, handleChange }) {
             required
             type="text"
             name="phone"
+            placeholder="Enter Phone Number"
             value={formData.phone || ""}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
@@ -39,13 +40,13 @@ export default function PersonalDetailsForm({ formData, handleChange }) {
           <input
             type="email"
             name="email"
+            placeholder="Enter Email"
             value={formData.email || ""}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
           />
         </div>
 
-        {/* FIX: Age as text to prevent parsing errors */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
             Age *
@@ -68,10 +69,37 @@ export default function PersonalDetailsForm({ formData, handleChange }) {
           <input
             type="text"
             name="address"
+            placeholder="Enter Address here"
             value={formData.address || ""}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
           />
+        </div>
+
+        {/* NAYA FIELD: Source Dropdown */}
+        <div className="lg:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Source *
+          </label>
+          <select
+            required
+            name="source"
+            value={formData.source || ""}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+          >
+            <option value="">-- Select Source --</option>
+            <option value="Job Hai">Job Hai</option>
+            <option value="Apna Job">Apna Job</option>
+            <option value="Naukri">Naukri</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Direct Message">Direct Message</option>
+            <option value="Candidate">Candidate</option>
+            <option value="Refrence">Refrence</option>
+            <option value="Social Media">Social Media</option>
+            <option value="Mumbai Job Group">Mumbai Job Group</option>
+            <option value="Time Job">Time Job</option>
+          </select>
         </div>
 
         <div>

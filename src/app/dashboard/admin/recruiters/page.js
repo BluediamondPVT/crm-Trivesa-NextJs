@@ -97,34 +97,50 @@ export default function RecruiterDashboard() {
   }
 
   // ====== EXCEL EXPORT LOGIC ======
+ // ====== UPDATED EXCEL EXPORT LOGIC ======
   const handleDownloadExcel = () => {
     if (!tableFilteredData || tableFilteredData.length === 0) {
       toast.error("No data available to download!");
       return;
     }
 
+    // 1. Data mapping with Source and Recruiter Name
     const excelData = tableFilteredData.map((emp) => ({
       "Candidate Name": emp.name || "N/A",
       "Phone Number": emp.phone || "N/A",
       "Email Address": emp.email || "N/A",
+      "Source": emp.source || "N/A", // NAYA COLUMN: Source
       "Assigned Company": emp.assignedCompanyName || "N/A",
       "Job Process": emp.assignedProcess || "N/A",
       "Status": emp.status || "N/A",
+      "Added By (Recruiter)": emp.addedBy || "N/A", // NAYA COLUMN: Recruiter ID/Email
       "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN")
     }));
 
+    // 2. Create Workbook
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     
+    // 3. Adjusted Column Widths for extra columns
     const colWidths = [
-      { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }
+      { wch: 20 }, // Name
+      { wch: 15 }, // Phone
+      { wch: 25 }, // Email
+      { wch: 20 }, // Source (Added)
+      { wch: 25 }, // Company
+      { wch: 20 }, // Process
+      { wch: 15 }, // Status
+      { wch: 25 }, // Added By (Added)
+      { wch: 15 }  // Date
     ];
     worksheet["!cols"] = colWidths;
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Data");
-    XLSX.writeFile(workbook, `CRM_Report_${dateFilter}_${activeTab}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Full_Report");
+
+    // 4. Trigger Download
+    XLSX.writeFile(workbook, `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`);
     
-    toast.success("Excel File Exported Successfully!");
+    toast.success("Detailed Excel Report Exported!");
   };
 
   return (

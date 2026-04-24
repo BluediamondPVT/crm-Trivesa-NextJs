@@ -30,10 +30,11 @@ export default function EditEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "", // INCLUDED
+    expertise: "", 
     experience: "",
     lastSalary: "",
     expectedSalary: "",
+    source: "",
     actualSalary: "",
     assignedCompanyId: "",
     assignedCompanyName: "",

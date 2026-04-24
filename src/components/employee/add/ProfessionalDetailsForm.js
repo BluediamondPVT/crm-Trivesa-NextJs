@@ -21,7 +21,7 @@ export default function ProfessionalDetailsForm({ formData, handleChange }) {
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Last Salary
+            Last Salary (Month)
           </label>
           <input
             type="text"
@@ -34,7 +34,7 @@ export default function ProfessionalDetailsForm({ formData, handleChange }) {
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Expected Salary
+            Expected Salary (Month)
           </label>
           <input
             type="text"
