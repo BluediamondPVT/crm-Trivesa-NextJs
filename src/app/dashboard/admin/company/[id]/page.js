@@ -90,7 +90,7 @@ export default function CompanyDetailsPage() {
 
       {/* 2. Company Info (Full Width) */}
       <div className="mb-8">
-        <CompanyInfo company={company} />
+        <CompanyInfo company={company} userRole={userRole} />  {/* Yahan userRole pass karna zaroori hai! */}
       </div>
 
       {/* 3. Payout Details (Full Width & Separate Section) */}
