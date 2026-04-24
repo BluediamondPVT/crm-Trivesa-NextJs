@@ -49,7 +49,7 @@ export default function ProfessionalDetailsView({ employee }) {
         </div>
 
         {employee.status === "Joining" && employee.actualSalary && (
-          <div className="flex items-center justify-between bg-teal-50 p-3.5 rounded-xl border border-teal-200 mt-2">
+          <div className="flex items-center justify-between bg-teal-50 p-2 rounded-xl border border-teal-200 mt-2">
             <span className="text-xs font-bold text-teal-800 uppercase tracking-wide">
               Final Salary
             </span>

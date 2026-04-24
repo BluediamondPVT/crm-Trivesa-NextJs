@@ -3,13 +3,13 @@ import Link from "next/link";
 
 export default function CompanyStatusTable({ filteredCompanies, currentStatus, handleDelete }) {
   // Infinite Scroll States
-  const [visibleCount, setVisibleCount] = useState(10);
+  const [visibleCount, setVisibleCount] = useState(20);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
   // Status change hone pe visible count reset karo
   useEffect(() => {
-    setVisibleCount(10);
+    setVisibleCount(20);
   }, [currentStatus]);
 
   // Intersection Observer for Infinite Scroll
@@ -38,7 +38,7 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
   const loadMoreData = () => {
     setIsFetchingMore(true);
     setTimeout(() => {
-      setVisibleCount((prev) => prev + 10);
+      setVisibleCount((prev) => prev + 20);
       setIsFetchingMore(false);
     }, 600); // 600ms ka smooth fake delay
   };
