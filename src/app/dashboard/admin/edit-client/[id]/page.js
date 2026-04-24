@@ -29,6 +29,7 @@ export default function EditClientPage() {
     companyType: "BPO",
     natureOfBusiness: "",
     description: "",
+    internalRemark: "",
     status: "Active",
     payoutDetails: {
       commercials: [{ category: "", slabs: [{ slabDetails: "" }] }],

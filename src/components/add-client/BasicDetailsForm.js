@@ -139,6 +139,28 @@ export default function BasicDetailsForm({ formData, handleChange }) {
             placeholder="Brief about the company..."
           />
         </div>
+
+        {/* NAYA: Internal Remark Box */}
+        <div className="md:col-span-2 mt-2 bg-orange-50 border border-orange-200 rounded-xl p-4 shadow-sm">
+          <label className="block text-sm font-extrabold text-orange-800 mb-1 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+            </svg>
+            Internal Remark / Notes (Admin Only)
+          </label>
+          <p className="text-xs text-orange-700 mb-3 font-medium">
+            This note will only be visible to internal team members on the company dashboard.
+          </p>
+          <textarea
+            name="internalRemark"
+            value={formData.internalRemark || ""}
+            onChange={(e) => handleChange(e, "basic")}
+            placeholder="Add any internal warnings, special instructions, or notes here..."
+            rows="3"
+            className="w-full p-2.5 border border-orange-300 bg-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-shadow"
+          ></textarea>
+        </div>
+        
       </div>
     </div>
   );

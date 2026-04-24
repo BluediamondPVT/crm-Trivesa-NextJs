@@ -116,6 +116,20 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+/* app/globals.css */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #434857;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to top, #092A49,#092A49);
+  border-radius: 5px;
+}
 
 @layer base {
   * {

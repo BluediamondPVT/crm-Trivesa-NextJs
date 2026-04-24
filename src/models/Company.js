@@ -42,6 +42,7 @@ const CompanySchema = new mongoose.Schema(
     },
     natureOfBusiness: { type: String },
     description: { type: String },
+    internalRemark: { type: String },
     status: { type: String, default: "Active" },
 
     // Payout Nested Object (UPDATED)

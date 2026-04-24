@@ -38,6 +38,7 @@ export async function POST(request) {
       natureOfBusiness: body.natureOfBusiness,
 
       description: body.description,
+      internalRemark: body.internalRemark,
       status: body.status || "Active",
       payoutDetails: body.payoutDetails,
       contactPersons: body.contactPersons,
