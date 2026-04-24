@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 // Component Imports
 import DashboardHeader from "@/components/recruiter/DashboardHeader";
@@ -16,70 +17,124 @@ export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("LineUp");
   const [selectedRemark, setSelectedRemark] = useState(null);
+  
+  const [userRole, setUserRole] = useState(null);
+  const [dateFilter, setDateFilter] = useState("All");
 
   const tabs = [
-    "All",
-    "LineUp",
-    "Attendees",
-    "On Hold",
-    "Selected",
-    "Joining",
-    "Rejected",
-    "Payout",
+    "All", "LineUp", "Attendees", "On Hold", "Selected", "Joining", "Rejected", "Payout",
   ];
 
-  // NAYA: Ek hi solid useEffect jo sab handle karega (Fetch + Filter + Loading)
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Fetch shuru hone se pehle loading ON
+      setLoading(true);
       try {
         const userId = localStorage.getItem("userId");
         const role = localStorage.getItem("role");
+        setUserRole(role);
 
-        const res = await axios.get(
-          `/api/employees?userId=${userId}&role=${role}`,
-        );
-
+        const res = await axios.get(`/api/employees?userId=${userId}&role=${role}`);
         if (res.data.success) {
           setEmployees(res.data.data);
         }
       } catch (error) {
-        console.error("Data fetch error:", error);
         toast.error("Failed to load candidates data");
       } finally {
-        setLoading(false); // Data aane ke baad (ya error ke baad) loading OFF
+        setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const filteredData =
-    activeTab === "All"
-      ? employees
-      : employees.filter((emp) => emp.status === activeTab);
+  // ==========================================
+  // MAGIC FIX: STEP 1 - SIRF DATE FILTER LAGAO
+  // ==========================================
+  let dateFilteredEmployees = employees;
 
-  // Calculate Metrics Counts
+  if (dateFilter !== "All") {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    dateFilteredEmployees = employees.filter((emp) => {
+      const empDate = new Date(emp.createdAt).getTime(); 
+
+      if (dateFilter === "Today") {
+        return empDate >= today;
+      } else if (dateFilter === "Yesterday") {
+        const yesterday = today - 24 * 60 * 60 * 1000;
+        return empDate >= yesterday && empDate < today;
+      } else if (dateFilter === "7Days") {
+        const sevenDaysAgo = today - 7 * 24 * 60 * 60 * 1000;
+        return empDate >= sevenDaysAgo;
+      } else if (dateFilter === "30Days") {
+        const thirtyDaysAgo = today - 30 * 24 * 60 * 60 * 1000;
+        return empDate >= thirtyDaysAgo;
+      }
+      return true;
+    });
+  }
+
+  // ==========================================
+  // MAGIC FIX: STEP 2 - MATRIX COUNTS NIKALO (Bina Tab filter ke)
+  // ==========================================
   const getCounts = () => {
     const counts = {
-      All: employees.length,
-      LineUp: 0,
-      Attendees: 0,
-      "On Hold": 0,
-      Selected: 0,
-      Rejected: 0,
-      Joining: 0,
-      Payout: 0,
+      All: dateFilteredEmployees.length,
+      LineUp: 0, Attendees: 0, "On Hold": 0, Selected: 0, Rejected: 0, Joining: 0, Payout: 0,
     };
-    employees.forEach((emp) => {
+    dateFilteredEmployees.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;
     });
     return counts;
   };
 
+  // ==========================================
+  // MAGIC FIX: STEP 3 - AB TABLE KE LIYE TAB FILTER LAGAO
+  // ==========================================
+  let tableFilteredData = dateFilteredEmployees;
+  if (activeTab !== "All") {
+    tableFilteredData = tableFilteredData.filter((emp) => emp.status === activeTab);
+  }
+
+  // ====== EXCEL EXPORT LOGIC ======
+  const handleDownloadExcel = () => {
+    if (!tableFilteredData || tableFilteredData.length === 0) {
+      toast.error("No data available to download!");
+      return;
+    }
+
+    const excelData = tableFilteredData.map((emp) => ({
+      "Candidate Name": emp.name || "N/A",
+      "Phone Number": emp.phone || "N/A",
+      "Email Address": emp.email || "N/A",
+      "Assigned Company": emp.assignedCompanyName || "N/A",
+      "Job Process": emp.assignedProcess || "N/A",
+      "Status": emp.status || "N/A",
+      "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN")
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    
+    const colWidths = [
+      { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }
+    ];
+    worksheet["!cols"] = colWidths;
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Data");
+    XLSX.writeFile(workbook, `CRM_Report_${dateFilter}_${activeTab}.xlsx`);
+    
+    toast.success("Excel File Exported Successfully!");
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8 md:p-10 relative">
-      <DashboardHeader />
+      <DashboardHeader 
+        role={userRole} 
+        dateFilter={dateFilter} 
+        setDateFilter={setDateFilter} 
+        handleDownload={handleDownloadExcel} 
+      />
 
       <MetricsMatrix
         counts={getCounts()}
@@ -93,8 +148,9 @@ export default function RecruiterDashboard() {
         setActiveTab={setActiveTab}
       />
 
+      {/* TABLE KO HUM FINAL tableFilteredData BHEJENGE */}
       <EmployeeTable
-        filteredData={filteredData}
+        filteredData={tableFilteredData}
         loading={loading}
         activeTab={activeTab}
         setSelectedRemark={setSelectedRemark}
