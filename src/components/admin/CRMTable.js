@@ -7,6 +7,13 @@ export default function CRMTable({ data, onDelete }) {
   const itemsPerPage = 10;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
+  
+   const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("role"));
+  });
+
   // Agar delete karne se current page khali ho jaye toh pichle page par bhej do
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -85,12 +92,14 @@ export default function CRMTable({ data, onDelete }) {
                     >
                       View
                     </Link>
+                    {userRole !== "recruiter" && (
                     <button
                       onClick={() => onDelete(company._id, company.name)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
                     >
                       Delete
                     </button>
+                    )}
                   </td>
                 </tr>
               ))

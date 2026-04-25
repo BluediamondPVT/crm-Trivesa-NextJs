@@ -21,6 +21,7 @@ export default function AdminDashboard() {
     nonActiveOpenings: 0,
   });
   const [loading, setLoading] = useState(true);
+  
 
   const fetchDashboardData = async () => {
     setLoading(true);
