@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { useSearchParams } from "next/navigation"; // <--- NAYA IMPORT YAHAN HAI
 
 // Component Imports
 import DashboardHeader from "@/components/recruiter/DashboardHeader";
@@ -13,17 +14,38 @@ import EmployeeTable from "@/components/recruiter/EmployeeTable";
 import RemarkModal from "@/components/recruiter/RemarkModal";
 
 export default function RecruiterDashboard() {
+  const searchParams = useSearchParams(); // URL ko read karne ke liye
+  const tabFromUrl = searchParams.get("tab"); // URL se ?tab= ki value nikal rahe hain
+
+  const tabs = [
+    "All",
+    "LineUp",
+    "Attendees",
+    "On Hold",
+    "Selected",
+    "Joining",
+    "Rejected",
+    "Payout",
+  ];
+
+  // Agar URL mein tab hai aur wo valid hai, toh usey default rakho, warna 'LineUp'
+  const initialTab =
+    tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
+
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("LineUp");
+  const [activeTab, setActiveTab] = useState(initialTab); // Initial tab set kar diya
   const [selectedRemark, setSelectedRemark] = useState(null);
-  
+
   const [userRole, setUserRole] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
 
-  const tabs = [
-    "All", "LineUp", "Attendees", "On Hold", "Selected", "Joining", "Rejected", "Payout",
-  ];
+  // NAYA: URL change hone pe activeTab bhi update hona chahiye (jab user sidebar se click kare)
+  useEffect(() => {
+    if (tabFromUrl && tabs.includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +55,9 @@ export default function RecruiterDashboard() {
         const role = localStorage.getItem("role");
         setUserRole(role);
 
-        const res = await axios.get(`/api/employees?userId=${userId}&role=${role}`);
+        const res = await axios.get(
+          `/api/employees?userId=${userId}&role=${role}`,
+        );
         if (res.data.success) {
           setEmployees(res.data.data);
         }
@@ -46,17 +70,19 @@ export default function RecruiterDashboard() {
     fetchData();
   }, []);
 
-  // ==========================================
-  // MAGIC FIX: STEP 1 - SIRF DATE FILTER LAGAO
-  // ==========================================
+  // ====== FILTERING LOGIC ======
   let dateFilteredEmployees = employees;
 
   if (dateFilter !== "All") {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    
+    const today = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    ).getTime();
+
     dateFilteredEmployees = employees.filter((emp) => {
-      const empDate = new Date(emp.createdAt).getTime(); 
+      const empDate = new Date(emp.createdAt).getTime();
 
       if (dateFilter === "Today") {
         return empDate >= today;
@@ -74,13 +100,16 @@ export default function RecruiterDashboard() {
     });
   }
 
-  // ==========================================
-  // MAGIC FIX: STEP 2 - MATRIX COUNTS NIKALO (Bina Tab filter ke)
-  // ==========================================
   const getCounts = () => {
     const counts = {
       All: dateFilteredEmployees.length,
-      LineUp: 0, Attendees: 0, "On Hold": 0, Selected: 0, Rejected: 0, Joining: 0, Payout: 0,
+      LineUp: 0,
+      Attendees: 0,
+      "On Hold": 0,
+      Selected: 0,
+      Rejected: 0,
+      Joining: 0,
+      Payout: 0,
     };
     dateFilteredEmployees.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;
@@ -88,68 +117,63 @@ export default function RecruiterDashboard() {
     return counts;
   };
 
-  // ==========================================
-  // MAGIC FIX: STEP 3 - AB TABLE KE LIYE TAB FILTER LAGAO
-  // ==========================================
   let tableFilteredData = dateFilteredEmployees;
   if (activeTab !== "All") {
-    tableFilteredData = tableFilteredData.filter((emp) => emp.status === activeTab);
+    tableFilteredData = tableFilteredData.filter(
+      (emp) => emp.status === activeTab,
+    );
   }
 
   // ====== EXCEL EXPORT LOGIC ======
- // ====== UPDATED EXCEL EXPORT LOGIC ======
   const handleDownloadExcel = () => {
     if (!tableFilteredData || tableFilteredData.length === 0) {
       toast.error("No data available to download!");
       return;
     }
 
-    // 1. Data mapping with Source and Recruiter Name
     const excelData = tableFilteredData.map((emp) => ({
       "Candidate Name": emp.name || "N/A",
       "Phone Number": emp.phone || "N/A",
       "Email Address": emp.email || "N/A",
-      "Source": emp.source || "N/A", // NAYA COLUMN: Source
+      Source: emp.source || "N/A",
       "Assigned Company": emp.assignedCompanyName || "N/A",
       "Job Process": emp.assignedProcess || "N/A",
-      "Status": emp.status || "N/A",
-      "Added By (Recruiter)": emp.addedBy || "N/A", // NAYA COLUMN: Recruiter ID/Email
-      "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN")
+      Status: emp.status || "N/A",
+      "Added By (Recruiter)": emp.addedBy || "N/A",
+      "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN"),
     }));
 
-    // 2. Create Workbook
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    
-    // 3. Adjusted Column Widths for extra columns
+
     const colWidths = [
-      { wch: 20 }, // Name
-      { wch: 15 }, // Phone
-      { wch: 25 }, // Email
-      { wch: 20 }, // Source (Added)
-      { wch: 25 }, // Company
-      { wch: 20 }, // Process
-      { wch: 15 }, // Status
-      { wch: 25 }, // Added By (Added)
-      { wch: 15 }  // Date
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
     ];
     worksheet["!cols"] = colWidths;
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Full_Report");
-
-    // 4. Trigger Download
-    XLSX.writeFile(workbook, `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`);
-    
+    XLSX.writeFile(
+      workbook,
+      `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`,
+    );
     toast.success("Detailed Excel Report Exported!");
   };
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8 md:p-10 relative">
-      <DashboardHeader 
-        role={userRole} 
-        dateFilter={dateFilter} 
-        setDateFilter={setDateFilter} 
-        handleDownload={handleDownloadExcel} 
+      <DashboardHeader
+        role={userRole}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        handleDownload={handleDownloadExcel}
       />
 
       <MetricsMatrix
@@ -164,7 +188,6 @@ export default function RecruiterDashboard() {
         setActiveTab={setActiveTab}
       />
 
-      {/* TABLE KO HUM FINAL tableFilteredData BHEJENGE */}
       <EmployeeTable
         filteredData={tableFilteredData}
         loading={loading}

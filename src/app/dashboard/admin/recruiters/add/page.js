@@ -114,7 +114,7 @@ export default function AddEmployeePage() {
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto mb-20">
       <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
         <h1 className="text-3xl font-bold text-[#092a49]">
-          Add Employee / LineUp
+          Add Candidate / LineUp
         </h1>
         <button
           onClick={() => router.back()}
