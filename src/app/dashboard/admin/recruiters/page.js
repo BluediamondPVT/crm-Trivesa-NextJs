@@ -126,6 +126,7 @@ export default function RecruiterDashboard() {
 
   // ====== EXCEL EXPORT LOGIC ======
   const handleDownloadExcel = () => {
+    console.log("Check Data Format: ", tableFilteredData[0].addedBy);
     if (!tableFilteredData || tableFilteredData.length === 0) {
       toast.error("No data available to download!");
       return;

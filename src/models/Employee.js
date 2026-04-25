@@ -33,7 +33,11 @@ const EmployeeSchema = new mongoose.Schema(
     interviewDate: { type: String },
     remark: { type: String },
 
-    addedBy: { type: String },
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // <--- YE LINE SABSE ZYADA ZAROORI HAI
+      required: true, // ya false, tere hisaab se
+    },
 
     status: {
       type: String,
