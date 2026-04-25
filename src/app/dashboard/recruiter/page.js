@@ -1,33 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react"; // <--- NAYA: Suspense import kiya
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar"; // Check karna ki path sahi ho tere project ke hisaab se
+import Sidebar from "@/components/Sidebar";
 
 export default function RecruiterDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear local storage aur login pe bhej do
     localStorage.clear();
-    router.push("/login"); // Agar tera login page alag path pe hai toh ise update kar lena
+    router.push("/login");
   };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       
-      {/* 1. Sidebar Component */}
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        handleLogout={handleLogout}
-      />
+      {/* MAGIC FIX: Sidebar ko Suspense mein wrap kar diya */}
+      <Suspense fallback={<div className="w-64 h-screen bg-[#092a49] hidden md:block">Loading Menu...</div>}>
+        <Sidebar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          handleLogout={handleLogout}
+        />
+      </Suspense>
 
-      {/* 2. Main Content Wrapper */}
+      {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         
-        {/* Mobile Header (Hamburger Menu) - Sirf choti screen pe dikhega */}
+        {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3 shrink-0 shadow-sm z-30">
           <span className="font-extrabold text-[#092a49] text-lg tracking-wide">CRM Dashboard</span>
           <button 
@@ -40,7 +41,7 @@ export default function RecruiterDashboard() {
           </button>
         </header>
 
-        {/* 3. Actual Page Content */}
+        {/* Actual Page Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 relative">
           <div className="flex flex-col items-center justify-center min-h-[70vh] text-center bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
             <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
