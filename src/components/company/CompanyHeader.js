@@ -1,6 +1,15 @@
 import Link from "next/link"; // Ye import add karo
+import { useEffect, useState } from "react";
 
 export default function CompanyHeader({ company }) {
+
+  // NAYA: Role save karne ke liye state
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("role"));
+  });
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border-l-8 border-[#092a49] p-6 sm:p-8 mb-6 relative overflow-hidden">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
@@ -21,6 +30,7 @@ export default function CompanyHeader({ company }) {
         </div>
         
         {/* NAYA: Link wrapper add kiya yahan */}
+        {userRole !== "recruiter" && (
         <Link href={`/dashboard/admin/edit-client/${company._id}`}>
           <button className="bg-[#1d4ed8] text-white cursor-pointer px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1e40af] shadow-md transition-all flex items-center gap-2">
             <svg
@@ -41,6 +51,7 @@ export default function CompanyHeader({ company }) {
             Edit Company
           </button>
         </Link>
+        )}
       </div>
     </div>
   );

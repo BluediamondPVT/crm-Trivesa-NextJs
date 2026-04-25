@@ -55,12 +55,12 @@ export default function DashboardHeader({
           </button>
         )}
 
-        {/* 3. ADD EMPLOYEE BUTTON */}
+        {/* 3. ADD Candidate BUTTON */}
         <Link
           href="/dashboard/admin/recruiters/add"
           className="bg-[#183e61] text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-[#061a2e] shadow-sm transition-colors"
         >
-          + Add Employee
+          + Add Candidate
         </Link>
       </div>
     </div>

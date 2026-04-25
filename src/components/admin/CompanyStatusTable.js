@@ -7,6 +7,13 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
+   const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("role"));
+  });
+
+
   // Status change hone pe visible count reset karo
   useEffect(() => {
     setVisibleCount(20);
@@ -103,12 +110,14 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
                           <span className="hidden sm:inline">View</span>
                         </button>
                       </Link>
+                         {userRole !== "recruiter" && (
                       <button
                         onClick={() => handleDelete(company._id, company.name)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
                       >
                         Delete
                       </button>
+                         )}
                     </td>
                   </tr>
                 ))}
