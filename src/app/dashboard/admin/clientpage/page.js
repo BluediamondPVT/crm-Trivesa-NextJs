@@ -11,6 +11,17 @@ export default function AdminDashboard() {
   const [visibleCount, setVisibleCount] = useState(10); // Shuru mein kitna dikhana hai
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [loading, setLoading] = useState(true);
+
+    // NAYA: Role save karne ke liye state
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    // Page load hote hi local storage se role nikal lo
+    setUserRole(localStorage.getItem("role"));
+
+  
+
+  }, );
   
   const loaderRef = useRef(null);
 
@@ -116,12 +127,15 @@ export default function AdminDashboard() {
           <p className="text-gray-500 mt-1">Overview of your system performance</p>
         </div>
 
-        <Link
-          href="/dashboard/admin/add-client"
-          className="bg-[#183e61] inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors"
-        >
-          + Add Clients
-        </Link>
+        {/* NAYA: Add Client button sirf tab dikhega jab role recruiter NAHI hoga */}
+        {userRole !== "recruiter" && (
+          <Link
+            href="/dashboard/admin/add-client"
+            className="bg-[#183e61] inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors"
+          >
+            + Add Clients
+          </Link>
+        )}
       </div>
 
       {/* Recent CRM Table */}

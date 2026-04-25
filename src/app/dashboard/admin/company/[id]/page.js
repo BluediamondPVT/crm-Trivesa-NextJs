@@ -101,10 +101,12 @@ export default function CompanyDetailsPage() {
         </div>
       )}
 
-      {/* 4. Contact Persons Table */}
-      <div className="mb-8">
-        <ContactPersons contactPersons={company.contactPersons} />
-      </div>
+     {/* 4. Contact Persons Table - HIDDEN FROM RECRUITERS */}
+      {userRole !== "recruiter" && (
+        <div className="mb-8">
+          <ContactPersons contactPersons={company.contactPersons} />
+        </div>
+      )}
 
       {/* 5. Current Openings */}
       <div className="mb-8">
