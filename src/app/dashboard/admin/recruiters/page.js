@@ -131,39 +131,44 @@ export default function RecruiterDashboard() {
       return;
     }
 
-    const excelData = tableFilteredData.map((emp) => ({
-      "Candidate Name": emp.name || "N/A",
-      "Phone Number": emp.phone || "N/A",
-      "Email Address": emp.email || "N/A",
-      Source: emp.source || "N/A",
-      "Assigned Company": emp.assignedCompanyName || "N/A",
-      "Job Process": emp.assignedProcess || "N/A",
-      Status: emp.status || "N/A",
-      "Added By (Recruiter)": emp.addedBy || "N/A",
-      "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN"),
-    }));
+    const excelData = tableFilteredData.map((emp) => {
+      // MAGIC YAHAN HAI: Email cut karne ka logic
+      let recruiterName = "N/A";
+      if (emp.addedBy && emp.addedBy.email) {
+        // Agar populated hai toh @ se pehle ka hissa le lo
+        recruiterName = emp.addedBy.email.split('@')[0];
+        
+        // Optional: Agar tu chahe ki pehla letter capital ho jaye (hr701 -> Hr701)
+        // recruiterName = recruiterName.charAt(0).toUpperCase() + recruiterName.slice(1);
+      } else if (typeof emp.addedBy === 'string') {
+        // Fallback: Agar kisi wajah se populate nahi hua toh ID hi dikha do
+        recruiterName = emp.addedBy;
+      }
+
+      return {
+        "Candidate Name": emp.name || "N/A",
+        "Phone Number": emp.phone || "N/A",
+        "Email Address": emp.email || "N/A",
+        "Source": emp.source || "N/A",
+        "Assigned Company": emp.assignedCompanyName || "N/A",
+        "Job Process": emp.assignedProcess || "N/A",
+        "Status": emp.status || "N/A",
+        "Added By (Recruiter)": recruiterName, // NAYA UPDATED NAAM
+        "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN")
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-
+    
     const colWidths = [
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 25 },
-      { wch: 20 },
-      { wch: 25 },
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 25 },
-      { wch: 15 },
+      { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }
     ];
     worksheet["!cols"] = colWidths;
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Full_Report");
-    XLSX.writeFile(
-      workbook,
-      `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`,
-    );
+    XLSX.writeFile(workbook, `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`);
+    
     toast.success("Detailed Excel Report Exported!");
   };
 

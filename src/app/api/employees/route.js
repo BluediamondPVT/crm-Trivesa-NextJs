@@ -19,7 +19,7 @@ export async function GET(request) {
       query = { addedBy: userId };
     }
 
-    const employees = await Employee.find(query).sort({ createdAt: -1 });
+    const employees = await Employee.find(query).sort({ createdAt: -1 }).populate("addedBy", "email");
     return NextResponse.json({ success: true, data: employees });
   } catch (error) {
     return NextResponse.json(
