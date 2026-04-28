@@ -2,11 +2,10 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-// 1. Import and configure Outfit
 const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-sans", // Maps Outfit to your Tailwind/Shadcn sans font
-  display: "swap", // Performance: Avoid invisible text during font load
+  variable: "--font-sans", 
+  display: "swap", 
 });
 
 export const metadata = {
@@ -16,11 +15,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${outfit.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${outfit.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <Toaster position="top-right" richColors />
