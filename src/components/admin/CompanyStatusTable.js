@@ -7,12 +7,23 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
-   const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
+  
   useEffect(() => {
-    setUserRole(localStorage.getItem("role"));
-  });
-
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (data.success && data.data?.role) {
+          setUserRole(data.data.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch role:", error);
+      }
+    };
+    fetchUserRole();
+  }, []);
 
   // Status change hone pe visible count reset karo
   useEffect(() => {
@@ -57,6 +68,12 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
     if (currentStatus === "Process") return "border-[#ea580c] text-[#ea580c]"; // Orange
     if (currentStatus === "Listed") return "border-[#2563eb] text-[#2563eb]"; // Blue
     return "border-[#092a49] text-[#092a49]";
+  };
+
+  // 🚀 FIX 3: Dynamic Path Logic for Admin vs Recruiter
+  const getViewPath = (id) => {
+    const basePath = userRole === "recruiter" ? "/dashboard/recruiter" : "/dashboard/admin";
+    return `${basePath}/company/${id}`;
   };
 
   // Sirf utna data nikaalo jitna dikhana hai
@@ -105,19 +122,22 @@ export default function CompanyStatusTable({ filteredCompanies, currentStatus, h
                       {company.address || "N/A"}
                     </td>
                     <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
-                      <Link href={`/dashboard/admin/company/${company._id}`}>
+                      
+                      {/* 🚀 Dynamic Link Apply Kiya */}
+                      <Link href={getViewPath(company._id)}>
                         <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-all border border-blue-200 shadow-sm cursor-pointer whitespace-nowrap">
                           <span className="hidden sm:inline">View</span>
                         </button>
                       </Link>
-                         {userRole !== "recruiter" && (
-                      <button
-                        onClick={() => handleDelete(company._id, company.name)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                         )}
+                      
+                      {userRole !== "recruiter" && (
+                        <button
+                          onClick={() => handleDelete(company._id, company.name)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

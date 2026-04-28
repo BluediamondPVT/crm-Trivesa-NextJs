@@ -1,6 +1,7 @@
 /**
  * API Client for Trivesa CRM Frontend
  * Handles all API requests with centralized error handling and configuration
+ * Uses HTTP-only cookies for authentication (no localStorage)
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -14,6 +15,7 @@ class APIClient {
 
   /**
    * Fetch wrapper with timeout support
+   * Credentials are automatically included in every request (for HTTP-only cookies)
    */
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
@@ -21,21 +23,17 @@ class APIClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
-      // Add Authorization header if token exists
+      // Setup headers
       const headers = {
         "Content-Type": "application/json",
         ...options.headers,
       };
 
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(url, {
         ...options,
         headers,
+        // CRITICAL: Include credentials so HTTP-only cookies are sent with every request
+        credentials: "include",
         signal: controller.signal,
       });
 
@@ -55,7 +53,7 @@ class APIClient {
         throw new APIError(
           data?.message || "Request failed",
           response.status,
-          data,
+          data
         );
       }
 
@@ -133,10 +131,28 @@ class APIError extends Error {
 // Export singleton instance
 export const apiClient = new APIClient();
 
-// Auth API methods
+/**
+ * Custom API Error class
+ */
+class APIError extends Error {
+  constructor(message, status, details) {
+    super(message);
+    this.name = "APIError";
+    this.status = status;
+    this.details = details;
+  }
+}
+
+// Export singleton instance
+export const apiClient = new APIClient();
+
+// Auth API methods (now uses HTTP-only cookies - no need to handle tokens)
 export const authAPI = {
   login: (email, password) =>
     apiClient.post("/api/auth/login", { email, password }),
+
+  logout: () =>
+    apiClient.post("/api/auth/logout", {}),
 
   verify: () => apiClient.get("/api/auth/verify"),
 };

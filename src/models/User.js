@@ -23,11 +23,19 @@ const UserSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: {
-        // NAYA: "recruiter" ko is list mein daal diya
-        values: ["admin", "superadmin", "recruiter"],
-        message: "Role must be either admin, superadmin or recruiter",
+        // 🔥 UPDATE: Saare 7 enterprise roles yahan define kar diye hain
+        values: [
+          "superadmin", 
+          "admin", 
+          "ta_head", 
+          "recruiter", 
+          "executive", 
+          "hr", 
+          "finance"
+        ],
+        message: "{VALUE} is not a valid role", // Dynamic message
       },
-      default: "admin",
+      required: [true, "Role is required"], // Role ab compulsory hai
     },
     isActive: {
       type: Boolean,

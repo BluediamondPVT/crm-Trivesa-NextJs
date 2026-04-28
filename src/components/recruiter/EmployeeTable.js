@@ -1,33 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import axios from "axios"; // 🚀 NAYA IMPORT
+import { toast } from "sonner"; // 🚀 NAYA IMPORT
 
 export default function EmployeeTable({
   filteredData,
   loading,
   activeTab,
   setSelectedRemark,
+  role = "admin", 
 }) {
   // Infinite Scroll States
   const [visibleCount, setVisibleCount] = useState(10);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
-  // Jab bhi tab change ho (e.g., LineUp se Selected), count wapas 10 kar do
   useEffect(() => {
     setVisibleCount(10);
   }, [activeTab, filteredData.length]);
 
-  // Intersection Observer (Scroll detect karne ke liye)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
-      
         if (target.isIntersecting && visibleCount < filteredData.length && !isFetchingMore) {
           loadMoreData();
         }
       },
-      { threshold: 0.1 } // Thoda sa dikhte hi trigger ho jayega
+      { threshold: 0.1 }
     );
 
     if (loaderRef.current) {
@@ -43,15 +43,35 @@ export default function EmployeeTable({
 
   const loadMoreData = () => {
     setIsFetchingMore(true);
-    // Fake delay taaki user ko loader dikhe (UX acha karne ke liye)
     setTimeout(() => {
       setVisibleCount((prev) => prev + 10);
       setIsFetchingMore(false);
     }, 800);
   };
 
-  // Sirf utna hi data dikhao jitna visibleCount allow kare
   const visibleData = filteredData.slice(0, visibleCount);
+
+  const getActionPath = (actionType, id) => {
+    const basePath = role === "recruiter"
+      ? "/dashboard/recruiter/recruiters"
+      : "/dashboard/admin/recruiters";
+    return `${basePath}/${actionType}/${id}`;
+  };
+
+  // 🚀 DELETE HANDLER
+  const confirmDelete = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+      try {
+        const res = await axios.delete(`/api/employees/${id}`);
+        if (res.data.success) {
+          toast.success("Candidate deleted successfully!");
+          window.location.reload(); // Page refresh taaki data update ho jaye
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to delete candidate");
+      }
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -148,21 +168,31 @@ export default function EmployeeTable({
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                      <Link href={`/dashboard/admin/recruiters/view/${emp._id}`}>
+                      <Link href={getActionPath("view", emp._id)}>
                         <button className="px-4 py-1.5 cursor-pointer text-[#092a49] bg-gray-100 hover:bg-gray-200 rounded-md text-xs font-bold transition-colors">
                           View
                         </button>
                       </Link>
-                      <Link href={`/dashboard/admin/recruiters/edit/${emp._id}`}>
+                      
+                      <Link href={getActionPath("edit", emp._id)}>
                         <button className="px-4 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer text-xs font-bold transition-colors">
                           Edit
                         </button>
                       </Link>
+
+                      {/* 🚀 ONLY SUPER ADMIN DELETE BUTTON */}
+                      {role === "superadmin" && (
+                        <button 
+                          onClick={() => confirmDelete(emp._id, emp.name)}
+                          className="px-4 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md cursor-pointer text-xs font-bold transition-colors border border-red-100"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
 
-                {/* SCROLL LOADER (Intersection Observer Target) */}
                 {visibleCount < filteredData.length && (
                   <tr ref={loaderRef}>
                     <td colSpan="7" className="text-center py-6">

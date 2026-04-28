@@ -3,18 +3,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 import SidebarItem from "./sidebar/SidebarItem";
 import SidebarDropdown from "./sidebar/SidebarDropdown";
 
-export default function Sidebar({
-  isSidebarOpen,
-  setIsSidebarOpen,
-  handleLogout,
-}) {
+export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentTab = searchParams.get("tab");
 
   const [isClientOpen, setIsClientOpen] = useState(false);
@@ -23,121 +20,162 @@ export default function Sidebar({
 
   const [userRole, setUserRole] = useState(null);
 
+  // 🚀 Fetch Role from Secure API
   useEffect(() => {
-    setUserRole(localStorage.getItem("role"));
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+
+        if (data.success && data.data?.role) {
+          setUserRole(data.data.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user role for sidebar:", error);
+      }
+    };
+
+    fetchUserRole();
   }, []);
 
   const handleMobileClose = () => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
-  const dashboardHref =
-    userRole === "recruiter" ? "/dashboard/recruiter" : "/dashboard/admin";
+  const handleLogoutClick = async () => {
+    try {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
 
-  // 1. Client Sub Items
+      if (res.ok) {
+        localStorage.clear();
+        router.push("/login");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  // Dynamic Dashboard Route
+  let dashboardHref = "/dashboard";
+  if (userRole === "superadmin") dashboardHref = "/dashboard/super";
+  else if (userRole === "admin") dashboardHref = "/dashboard/admin";
+  else if (userRole === "recruiter") dashboardHref = "/dashboard/recruiter";
+
+  // 🚀 1. Client Sub Items (NAYA FIX: Dynamic routes for Admin vs Recruiter)
+  const baseClientPath =
+    userRole === "recruiter"
+      ? "/dashboard/recruiter/companies"
+      : "/dashboard/admin/companies";
+  const clientPagePath =
+    userRole === "recruiter"
+      ? "/dashboard/recruiter/clientpage"
+      : "/dashboard/admin/clientpage";
+
   const clientSubItems = [
     {
       name: "All Clients",
       color: "bg-yellow-700",
-      href: "/dashboard/admin/clientpage",
+      href: clientPagePath,
     },
     {
       name: "Active",
       color: "bg-green-700",
-      href: "/dashboard/admin/companies/active",
+      href: `${baseClientPath}/active`,
     },
     {
       name: "Non Active",
       color: "bg-red-700",
-      href: "/dashboard/admin/companies/non-active",
+      href: `${baseClientPath}/non-active`,
     },
     {
       name: "Process",
       color: "bg-orange-700",
-      href: "/dashboard/admin/companies/process",
+      href: `${baseClientPath}/process`,
     },
     {
       name: "Listed",
       color: "bg-blue-700",
-      href: "/dashboard/admin/companies/listed",
+      href: `${baseClientPath}/listed`,
     },
   ].map((item) => ({
     ...item,
     isActive: pathname === item.href,
   }));
 
-  // 2. Candidate Sub Items
+  // 2. Candidate Sub Items (Dynamic based on role)
+  const baseCandidatePath =
+    userRole === "recruiter"
+      ? "/dashboard/recruiter"
+      : "/dashboard/admin/recruiters";
   const candidateSubItems = [
     {
       name: "All",
       tabName: "All",
       color: "bg-gray-400",
-      href: "/dashboard/admin/recruiters?tab=All",
+      href: `${baseCandidatePath}?tab=All`,
     },
     {
       name: "LineUp",
       tabName: "LineUp",
       color: "bg-blue-500",
-      href: "/dashboard/admin/recruiters?tab=LineUp",
+      href: `${baseCandidatePath}?tab=LineUp`,
     },
     {
       name: "Attendees",
       tabName: "Attendees",
       color: "bg-orange-500",
-      href: "/dashboard/admin/recruiters?tab=Attendees",
+      href: `${baseCandidatePath}?tab=Attendees`,
     },
     {
       name: "On Hold",
       tabName: "On Hold",
       color: "bg-yellow-400",
-      href: "/dashboard/admin/recruiters?tab=On Hold",
+      href: `${baseCandidatePath}?tab=On Hold`,
     },
     {
       name: "Selected",
       tabName: "Selected",
       color: "bg-green-500",
-      href: "/dashboard/admin/recruiters?tab=Selected",
+      href: `${baseCandidatePath}?tab=Selected`,
     },
     {
       name: "Joining",
       tabName: "Joining",
       color: "bg-teal-500",
-      href: "/dashboard/admin/recruiters?tab=Joining",
+      href: `${baseCandidatePath}?tab=Joining`,
     },
     {
       name: "Rejected",
       tabName: "Rejected",
       color: "bg-red-500",
-      href: "/dashboard/admin/recruiters?tab=Rejected",
+      href: `${baseCandidatePath}?tab=Rejected`,
     },
     {
       name: "Payout",
       tabName: "Payout",
       color: "bg-purple-500",
-      href: "/dashboard/admin/recruiters?tab=Payout",
+      href: `${baseCandidatePath}?tab=Payout`,
     },
   ].map((item) => ({
     ...item,
     isActive:
-      pathname.includes("/recruiters") &&
+      (userRole === "recruiter"
+        ? pathname === "/dashboard/recruiter"
+        : pathname.includes("/recruiters")) &&
       (currentTab === item.tabName ||
         (!currentTab && item.tabName === "LineUp")),
   }));
 
-  // 3. Recruiter Dropdown Items (Dummy Links)
+  // 3. Recruiter Dropdown Items
   const recruiterSubItems = [
     { name: "HR701", color: "bg-cyan-500", href: "#hr701" },
     { name: "HR702", color: "bg-cyan-500", href: "#hr702" },
     { name: "HR703", color: "bg-cyan-500", href: "#hr703" },
     { name: "HR704", color: "bg-cyan-500", href: "#hr704" },
-    { name: "HR705", color: "bg-cyan-500", href: "#hr705" },
-    { name: "HR706", color: "bg-cyan-500", href: "#hr706" },
-    { name: "HR707", color: "bg-cyan-500", href: "#hr707" },
-    { name: "HR708", color: "bg-cyan-500", href: "#hr708" },
-  ].map((item) => ({
-    ...item,
-    isActive: pathname === item.href,
-  }));
+  ].map((item) => ({ ...item, isActive: pathname === item.href }));
 
   return (
     <>
@@ -159,7 +197,6 @@ export default function Sidebar({
         animate={{ x: isSidebarOpen ? 0 : "-100%", opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        {/* Header Section */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <Link
             href={dashboardHref}
@@ -180,12 +217,10 @@ export default function Sidebar({
                 />
               </svg>
             </div>
-            <span className="text-xl font-bold tracking-wide group-hover:text-gray-200 transition-colors">
-              {userRole === "superadmin"
-                ? "Super Admin"
-                : userRole === "recruiter"
-                  ? "Recruiter"
-                  : "Admin"}
+            <span className="text-xl font-bold tracking-wide group-hover:text-gray-200 transition-colors capitalize">
+              {userRole
+                ? userRole.replace("superadmin", "Super Admin")
+                : "Loading..."}
             </span>
           </Link>
           <button
@@ -209,13 +244,12 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Navigation Section (NEW SEQUENCE) */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {/* 1. Dashboard */}
           <SidebarItem
             href={dashboardHref}
             label="Dashboard"
-            isActive={pathname === dashboardHref}
+            isActive={pathname === dashboardHref && !currentTab}
             onClick={handleMobileClose}
             icon={
               <svg
@@ -240,8 +274,8 @@ export default function Sidebar({
             }
           />
 
-          {/* 2. Recruiters (Restricted to non-recruiters) */}
-          {userRole !== "recruiter" && (
+          {/* 2. Recruiters (Restricted) */}
+          {userRole && userRole !== "recruiter" && (
             <SidebarDropdown
               label="Recruiters"
               isOpen={isRecruiterOpen}
@@ -275,8 +309,8 @@ export default function Sidebar({
             isOpen={isCandidateOpen}
             toggleOpen={() => setIsCandidateOpen(!isCandidateOpen)}
             isActive={
-              pathname.includes("/recruiters") &&
-              !pathname.includes("/recruiter-head")
+              pathname.includes("/recruiters") ||
+              (userRole === "recruiter" && currentTab)
             }
             subItems={candidateSubItems}
             pathname={pathname}
@@ -299,8 +333,8 @@ export default function Sidebar({
             }
           />
 
-          {/* 4. Recruiter Head (Restricted to non-recruiters) */}
-          {userRole !== "recruiter" && (
+          {/* 4. Recruiter Head (Restricted) */}
+          {userRole && userRole !== "recruiter" && (
             <SidebarItem
               href="/dashboard/admin/recruiter-head"
               label="Recruiter Head"
@@ -325,37 +359,39 @@ export default function Sidebar({
             />
           )}
 
-          {/* 5. Clients */}
-          <SidebarDropdown
-            label="Clients"
-            isOpen={isClientOpen}
-            toggleOpen={() => setIsClientOpen(!isClientOpen)}
-            isActive={
-              pathname.includes("/companies") ||
-              pathname.includes("/clientpage")
-            }
-            subItems={clientSubItems}
-            pathname={pathname}
-            onSubItemClick={handleMobileClose}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
-                />
-              </svg>
-            }
-          />
+          {/* 🚀 5. Clients (Ab Sabhi roles ko dikhega - Restriction hata di) */}
+          {userRole && (
+            <SidebarDropdown
+              label="Clients"
+              isOpen={isClientOpen}
+              toggleOpen={() => setIsClientOpen(!isClientOpen)}
+              isActive={
+                pathname.includes("/companies") ||
+                pathname.includes("/clientpage")
+              }
+              subItems={clientSubItems}
+              pathname={pathname}
+              onSubItemClick={handleMobileClose}
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                  />
+                </svg>
+              }
+            />
+          )}
 
-          {/* Super Admin Area: Add Recruiter */}
+          {/* Super Admin Area */}
           {userRole === "superadmin" && (
             <SidebarItem
               href="/dashboard/super/create-recruiter"
@@ -386,7 +422,7 @@ export default function Sidebar({
         {/* Footer Section */}
         <div className="p-4 mb-4 shrink-0">
           <button
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             className="w-full flex items-center gap-3 text-gray-300 hover:bg-red-500/10 hover:text-red-400 px-4 py-3 rounded-xl transition-all border-l-4 border-transparent focus:outline-none focus:ring-2 focus:ring-red-500/50"
           >
             <svg

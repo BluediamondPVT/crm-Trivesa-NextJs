@@ -1,25 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 
-// Components Import
+// Reusable Components Import
 import PersonalDetailsForm from "@/components/employee/add/PersonalDetailsForm";
 import ProfessionalDetailsForm from "@/components/employee/add/ProfessionalDetailsForm";
-import InterviewDetailsForm from "@/components/employee/add/InterviewDetailsForm";
+import EditInterviewDetailsForm from "@/components/employee/add/EditInterviewDetailsForm";
 import SubmitButtons from "@/components/employee/add/SubmitButtons";
 
-export default function AddEmployeePage() {
+export default function EditEmployeePage() {
   const router = useRouter();
+  const { id } = useParams();
+
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
 
   const [activeCompanies, setActiveCompanies] = useState([]);
   const [availableOpenings, setAvailableOpenings] = useState([]);
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
 
-  // 🚀 NAYA: Role save karne ke liye state (Redirection ke kaam aayega)
+  // 🚀 NAYA: Role save karne ke liye state
   const [userRole, setUserRole] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -35,42 +38,60 @@ export default function AddEmployeePage() {
     lastSalary: "",
     expectedSalary: "",
     source: "",
+    actualSalary: "",
     assignedCompanyId: "",
     assignedCompanyName: "",
     assignedProcess: "",
     interviewDate: "",
-    status: "LineUp",
+    remark: "",
+    status: "",
   });
 
   useEffect(() => {
-    // 🚀 NAYA: Component load hote hi role fetch kar lo
-    const fetchUserRole = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/auth/me");
-        const data = await res.json();
-        if (data.success) {
-          setUserRole(data.data.role);
-        }
-      } catch (error) {
-        console.error("Failed to fetch role:", error);
-      }
-    };
-    fetchUserRole();
+        // 🚀 NAYA: Secure API se role fetch karo redirect ke liye
+        const authRes = await fetch("/api/auth/me");
+        const authData = await authRes.json();
+        if (authData.success) setUserRole(authData.data.role);
 
-    // Companies fetch logic (Same as before)
-    const fetchCompanies = async () => {
-      try {
-        const res = await axios.get("/api/companies");
-        if (res.data.success) {
-          const actives = res.data.data.filter((c) => c.status === "Active");
-          setActiveCompanies(actives);
+        const compRes = await axios.get("/api/companies");
+        let companies = [];
+        if (compRes.data.success) {
+          companies = compRes.data.data.filter((c) => c.status === "Active");
+          setActiveCompanies(companies);
+        }
+
+        const empRes = await axios.get(`/api/employees/${id}`);
+        if (empRes.data.success) {
+          const empData = empRes.data.data;
+          if (empData.interviewDate && empData.interviewDate.includes("T")) {
+            empData.interviewDate = empData.interviewDate.split("T")[0];
+          }
+          empData.remark = empData.remark || "";
+          setFormData(empData);
+
+          const selectedCompany = companies.find(
+            (c) => c._id === empData.assignedCompanyId,
+          );
+          if (selectedCompany && selectedCompany.openings) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const activeOnlyOpenings = selectedCompany.openings.filter((op) => {
+              if (!op.expiryDate) return true;
+              return new Date(op.expiryDate) >= today;
+            });
+            setAvailableOpenings(activeOnlyOpenings);
+          }
         }
       } catch (error) {
-        toast.error("Failed to load companies");
+        toast.error("Failed to load data");
+      } finally {
+        setFetching(false);
       }
     };
-    fetchCompanies();
-  }, []);
+    if (id) fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -92,8 +113,7 @@ export default function AddEmployeePage() {
       today.setHours(0, 0, 0, 0);
       const activeOnlyOpenings = selectedCompany.openings.filter((op) => {
         if (!op.expiryDate) return true;
-        const expDate = new Date(op.expiryDate);
-        return expDate >= today;
+        return new Date(op.expiryDate) >= today;
       });
       setAvailableOpenings(activeOnlyOpenings);
     } else {
@@ -104,16 +124,12 @@ export default function AddEmployeePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      // 🚀 MAGIC FIX: Backend khud x-user-id header read kar lega.
-      
-      const res = await axios.post("/api/employees", formData);
-
+      const res = await axios.put(`/api/employees/${id}`, formData);
       if (res.data.success) {
-        toast.success("Candidate Added!");
+        toast.success("Candidate Data Updated!");
 
-        // 🚀 DYNAMIC REDIRECT: Role ke hisab se wapas bhejo
+        // 🚀 MAGIC REDIRECT: Role ke hisab se sahi folder mein bhejo
         if (userRole === "recruiter") {
           router.push("/dashboard/recruiter");
         } else {
@@ -121,23 +137,37 @@ export default function AddEmployeePage() {
         }
       }
     } catch (error) {
-      toast.error("Failed to add candidate");
+      toast.error("Update failed.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching)
+    return (
+      <div className="p-10 text-center font-bold text-[#092a49] mt-10">
+        Loading Data...
+      </div>
+    );
+
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto mb-20">
+      {/* ... baaki UI same rahega ... */}
       <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-        <h1 className="text-3xl font-bold text-[#092a49]">
-          Add Candidate / LineUp
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold text-[#092a49]">
+            View / Edit Candidate
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Update details for {formData.name}
+          </p>
+        </div>
         <button
+          type="button"
           onClick={() => router.back()}
           className="text-gray-500 hover:text-[#1d4ed8] font-medium text-sm transition-colors cursor-pointer"
         >
-          Cancel & Go Back
+          Cancel
         </button>
       </div>
 
@@ -150,8 +180,7 @@ export default function AddEmployeePage() {
           formData={formData}
           handleChange={handleChange}
         />
-
-        <InterviewDetailsForm
+        <EditInterviewDetailsForm
           formData={formData}
           handleChange={handleChange}
           activeCompanies={activeCompanies}
@@ -160,7 +189,6 @@ export default function AddEmployeePage() {
           isStatusOpen={isStatusOpen}
           setIsStatusOpen={setIsStatusOpen}
         />
-
         <SubmitButtons loading={loading} />
       </form>
     </div>

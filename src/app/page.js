@@ -1,14 +1,7 @@
-import LoginForm from '@/components/LoginForm';
-
-export const metadata = {
-  title: 'Login - Trivesa CRM',
-  description: 'Sign in to manage your HR consultancy.',
-};
+// src/app/page.js
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <main>
-      <LoginForm />
-    </main>
-  );
+  // Koi direct main website pe aaye toh usko login pe dhakel do
+  redirect("/login");
 }

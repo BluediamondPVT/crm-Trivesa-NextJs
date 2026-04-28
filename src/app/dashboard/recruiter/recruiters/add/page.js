@@ -18,8 +18,8 @@ export default function AddEmployeePage() {
   const [activeCompanies, setActiveCompanies] = useState([]);
   const [availableOpenings, setAvailableOpenings] = useState([]);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
-
-  // 🚀 NAYA: Role save karne ke liye state (Redirection ke kaam aayega)
+  
+  // 🚀 NAYA FIX: Role state for dynamic redirect
   const [userRole, setUserRole] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -30,10 +30,10 @@ export default function AddEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "",
+    expertise: "", 
     experience: "",
     lastSalary: "",
-    expectedSalary: "",
+    expectedSalary: "", 
     source: "",
     assignedCompanyId: "",
     assignedCompanyName: "",
@@ -43,12 +43,12 @@ export default function AddEmployeePage() {
   });
 
   useEffect(() => {
-    // 🚀 NAYA: Component load hote hi role fetch kar lo
+    // 🚀 NAYA FIX: Component load hote hi role secure API se mangwao
     const fetchUserRole = async () => {
       try {
         const res = await fetch("/api/auth/me");
         const data = await res.json();
-        if (data.success) {
+        if (data.success && data.data?.role) {
           setUserRole(data.data.role);
         }
       } catch (error) {
@@ -57,7 +57,6 @@ export default function AddEmployeePage() {
     };
     fetchUserRole();
 
-    // Companies fetch logic (Same as before)
     const fetchCompanies = async () => {
       try {
         const res = await axios.get("/api/companies");
@@ -106,14 +105,14 @@ export default function AddEmployeePage() {
     setLoading(true);
 
     try {
-      // 🚀 MAGIC FIX: Backend khud x-user-id header read kar lega.
-      
+      // 🚀 MAGIC FIX: Backend automatically headers se user ID read kar lega.
+      // Toh humein addedBy bhejney ki zarurat hi nahi hai!
       const res = await axios.post("/api/employees", formData);
-
+      
       if (res.data.success) {
         toast.success("Candidate Added!");
-
-        // 🚀 DYNAMIC REDIRECT: Role ke hisab se wapas bhejo
+        
+        // 🚀 DYNAMIC REDIRECT: Role ke hisab se redirect karo
         if (userRole === "recruiter") {
           router.push("/dashboard/recruiter");
         } else {

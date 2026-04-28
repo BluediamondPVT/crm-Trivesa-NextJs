@@ -1,11 +1,18 @@
 import Link from "next/link";
 
 export default function DashboardHeader({
-  role,
+  role, // 🚀 FIX: Yahan sirf 'role' aayega, 'role={userRole}' nahi
   dateFilter,
   setDateFilter,
   handleDownload,
 }) {
+  // Console log laga ke check kar sakte ho ki kya role aa raha hai
+  console.log("Current Role in Header:", role);
+
+  const addCandidatePath = role === "recruiter"
+    ? "/dashboard/recruiter/recruiters/add"
+    : "/dashboard/admin/recruiters/add";
+
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
       <div>
@@ -31,8 +38,8 @@ export default function DashboardHeader({
           <option value="30Days">Last 30 Days</option>
         </select>
 
-        {/* 2. EXPORT BUTTON (Only for Admin) */}
-        {role && role.toLowerCase() === "admin" && (
+        {/* 2. EXPORT BUTTON (Only for Admin & Super Admin) */}
+        {role && ["admin", "superadmin"].includes(role.toLowerCase()) && (
           <button
             onClick={handleDownload}
             className="bg-green-600 text-white text-sm px-4 py-2.5 rounded-lg font-semibold hover:bg-green-700 shadow-sm transition-colors flex items-center gap-2 cursor-pointer"
@@ -56,11 +63,10 @@ export default function DashboardHeader({
         )}
 
         {/* 3. ADD Candidate BUTTON */}
-        <Link
-          href="/dashboard/admin/recruiters/add"
-          className="bg-[#183e61] text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-[#061a2e] shadow-sm transition-colors"
-        >
-          + Add Candidate
+        <Link href={addCandidatePath}>
+          <button className="bg-[#092a49] text-white px-4 py-2 rounded-lg">
+            + Add Candidate
+          </button>
         </Link>
       </div>
     </div>

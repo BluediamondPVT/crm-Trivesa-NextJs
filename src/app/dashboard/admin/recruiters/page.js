@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
-import { useSearchParams } from "next/navigation"; // <--- NAYA IMPORT YAHAN HAI
+import { useSearchParams } from "next/navigation"; 
 
 // Component Imports
 import DashboardHeader from "@/components/recruiter/DashboardHeader";
@@ -14,8 +14,8 @@ import EmployeeTable from "@/components/recruiter/EmployeeTable";
 import RemarkModal from "@/components/recruiter/RemarkModal";
 
 export default function RecruiterDashboard() {
-  const searchParams = useSearchParams(); // URL ko read karne ke liye
-  const tabFromUrl = searchParams.get("tab"); // URL se ?tab= ki value nikal rahe hain
+  const searchParams = useSearchParams(); 
+  const tabFromUrl = searchParams.get("tab"); 
 
   const tabs = [
     "All",
@@ -28,19 +28,16 @@ export default function RecruiterDashboard() {
     "Payout",
   ];
 
-  // Agar URL mein tab hai aur wo valid hai, toh usey default rakho, warna 'LineUp'
-  const initialTab =
-    tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
+  const initialTab = tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
 
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(initialTab); // Initial tab set kar diya
+  const [activeTab, setActiveTab] = useState(initialTab); 
   const [selectedRemark, setSelectedRemark] = useState(null);
 
   const [userRole, setUserRole] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
 
-  // NAYA: URL change hone pe activeTab bhi update hona chahiye (jab user sidebar se click kare)
   useEffect(() => {
     if (tabFromUrl && tabs.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
@@ -51,13 +48,17 @@ export default function RecruiterDashboard() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const userId = localStorage.getItem("userId");
-        const role = localStorage.getItem("role");
-        setUserRole(role);
+        
+        const authRes = await fetch("/api/auth/me");
+        const authData = await authRes.json();
+        
+        if (authData.success && authData.data?.role) {
+          setUserRole(authData.data.role);
+        }
 
-        const res = await axios.get(
-          `/api/employees?userId=${userId}&role=${role}`,
-        );
+        // 🚀 URL se query parameters hata diye, kyunki backend ab khud headers se ID/Role nikalta hai
+        const res = await axios.get("/api/employees");
+        
         if (res.data.success) {
           setEmployees(res.data.data);
         }
@@ -126,23 +127,16 @@ export default function RecruiterDashboard() {
 
   // ====== EXCEL EXPORT LOGIC ======
   const handleDownloadExcel = () => {
-    console.log("Check Data Format: ", tableFilteredData[0].addedBy);
     if (!tableFilteredData || tableFilteredData.length === 0) {
       toast.error("No data available to download!");
       return;
     }
 
     const excelData = tableFilteredData.map((emp) => {
-      // MAGIC YAHAN HAI: Email cut karne ka logic
       let recruiterName = "N/A";
       if (emp.addedBy && emp.addedBy.email) {
-        // Agar populated hai toh @ se pehle ka hissa le lo
         recruiterName = emp.addedBy.email.split('@')[0];
-        
-        // Optional: Agar tu chahe ki pehla letter capital ho jaye (hr701 -> Hr701)
-        // recruiterName = recruiterName.charAt(0).toUpperCase() + recruiterName.slice(1);
       } else if (typeof emp.addedBy === 'string') {
-        // Fallback: Agar kisi wajah se populate nahi hua toh ID hi dikha do
         recruiterName = emp.addedBy;
       }
 
@@ -154,7 +148,7 @@ export default function RecruiterDashboard() {
         "Assigned Company": emp.assignedCompanyName || "N/A",
         "Job Process": emp.assignedProcess || "N/A",
         "Status": emp.status || "N/A",
-        "Added By (Recruiter)": recruiterName, // NAYA UPDATED NAAM
+        "Added By (Recruiter)": recruiterName, 
         "Date Added": new Date(emp.createdAt).toLocaleDateString("en-IN")
       };
     });
@@ -175,6 +169,9 @@ export default function RecruiterDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8 md:p-10 relative">
+      {/* Test ke liye debug text, isko baad me hata dena jab button dikh jaye */}
+      {/* <p className="text-red-500 font-bold">Current Role is: {userRole || "LOADING..."}</p> */}
+
       <DashboardHeader
         role={userRole}
         dateFilter={dateFilter}
@@ -199,6 +196,7 @@ export default function RecruiterDashboard() {
         loading={loading}
         activeTab={activeTab}
         setSelectedRemark={setSelectedRemark}
+        role={userRole} 
       />
 
       <RemarkModal

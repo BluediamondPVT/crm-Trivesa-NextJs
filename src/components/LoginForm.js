@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginForm() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,22 +10,8 @@ export default function LoginForm() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-
-    if (token && role) {
-      // SMART REDIRECT LOGIC
-      let redirectPath = "/dashboard/admin"; // Default fallback (for admin)
-      if (role === "superadmin") redirectPath = "/dashboard/super";
-      
-      // YAHAN FIX KIYA: Recruiter seedha apni tab pe jayega
-      if (role === "recruiter") redirectPath = "/dashboard/admin/recruiters"; 
-
-      router.replace(redirectPath);
-    }
-  }, [router]);
+  
+  // Ab auth ka saara heavy lifting tera middleware karega!
 
   const validateForm = () => {
     // Email validation
@@ -47,72 +30,83 @@ export default function LoginForm() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    // Client-side validation
-    if (!validateForm()) {
-      return;
+  if (!validateForm()) return;
+
+  setLoading(true);
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email.toLowerCase(),
+        password,
+      }),
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      throw new Error(responseData.message || "Invalid credentials");
     }
 
-    setLoading(true);
+    // 🕵️‍♂️ Debugging ke liye: Console mein check kar role kya aa raha hai
+    const role = responseData.data?.role;
+    console.log("User Role Detected:", role);
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.toLowerCase(),
-          password,
-        }),
-      });
-
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(responseData.message || "Invalid email or password");
-      }
-
-      // NAYA: resEmail variable add kiya backend se email nikalne ke liye
-      const { token, role, userId, email: resEmail } = responseData.data;
-
-      if (!token || !role) {
-        throw new Error("Missing authentication data");
-      }
-
-      // Store authentication data securely
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("userId", userId);
-      
-      // YAHAN FIX KIYA: Email ko localStorage mein save kar rahe hain (Sidebar ke liye)
-      localStorage.setItem("email", resEmail || email.toLowerCase());
-
-      setSuccess("Login successful! Redirecting...");
-
-      // Redirect after short delay
-      setTimeout(() => {
-        let redirectPath = "/dashboard/admin"; 
-        if (role === "superadmin") redirectPath = "/dashboard/super";
-        
-        // YAHAN FIX KIYA: Recruiter ka path update kiya
-        if (role === "recruiter") redirectPath = "/dashboard/admin/recruiters"; 
-
-        router.replace(redirectPath);
-      }, 500);
-    } catch (err) {
-      setError(
-        err.message || "An unexpected error occurred. Please try again.",
-      );
-      console.error("Login error:", err);
-    } finally {
-      setLoading(false);
+    if (!role) {
+      throw new Error("Role data missing from server");
     }
-  };
+
+    setSuccess("Login successful! Redirecting to your layout...");
+
+    // 🚀 MASTER REDIRECT LOGIC: Har role ke liye alag rasta
+    setTimeout(() => {
+      let redirectPath = "/dashboard"; // Base fallback
+
+      switch (role) {
+        case "superadmin":
+          redirectPath = "/dashboard/super";
+          break;
+        case "admin":
+          redirectPath = "/dashboard/admin";
+          break;
+        case "recruiter":
+          redirectPath = "/dashboard/recruiter";
+          break;
+        // case "ta_head":
+        //   redirectPath = "/dashboard/ta_head";
+        //   break;
+        // case "hr":
+        //   redirectPath = "/dashboard/hr";
+        //   break;
+        // case "finance":
+        //   redirectPath = "/dashboard/finance";
+        //   break;
+        // case "executive":
+        //   redirectPath = "/dashboard/executive";
+        //   break;
+        default:
+          // Agar koi naya role aaye toh uska folder check karega
+          redirectPath = `/dashboard/${role}`;
+      }
+
+      console.log("Redirecting to:", redirectPath);
+      window.location.href = redirectPath;
+    }, 800);
+
+  } catch (err) {
+    setError(err.message || "An unexpected error occurred.");
+    console.error("Login Error Details:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f8f6f4] p-4">
@@ -237,7 +231,7 @@ export default function LoginForm() {
                         strokeWidth={1.5}
                         stroke="currentColor"
                         className="w-5 h-5"
-                        aria-hidden="true" // SVG ko hide karein
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"

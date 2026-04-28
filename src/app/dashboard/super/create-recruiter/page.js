@@ -117,6 +117,7 @@ export default function CreateRecruiterPage() {
                 <input
                   required
                   type="password"
+                  autoComplete="current-password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}

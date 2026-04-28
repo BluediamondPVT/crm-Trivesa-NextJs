@@ -23,7 +23,6 @@ export default function CompanyDetailsPage() {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    
     const fetchUserRole = async () => {
       try {
         const res = await fetch("/api/auth/me");

@@ -7,12 +7,23 @@ export default function CRMTable({ data, onDelete }) {
   const itemsPerPage = 10;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  
-   const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
+  // 🚀 FIX 1 & 2: Secure API se role fetch karo aur [] lagao taaki loop na bane
   useEffect(() => {
-    setUserRole(localStorage.getItem("role"));
-  });
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const authData = await res.json();
+        if (authData.success && authData.data?.role) {
+          setUserRole(authData.data.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch role:", error);
+      }
+    };
+    fetchUserRole();
+  }, []);
 
   // Agar delete karne se current page khali ho jaye toh pichle page par bhej do
   useEffect(() => {
@@ -26,6 +37,12 @@ export default function CRMTable({ data, onDelete }) {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // 🚀 FIX 3: Dynamic Path Logic (Admin vs Recruiter)
+  const getViewPath = (id) => {
+    const basePath = userRole === "recruiter" ? "/dashboard/recruiter" : "/dashboard/admin";
+    return `${basePath}/company/${id}`;
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-10 border border-gray-100 flex flex-col">
@@ -86,19 +103,23 @@ export default function CRMTable({ data, onDelete }) {
                     {company.address || "N/A"}
                   </td>
                   <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                    
+                    {/* 🚀 NAYA: Dynamic View Link */}
                     <Link
-                      href={`/dashboard/admin/company/${company._id}`}
+                      href={getViewPath(company._id)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#1d4ed8] bg-blue-50 hover:bg-blue-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
                     >
                       View
                     </Link>
+
+                    {/* Sirf Admin/SuperAdmin delete kar sakte hain */}
                     {userRole !== "recruiter" && (
-                    <button
-                      onClick={() => onDelete(company._id, company.name)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
-                    >
-                      Delete
-                    </button>
+                      <button
+                        onClick={() => onDelete(company._id, company.name)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-md font-medium text-xs transition-colors cursor-pointer"
+                      >
+                        Delete
+                      </button>
                     )}
                   </td>
                 </tr>
