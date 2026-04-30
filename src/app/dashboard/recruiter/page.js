@@ -18,7 +18,7 @@ function RecruiterContent() {
   const router = useRouter();
   const tabFromUrl = searchParams.get("tab");
 
-  const tabs = ["All", "LineUp", "Attendees", "On Hold", "Selected", "Joining", "Rejected", "Payout"];
+  const tabs = ["All", "LineUp", "Attendees", "On Hold", "Selected", "Joining", "Rejected", "Payout","future"];
   
   const isCandidateView = tabFromUrl && tabs.includes(tabFromUrl);
   const activeTab = isCandidateView ? tabFromUrl : "LineUp";
@@ -76,7 +76,7 @@ function RecruiterContent() {
   });
 
   const getCounts = () => {
-    const counts = { All: filteredByDate.length, LineUp: 0, Attendees: 0, "On Hold": 0, Selected: 0, Rejected: 0, Joining: 0, Payout: 0 };
+    const counts = { All: filteredByDate.length, LineUp: 0, Attendees: 0, "On Hold": 0, Selected: 0, Rejected: 0, Joining: 0, Payout: 0, future: 0 };
     filteredByDate.forEach(emp => { if (counts[emp.status] !== undefined) counts[emp.status]++; });
     return counts;
   };

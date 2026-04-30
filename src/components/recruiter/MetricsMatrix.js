@@ -91,21 +91,6 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
       ),
     },
     {
-      label: "Payout",
-      tab: "Payout",
-      count: counts["Payout"],
-      borderColor: "border-purple-500",
-      textColor: "text-purple-700",
-      bgHover: "hover:bg-purple-50",
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V4.245c0-.754-.726-1.294-1.453-1.096a60.07 60.07 0 01-15.797 2.101c-.699.03-.699 1.038 0 1.068zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-        />
-      ),
-    },
-    {
       label: "Rejected",
       tab: "Rejected",
       count: counts["Rejected"],
@@ -120,6 +105,38 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
         />
       ),
     },
+    {
+      label: "Payout",
+      tab: "Payout",
+      count: counts["Payout"],
+      borderColor: "border-purple-500",
+      textColor: "text-purple-700",
+      bgHover: "hover:bg-purple-50",
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V4.245c0-.754-.726-1.294-1.453-1.096a60.07 60.07 0 01-15.797 2.101c-.699.03-.699 1.038 0 1.068zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+        />
+      ),
+    },
+
+    {
+      label: "future",
+      tab: "future",
+      count: counts["future"],
+      borderColor: "border-blue-500",
+      textColor: "text-blue-700",
+      bgHover: "hover:bg-blue-50",
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      ),
+    },
+    
   ];
 
   return (

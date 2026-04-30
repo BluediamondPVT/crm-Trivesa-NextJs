@@ -159,6 +159,12 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
       color: "bg-purple-500",
       href: `${baseCandidatePath}?tab=Payout`,
     },
+    {
+      name: "Future",
+      tabName: "Future",
+      color: "bg-indigo-500",
+      href: `${baseCandidatePath}?tab=future`,
+    },
   ].map((item) => ({
     ...item,
     isActive:

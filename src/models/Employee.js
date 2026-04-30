@@ -49,6 +49,7 @@ const EmployeeSchema = new mongoose.Schema(
         "On Hold",
         "Joining",
         "Payout",
+        "future",
       ],
       default: "LineUp",
     },
