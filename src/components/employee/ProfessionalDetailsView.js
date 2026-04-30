@@ -5,6 +5,8 @@ export default function ProfessionalDetailsView({ employee }) {
         Professional Details
       </h2>
       <div className="space-y-3 flex-1 flex flex-col justify-center">
+        
+        {/* Experience */}
         <div className="flex items-center justify-between bg-gray-50 p-2 rounded-xl border border-gray-100">
           <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
             Experience
@@ -13,6 +15,8 @@ export default function ProfessionalDetailsView({ employee }) {
             {employee.experience || "Fresher / N/A"}
           </span>
         </div>
+        
+        {/* Qual & Spec */}
         <div className="flex items-center justify-between bg-gray-50 p-2 rounded-xl border border-gray-100">
           <span className="text-xs font-bold text-gray-500 uppercase tracking-wide shrink-0 mr-4">
             Qual & Spec.
@@ -22,14 +26,29 @@ export default function ProfessionalDetailsView({ employee }) {
             {employee.specialization ? `(${employee.specialization})` : ""}
           </span>
         </div>
+
+        {/* 🚀 NAYA FIX: Expertise hata kar Skills array ko badges mein dikhaya */}
         <div className="flex items-center justify-between bg-gray-50 p-2 rounded-xl border border-gray-100">
-          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Expertise
+          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide shrink-0 mr-4">
+            Skills
           </span>
-          <span className="font-bold text-[#092a49] text-right">
-            {employee.expertise || "N/A"}
-          </span>
+          <div className="flex flex-wrap justify-end gap-1.5">
+            {employee.skills && employee.skills.length > 0 ? (
+              employee.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="bg-blue-50 border border-blue-200 text-[#092a49] px-2 py-0.5 rounded-md text-[11px] font-bold tracking-wide shadow-sm"
+                >
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <span className="font-bold text-[#092a49]">N/A</span>
+            )}
+          </div>
         </div>
+
+        {/* Last Salary */}
         <div className="flex items-center justify-between bg-gray-50 p-2 rounded-xl border border-gray-100">
           <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
             Last Salary
@@ -39,6 +58,7 @@ export default function ProfessionalDetailsView({ employee }) {
           </span>
         </div>
 
+        {/* Expected Salary */}
         <div className="flex items-center justify-between bg-[#e6f4ff] p-2 rounded-xl border border-blue-200 mt-2">
           <span className="text-xs font-bold text-blue-800 uppercase tracking-wide">
             Expected Salary
@@ -48,6 +68,7 @@ export default function ProfessionalDetailsView({ employee }) {
           </span>
         </div>
 
+        {/* Final Salary (Only if Joined) */}
         {employee.status === "Joining" && employee.actualSalary && (
           <div className="flex items-center justify-between bg-teal-50 p-2 rounded-xl border border-teal-200 mt-2">
             <span className="text-xs font-bold text-teal-800 uppercase tracking-wide">
@@ -58,6 +79,7 @@ export default function ProfessionalDetailsView({ employee }) {
             </span>
           </div>
         )}
+        
       </div>
     </div>
   );

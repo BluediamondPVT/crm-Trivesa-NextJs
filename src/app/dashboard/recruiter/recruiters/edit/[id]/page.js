@@ -33,7 +33,7 @@ export default function EditEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "",
+    skills: [], // 🚀 NAYA: Skills array add kiya
     experience: "",
     lastSalary: "",
     expectedSalary: "",
@@ -50,7 +50,7 @@ export default function EditEmployeePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🚀 NAYA: Secure API se role fetch karo redirect ke liye
+        // Secure API se role fetch karo redirect ke liye
         const authRes = await fetch("/api/auth/me");
         const authData = await authRes.json();
         if (authData.success) setUserRole(authData.data.role);
@@ -69,6 +69,10 @@ export default function EditEmployeePage() {
             empData.interviewDate = empData.interviewDate.split("T")[0];
           }
           empData.remark = empData.remark || "";
+          
+          // 🚀 NAYA FIX: Agar purane data mein skills nahi hai toh empty array set karo
+          empData.skills = empData.skills || []; 
+          
           setFormData(empData);
 
           const selectedCompany = companies.find(
@@ -95,6 +99,23 @@ export default function EditEmployeePage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 🚀 NAYA LOGIC: Edit page par bhi Skill Add/Remove karne ke liye
+  const handleAddSkill = (newSkill) => {
+    const skill = newSkill.trim();
+    const currentSkills = formData.skills || [];
+    if (skill && !currentSkills.includes(skill)) {
+      setFormData({ ...formData, skills: [...currentSkills, skill] });
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    const currentSkills = formData.skills || [];
+    setFormData({
+      ...formData,
+      skills: currentSkills.filter((skill) => skill !== skillToRemove),
+    });
   };
 
   const handleCompanyChange = (e) => {
@@ -129,7 +150,6 @@ export default function EditEmployeePage() {
       if (res.data.success) {
         toast.success("Candidate Data Updated!");
 
-        // 🚀 MAGIC REDIRECT: Role ke hisab se sahi folder mein bhejo
         if (userRole === "recruiter") {
           router.push("/dashboard/recruiter");
         } else {
@@ -152,7 +172,6 @@ export default function EditEmployeePage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto mb-20">
-      {/* ... baaki UI same rahega ... */}
       <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-3xl font-bold text-[#092a49]">
@@ -175,10 +194,18 @@ export default function EditEmployeePage() {
         onSubmit={handleSubmit}
         className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
       >
-        <PersonalDetailsForm formData={formData} handleChange={handleChange} />
+        {/* 🚀 NAYA FIX: Dono forms mein skill handle karne wale functions pass kar diye */}
+        <PersonalDetailsForm 
+          formData={formData} 
+          handleChange={handleChange} 
+          handleAddSkill={handleAddSkill}
+          handleRemoveSkill={handleRemoveSkill}
+        />
         <ProfessionalDetailsForm
           formData={formData}
           handleChange={handleChange}
+          handleAddSkill={handleAddSkill}
+          handleRemoveSkill={handleRemoveSkill}
         />
         <EditInterviewDetailsForm
           formData={formData}

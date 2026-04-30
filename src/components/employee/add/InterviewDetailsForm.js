@@ -22,10 +22,10 @@ export default function InterviewDetailsForm({
           <>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Select Company *
+                Select Company
               </label>
               <select
-                required={!isFuture}
+                // required={!isFuture}
                 name="assignedCompanyId"
                 value={formData.assignedCompanyId}
                 onChange={handleCompanyChange}
@@ -41,10 +41,10 @@ export default function InterviewDetailsForm({
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Process / Opening *
+                Process / Opening 
               </label>
               <select
-                required={!isFuture}
+                // required={!isFuture}
                 name="assignedProcess"
                 value={formData.assignedProcess}
                 onChange={handleChange}
@@ -61,10 +61,10 @@ export default function InterviewDetailsForm({
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Interview Date *
+                Interview Date 
               </label>
               <input
-                required={!isFuture}
+                // required={!isFuture}
                 type="date"
                 name="interviewDate"
                 value={formData.interviewDate}

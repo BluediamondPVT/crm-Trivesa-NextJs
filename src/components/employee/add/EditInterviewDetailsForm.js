@@ -99,7 +99,7 @@ export default function EditInterviewDetailsForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Select Company *
+            Select Company
           </label>
           <select
             required
@@ -119,7 +119,7 @@ export default function EditInterviewDetailsForm({
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Process / Opening *
+            Process / Opening 
           </label>
           <select
             required
@@ -140,7 +140,7 @@ export default function EditInterviewDetailsForm({
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Interview Date *
+            Interview Date 
           </label>
           <input
             required

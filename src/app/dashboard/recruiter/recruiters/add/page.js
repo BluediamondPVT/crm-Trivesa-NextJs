@@ -18,8 +18,7 @@ export default function AddEmployeePage() {
   const [activeCompanies, setActiveCompanies] = useState([]);
   const [availableOpenings, setAvailableOpenings] = useState([]);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
-  
-  // 🚀 NAYA FIX: Role state for dynamic redirect
+
   const [userRole, setUserRole] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -30,10 +29,10 @@ export default function AddEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "", 
+    skills: [], // 🚀 NAYA: Skills array initialized
     experience: "",
     lastSalary: "",
-    expectedSalary: "", 
+    expectedSalary: "",
     source: "",
     assignedCompanyId: "",
     assignedCompanyName: "",
@@ -43,7 +42,6 @@ export default function AddEmployeePage() {
   });
 
   useEffect(() => {
-    // 🚀 NAYA FIX: Component load hote hi role secure API se mangwao
     const fetchUserRole = async () => {
       try {
         const res = await fetch("/api/auth/me");
@@ -73,6 +71,22 @@ export default function AddEmployeePage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 🚀 NAYA LOGIC: Skill Add Karne Ke Liye
+  const handleAddSkill = (newSkill) => {
+    const skill = newSkill.trim();
+    if (skill && !formData.skills.includes(skill)) {
+      setFormData({ ...formData, skills: [...formData.skills, skill] });
+    }
+  };
+
+  // 🚀 NAYA LOGIC: Skill Remove Karne Ke Liye
+  const handleRemoveSkill = (skillToRemove) => {
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter((skill) => skill !== skillToRemove),
+    });
   };
 
   const handleCompanyChange = (e) => {
@@ -105,14 +119,11 @@ export default function AddEmployeePage() {
     setLoading(true);
 
     try {
-      // 🚀 MAGIC FIX: Backend automatically headers se user ID read kar lega.
-      // Toh humein addedBy bhejney ki zarurat hi nahi hai!
       const res = await axios.post("/api/employees", formData);
-      
+
       if (res.data.success) {
         toast.success("Candidate Added!");
-        
-        // 🚀 DYNAMIC REDIRECT: Role ke hisab se redirect karo
+
         if (userRole === "recruiter") {
           router.push("/dashboard/recruiter");
         } else {
@@ -144,10 +155,19 @@ export default function AddEmployeePage() {
         onSubmit={handleSubmit}
         className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
       >
-        <PersonalDetailsForm formData={formData} handleChange={handleChange} />
+        <PersonalDetailsForm 
+  formData={formData} 
+  handleChange={handleChange} 
+  handleAddSkill={handleAddSkill} 
+  handleRemoveSkill={handleRemoveSkill} 
+/>
+
+        {/* 🚀 Props pass kiye Naye Skill features ke liye */}
         <ProfessionalDetailsForm
           formData={formData}
           handleChange={handleChange}
+          handleAddSkill={handleAddSkill}
+          handleRemoveSkill={handleRemoveSkill}
         />
 
         <InterviewDetailsForm

@@ -39,7 +39,7 @@ export default function PlacementHistoryTimeline({ history }) {
                   </span>
                 </div>
 
-                {/* Interview Date */}
+                {/* Interview Date /}
                 {item.interviewDate && (
                   <p className="text-sm text-blue-700 mb-2 font-bold flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
