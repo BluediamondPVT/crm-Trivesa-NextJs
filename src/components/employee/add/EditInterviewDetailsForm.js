@@ -102,7 +102,7 @@ export default function EditInterviewDetailsForm({
             Select Company
           </label>
           <select
-            required
+            
             name="assignedCompanyId"
             value={formData.assignedCompanyId}
             onChange={handleCompanyChange}
@@ -122,7 +122,7 @@ export default function EditInterviewDetailsForm({
             Process / Opening 
           </label>
           <select
-            required
+            
             name="assignedProcess"
             value={formData.assignedProcess}
             onChange={handleChange}
@@ -143,7 +143,7 @@ export default function EditInterviewDetailsForm({
             Interview Date 
           </label>
           <input
-            required
+            
             type="date"
             name="interviewDate"
             value={formData.interviewDate || ""}
