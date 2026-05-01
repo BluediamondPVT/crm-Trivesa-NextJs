@@ -26,6 +26,7 @@ export default function RecruiterDashboard() {
     "Joining",
     "Rejected",
     "Payout",
+    "future",
   ];
 
   const initialTab = tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
@@ -111,6 +112,7 @@ export default function RecruiterDashboard() {
       Rejected: 0,
       Joining: 0,
       Payout: 0,
+      future: 0,
     };
     dateFilteredEmployees.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;

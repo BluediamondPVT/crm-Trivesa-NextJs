@@ -19,7 +19,6 @@ export default function AddEmployeePage() {
   const [availableOpenings, setAvailableOpenings] = useState([]);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
 
-  // 🚀 NAYA: Role save karne ke liye state (Redirection ke kaam aayega)
   const [userRole, setUserRole] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -30,7 +29,7 @@ export default function AddEmployeePage() {
     age: "",
     qualification: "",
     specialization: "",
-    expertise: "",
+    skills: [], // 🚀 NAYA: Skills array initialized
     experience: "",
     lastSalary: "",
     expectedSalary: "",
@@ -43,12 +42,11 @@ export default function AddEmployeePage() {
   });
 
   useEffect(() => {
-    // 🚀 NAYA: Component load hote hi role fetch kar lo
     const fetchUserRole = async () => {
       try {
         const res = await fetch("/api/auth/me");
         const data = await res.json();
-        if (data.success) {
+        if (data.success && data.data?.role) {
           setUserRole(data.data.role);
         }
       } catch (error) {
@@ -57,7 +55,6 @@ export default function AddEmployeePage() {
     };
     fetchUserRole();
 
-    // Companies fetch logic (Same as before)
     const fetchCompanies = async () => {
       try {
         const res = await axios.get("/api/companies");
@@ -74,6 +71,22 @@ export default function AddEmployeePage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 🚀 NAYA LOGIC: Skill Add Karne Ke Liye
+  const handleAddSkill = (newSkill) => {
+    const skill = newSkill.trim();
+    if (skill && !formData.skills.includes(skill)) {
+      setFormData({ ...formData, skills: [...formData.skills, skill] });
+    }
+  };
+
+  // 🚀 NAYA LOGIC: Skill Remove Karne Ke Liye
+  const handleRemoveSkill = (skillToRemove) => {
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter((skill) => skill !== skillToRemove),
+    });
   };
 
   const handleCompanyChange = (e) => {
@@ -106,14 +119,11 @@ export default function AddEmployeePage() {
     setLoading(true);
 
     try {
-      // 🚀 MAGIC FIX: Backend khud x-user-id header read kar lega.
-      
       const res = await axios.post("/api/employees", formData);
 
       if (res.data.success) {
         toast.success("Candidate Added!");
 
-        // 🚀 DYNAMIC REDIRECT: Role ke hisab se wapas bhejo
         if (userRole === "recruiter") {
           router.push("/dashboard/recruiter");
         } else {
@@ -145,10 +155,19 @@ export default function AddEmployeePage() {
         onSubmit={handleSubmit}
         className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
       >
-        <PersonalDetailsForm formData={formData} handleChange={handleChange} />
+        <PersonalDetailsForm 
+  formData={formData} 
+  handleChange={handleChange} 
+  handleAddSkill={handleAddSkill} 
+  handleRemoveSkill={handleRemoveSkill} 
+/>
+
+        {/* 🚀 Props pass kiye Naye Skill features ke liye */}
         <ProfessionalDetailsForm
           formData={formData}
           handleChange={handleChange}
+          handleAddSkill={handleAddSkill}
+          handleRemoveSkill={handleRemoveSkill}
         />
 
         <InterviewDetailsForm

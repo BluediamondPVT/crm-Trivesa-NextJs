@@ -85,6 +85,22 @@ export default function EditEmployeePage() {
     if (id) fetchData();
   }, [id]);
 
+const handleAddSkill = (newSkill) => {
+    const skill = newSkill.trim();
+    const currentSkills = formData.skills || [];
+    if (skill && !currentSkills.includes(skill)) {
+      setFormData({ ...formData, skills: [...currentSkills, skill] });
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    const currentSkills = formData.skills || [];
+    setFormData({
+      ...formData,
+      skills: currentSkills.filter((skill) => skill !== skillToRemove),
+    });
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -161,7 +177,12 @@ export default function EditEmployeePage() {
         className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
       >
         {/* Reusing Components from Add Page! */}
-        <PersonalDetailsForm formData={formData} handleChange={handleChange} />
+        <PersonalDetailsForm 
+          formData={formData} 
+          handleChange={handleChange} 
+          handleAddSkill={handleAddSkill}
+          handleRemoveSkill={handleRemoveSkill}
+        />
         <ProfessionalDetailsForm
           formData={formData}
           handleChange={handleChange}
