@@ -92,7 +92,7 @@ export default function PersonalDetailsForm({
             Source *
           </label>
           <select
-            required
+            
             name="source"
             value={formData.source || ""}
             onChange={handleChange}
