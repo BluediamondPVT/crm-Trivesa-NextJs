@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 import SidebarItem from "./sidebar/SidebarItem";
 import SidebarDropdown from "./sidebar/SidebarDropdown";
@@ -203,26 +204,23 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
         animate={{ x: isSidebarOpen ? 0 : "-100%", opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+       <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <Link
             href={dashboardHref}
             onClick={handleMobileClose}
             className="flex items-center cursor-pointer group"
           >
-            <div className="bg-white text-[#092a49] p-1.5 rounded-lg mr-3 group-hover:scale-105 transition-transform">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 0 0 .374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                  clipRule="evenodd"
-                />
-              </svg>
+            {/* 🚀 NAYA: SVG hata kar Image laga diya */}
+            <div className="bg-white p-1 rounded-xl shadow-sm mr-3 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Image 
+                src="/fav.png" 
+                alt="Logo" 
+                width={32} 
+                height={32} 
+                className="rounded-lg object-contain"
+              />
             </div>
+            
             <span className="text-xl font-bold tracking-wide group-hover:text-gray-200 transition-colors capitalize">
               {userRole
                 ? userRole.replace("superadmin", "Super Admin")

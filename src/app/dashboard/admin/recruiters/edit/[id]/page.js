@@ -177,15 +177,17 @@ const handleAddSkill = (newSkill) => {
         className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
       >
         {/* Reusing Components from Add Page! */}
-        <PersonalDetailsForm 
+      <PersonalDetailsForm 
           formData={formData} 
           handleChange={handleChange} 
-          handleAddSkill={handleAddSkill}
-          handleRemoveSkill={handleRemoveSkill}
         />
+        
+        {/* 🚀 ProfessionalDetailsForm mein props DAAL DO */}
         <ProfessionalDetailsForm
           formData={formData}
           handleChange={handleChange}
+          handleAddSkill={handleAddSkill}       
+          handleRemoveSkill={handleRemoveSkill} 
         />
 
         {/* Using Special Edit Component */}

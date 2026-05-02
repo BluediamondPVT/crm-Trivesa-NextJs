@@ -11,6 +11,9 @@ const outfit = Outfit({
 export const metadata = {
   title: "Trivesa CRM",
   description: "Manage your HR consultancy with powerful tools designed for growth.",
+  icons: {
+    icon: '/fav.png', 
+  },
 };
 
 export default function RootLayout({ children }) {
