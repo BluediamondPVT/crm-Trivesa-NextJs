@@ -30,33 +30,28 @@ export default function CurrentOpenings({ openings }) {
 
           return (
             <div
-              key={job._id} // THE FIX: Yahan job.id ki jagah job._id lagaya hai
+              key={job._id}
               className={`bg-white rounded-2xl shadow-sm border p-6 transition-all duration-200 hover:shadow-md ${
                 active
                   ? "border-l-4 border-l-green-500 border-gray-100"
                   : "border-l-4 border-l-red-400 border-gray-100 opacity-80"
               }`}
             >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
-                {/* Job Title & Badge */}
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {job.title}
-                    </h3>
-                    {active ? (
-                      <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="bg-red-50 text-red-600 border border-red-100 text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                        Non Active
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-500 line-clamp-1">
-                    {job.description}
-                  </p>
+              {/* Top Section: Job Title & Expiry Date */}
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-5">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {job.title}
+                  </h3>
+                  {active ? (
+                    <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="bg-red-50 text-red-600 border border-red-100 text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+                      Non Active
+                    </span>
+                  )}
                 </div>
 
                 {/* Expiry Date Warning */}
@@ -85,30 +80,42 @@ export default function CurrentOpenings({ openings }) {
                 </div>
               </div>
 
+              {/* 🚀 NAYA FIX: Full Job Description Box */}
+              {job.description && (
+                <div className="mb-6 bg-gray-50/70 p-4 rounded-xl border border-gray-100">
+                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    Job Description
+                  </h4>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {job.description}
+                  </p>
+                </div>
+              )}
+
               {/* Job Meta Data Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-50">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
                 <div>
-                  <p className="text-xs text-gray-600 font-semibold mb-1">
+                  <p className="text-xs text-gray-500 font-semibold mb-1">
                     Vacancies
                   </p>
                   <p className="text-sm font-bold text-gray-800">
-                    {job.vacancies} Openings
+                    {job.vacancies || "N/A"} Openings
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 font-semibold mb-1">
+                  <p className="text-xs text-gray-500 font-semibold mb-1">
                     Experience
                   </p>
                   <p className="text-sm font-bold text-gray-800">
-                    {job.experience}
+                    {job.experience || "N/A"}
                   </p>
                 </div>
                 <div className="col-span-2 sm:col-span-2">
-                  <p className="text-xs text-gray-600 font-semibold mb-1">
+                  <p className="text-xs text-gray-500 font-semibold mb-1">
                     Salary Range
                   </p>
                   <p className="text-sm font-bold text-gray-800">
-                    {job.salary}
+                    {job.salary || "N/A"}
                   </p>
                 </div>
               </div>
