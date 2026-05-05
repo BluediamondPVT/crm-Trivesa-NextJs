@@ -6,9 +6,8 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 
-// Reuse the exact same components from Add Client!
+// 🚀 FIX: Removed the outdated PayoutCommercialsForm
 import BasicDetailsForm from "@/components/add-client/BasicDetailsForm";
-import PayoutCommercialsForm from "@/components/add-client/PayoutCommercialsForm";
 import ContactPersonsForm from "@/components/add-client/ContactPersonsForm";
 import OpeningsForm from "@/components/add-client/OpeningsForm";
 
@@ -19,7 +18,7 @@ export default function EditClientPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // Initial empty state
+  // Initial clean state (Updated for new Payout structure)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,7 +31,6 @@ export default function EditClientPage() {
     internalRemark: "",
     status: "Active",
     payoutDetails: {
-      commercials: [{ category: "", slabs: [{ slabDetails: "" }] }],
       payoutDuration: "",
       replacementTime: "",
       paymentTerms: "",
@@ -46,6 +44,10 @@ export default function EditClientPage() {
         vacancies: "",
         expiryDate: "",
         description: "",
+        payoutType: "Flat Amount",
+        flatAmount: "",
+        percentageValue: "",
+        slabs: [],
       },
     ],
   });
@@ -68,20 +70,23 @@ export default function EditClientPage() {
             }));
           }
 
-          // Safety Check: If arrays are completely empty, provide at least one empty row so form doesn't break
-          if (
-            !data.payoutDetails.commercials ||
-            data.payoutDetails.commercials.length === 0
-          ) {
-            data.payoutDetails.commercials = [
-              { category: "", slabs: [{ slabDetails: "" }] },
-            ];
+          // Safety Check: General Terms fallback
+          if (!data.payoutDetails) {
+            data.payoutDetails = {
+              payoutDuration: "",
+              replacementTime: "",
+              paymentTerms: "",
+            };
           }
+
+          // Safety Check: Contacts fallback
           if (!data.contactPersons || data.contactPersons.length === 0) {
             data.contactPersons = [
               { name: "", designation: "", phone: "", email: "" },
             ];
           }
+
+          // Safety Check: Openings fallback (with new payout fields)
           if (!data.openings || data.openings.length === 0) {
             data.openings = [
               {
@@ -91,6 +96,10 @@ export default function EditClientPage() {
                 vacancies: "",
                 expiryDate: "",
                 description: "",
+                payoutType: "Flat Amount",
+                flatAmount: "",
+                percentageValue: "",
+                slabs: [],
               },
             ];
           }
@@ -106,7 +115,7 @@ export default function EditClientPage() {
     if (id) fetchCompanyData();
   }, [id]);
 
-  // ALL HANDLERS (Same as Add Client)
+  // Main input handler
   const handleChange = (e, section, index, field) => {
     if (section === "basic") {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -129,39 +138,6 @@ export default function EditClientPage() {
     }
   };
 
-  const addCommercialCategory = () => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials.push({ category: "", slabs: [{ slabDetails: "" }] });
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-  const removeCommercialCategory = (catIndex) => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials = updated.commercials.filter((_, i) => i !== catIndex);
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-  const handleCategoryChange = (e, catIndex) => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials[catIndex].category = e.target.value;
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-  const addSlab = (catIndex) => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials[catIndex].slabs.push({ slabDetails: "" });
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-  const removeSlab = (catIndex, slabIndex) => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials[catIndex].slabs = updated.commercials[
-      catIndex
-    ].slabs.filter((_, i) => i !== slabIndex);
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-  const handleSlabChange = (e, catIndex, slabIndex) => {
-    const updated = { ...formData.payoutDetails };
-    updated.commercials[catIndex].slabs[slabIndex].slabDetails = e.target.value;
-    setFormData({ ...formData, payoutDetails: updated });
-  };
-
   const addContactPerson = () =>
     setFormData({
       ...formData,
@@ -170,12 +146,14 @@ export default function EditClientPage() {
         { name: "", designation: "", phone: "", email: "" },
       ],
     });
+
   const removeContactPerson = (index) =>
     setFormData({
       ...formData,
       contactPersons: formData.contactPersons.filter((_, i) => i !== index),
     });
 
+  // Updated addOpening with new payout fields
   const addOpening = () =>
     setFormData({
       ...formData,
@@ -188,16 +166,21 @@ export default function EditClientPage() {
           vacancies: "",
           expiryDate: "",
           description: "",
+          payoutType: "Flat Amount",
+          flatAmount: "",
+          percentageValue: "",
+          slabs: [],
         },
       ],
     });
+
   const removeOpening = (index) =>
     setFormData({
       ...formData,
       openings: formData.openings.filter((_, i) => i !== index),
     });
 
-  // NAYA: PUT request for update
+  // PUT request for update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -235,6 +218,7 @@ export default function EditClientPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => router.back()}
           className="text-gray-500 hover:text-[#1d4ed8] font-medium text-sm transition-colors"
         >
@@ -243,19 +227,10 @@ export default function EditClientPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Basic Details */}
         <BasicDetailsForm formData={formData} handleChange={handleChange} />
 
-        <PayoutCommercialsForm
-          formData={formData}
-          handleChange={handleChange}
-          addCommercialCategory={addCommercialCategory}
-          removeCommercialCategory={removeCommercialCategory}
-          handleCategoryChange={handleCategoryChange}
-          addSlab={addSlab}
-          removeSlab={removeSlab}
-          handleSlabChange={handleSlabChange}
-        />
-
+        {/* Contact Persons */}
         <ContactPersonsForm
           formData={formData}
           handleChange={handleChange}
@@ -263,6 +238,7 @@ export default function EditClientPage() {
           removeContactPerson={removeContactPerson}
         />
 
+        {/* 🚀 Openings Form (Now includes Slab and Payout logic internally) */}
         <OpeningsForm
           formData={formData}
           handleChange={handleChange}

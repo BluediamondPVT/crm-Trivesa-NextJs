@@ -73,6 +73,9 @@ export async function PUT(request, { params }) {
       { new: true, runValidators: true }, // Returns the updated document
     );
 
+
+    
+
     if (!updatedCompany) {
       return NextResponse.json(
         { success: false, message: "Company not found" },

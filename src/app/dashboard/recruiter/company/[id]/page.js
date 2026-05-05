@@ -19,7 +19,7 @@ export default function CompanyDetailsPage() {
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // NAYA: Role save karne ke liye state
+  // Role save karne ke liye state
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
@@ -51,8 +51,8 @@ export default function CompanyDetailsPage() {
     };
 
     if (id) {
-      fetchUserRole(); // Pehle role mangwao
-      fetchCompanyDetails(); // Phir company ka data
+      fetchUserRole(); 
+      fetchCompanyDetails(); 
     }
   }, [id]);
 
@@ -73,6 +73,9 @@ export default function CompanyDetailsPage() {
         Client details not found!
       </div>
     );
+
+  // 🚀 JADOO: Bulletproof check for recruiter
+  const isRecruiter = userRole?.toLowerCase() === "recruiter";
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
@@ -107,15 +110,14 @@ export default function CompanyDetailsPage() {
       </div>
 
       {/* 3. Payout Details (Full Width & Separate Section) */}
-      {/* NAYA FIX: Sirf tab dikhega jab userRole recruiter NAHI hoga */}
-      {userRole !== "recruiter" && (
+      {!isRecruiter && (
         <div className="mb-8">
           <PayoutDetails payoutDetails={company.payoutDetails} />
         </div>
       )}
 
       {/* 4. Contact Persons Table - HIDDEN FROM RECRUITERS */}
-      {userRole !== "recruiter" && (
+      {!isRecruiter && (
         <div className="mb-8">
           <ContactPersons contactPersons={company.contactPersons} />
         </div>
@@ -123,7 +125,12 @@ export default function CompanyDetailsPage() {
 
       {/* 5. Current Openings */}
       <div className="mb-8">
-        <CurrentOpenings openings={company.openings} />
+        {/* 🚀 NAYA FIX: Yahan userRole aur payoutDetails pass karna zaroori tha! */}
+        <CurrentOpenings 
+          openings={company.openings} 
+          payoutDetails={company.payoutDetails} 
+          userRole={userRole} 
+        />
       </div>
     </div>
   );

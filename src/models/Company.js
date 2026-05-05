@@ -1,17 +1,13 @@
-// src/models/Company.js
 import mongoose from "mongoose";
 
-// 1. NAYA SCHEMA: Commercials ke Slabs ke liye
+// 🚀 1. NAYA SLAB SCHEMA (Ab ye Min, Max, aur Amount accept karega)
 const SlabSchema = new mongoose.Schema({
-  slabDetails: String,
+  minJoinees: Number,
+  maxJoinees: Number,
+  amount: Number,
 });
 
-// 2. NAYA SCHEMA: Commercials ki Category ke liye
-const CommercialRuleSchema = new mongoose.Schema({
-  category: String,
-  slabs: [SlabSchema], // Us category ke andar multiple slabs ka array
-});
-
+// 2. Contact Person Schema
 const ContactPersonSchema = new mongoose.Schema({
   name: String,
   designation: String,
@@ -19,6 +15,7 @@ const ContactPersonSchema = new mongoose.Schema({
   email: String,
 });
 
+// 3. Opening Schema
 const OpeningSchema = new mongoose.Schema({
   title: String,
   experience: String,
@@ -26,8 +23,19 @@ const OpeningSchema = new mongoose.Schema({
   vacancies: Number,
   expiryDate: Date,
   description: String,
+
+  // Role-Specific Payouts
+  payoutType: {
+    type: String,
+    enum: ["Flat Amount", "Percentage", "Slab Wise"],
+    default: "Flat Amount",
+  },
+  flatAmount: Number,
+  percentageValue: Number,
+  slabs: [SlabSchema], // 🚀 Naya SlabSchema yahan use ho raha hai
 });
 
+// 4. Main Company Schema
 const CompanySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -45,9 +53,8 @@ const CompanySchema = new mongoose.Schema(
     internalRemark: { type: String },
     status: { type: String, default: "Active" },
 
-    // Payout Nested Object (UPDATED)
+    // General Company Terms
     payoutDetails: {
-      commercials: [CommercialRuleSchema], // THE FIX: Ye ab Array hai
       payoutDuration: String,
       replacementTime: String,
       paymentTerms: String,
@@ -59,7 +66,6 @@ const CompanySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// Avoid OverwriteModelError
 const Company =
   mongoose.models.Company || mongoose.model("Company", CompanySchema);
 export default Company;

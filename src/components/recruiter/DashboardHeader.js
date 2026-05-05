@@ -64,7 +64,7 @@ export default function DashboardHeader({
 
         {/* 3. ADD Candidate BUTTON */}
         <Link href={addCandidatePath}>
-          <button className="bg-[#092a49] text-white px-4 py-2 rounded-lg">
+          <button className="bg-[#092a49] cursor-pointer text-white px-4 py-2 rounded-lg">
             + Add Candidate
           </button>
         </Link>
