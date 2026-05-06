@@ -99,6 +99,7 @@ export default function PersonalDetailsForm({
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
           >
             <option value="">-- Select Source --</option>
+            <option value="Indeed">Indeed</option>
             <option value="Job Hai">Job Hai</option>
             <option value="Apna Job">Apna Job</option>
             <option value="Naukri">Naukri</option>
