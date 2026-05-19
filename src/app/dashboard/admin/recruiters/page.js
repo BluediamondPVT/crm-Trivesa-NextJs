@@ -12,6 +12,7 @@ import MetricsMatrix from "@/components/recruiter/MetricsMatrix";
 import TabsFilter from "@/components/recruiter/TabsFilter";
 import EmployeeTable from "@/components/recruiter/EmployeeTable";
 import RemarkModal from "@/components/recruiter/RemarkModal";
+import DashboardToolbar from "@/components/recruiter/DashboardToolbar"; // 🚀 NAYA IMPORT
 
 export default function RecruiterDashboard() {
   const searchParams = useSearchParams();
@@ -33,7 +34,7 @@ export default function RecruiterDashboard() {
     tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
 
   const [employees, setEmployees] = useState([]);
-  const [companies, setCompanies] = useState([]); // 🚀 NAYA: Companies ka data yahan store hoga calculation ke liye
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(initialTab);
   const [selectedRemark, setSelectedRemark] = useState(null);
@@ -43,8 +44,8 @@ export default function RecruiterDashboard() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  
-  const [totalPayout, setTotalPayout] = useState(0); // 🚀 NAYA: Total Payout state
+
+  const [totalPayout, setTotalPayout] = useState(0);
 
   useEffect(() => {
     if (tabFromUrl && tabs.includes(tabFromUrl)) {
@@ -63,10 +64,11 @@ export default function RecruiterDashboard() {
           setUserRole(authData.data.role);
         }
 
-        // 🚀 NAYA: Dono API ek sath call kar rahe hain (Fast Performance)
         const [empRes, compRes] = await Promise.all([
           axios.get("/api/employees"),
-          axios.get("/api/companies").catch(() => ({ data: { success: false, data: [] } }))
+          axios
+            .get("/api/companies")
+            .catch(() => ({ data: { success: false, data: [] } })),
         ]);
 
         if (empRes.data.success) {
@@ -99,7 +101,7 @@ export default function RecruiterDashboard() {
     const today = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate()
+      now.getDate(),
     ).getTime();
 
     filteredData = filteredData.filter((emp) => {
@@ -143,7 +145,7 @@ export default function RecruiterDashboard() {
         emp.status,
         ...(emp.skills || []),
         ...(emp.assignmentHistory?.map(
-          (h) => `${h.companyName} ${h.process} ${h.status} ${h.remark}`
+          (h) => `${h.companyName} ${h.process} ${h.status} ${h.remark}`,
         ) || []),
       ]
         .filter(Boolean)
@@ -157,27 +159,29 @@ export default function RecruiterDashboard() {
   let tableFilteredData = filteredData;
   if (activeTab !== "All") {
     tableFilteredData = tableFilteredData.filter(
-      (emp) => emp.status === activeTab
+      (emp) => emp.status === activeTab,
     );
   }
 
-  // 🚀 JADOO: GRAND TOTAL PAYOUT CALCULATOR 
-  // Ye tab chalega jab bhi tum search karoge, tab change karoge ya date change karoge
+  // GRAND TOTAL PAYOUT CALCULATOR
   useEffect(() => {
     const calculateTotalPayout = () => {
-      const isAdminOrSuper = ["admin", "superadmin"].includes(userRole?.toLowerCase());
-      
-      // Sirf admin ko dikhega aur relevant tabs par
-      if (!isAdminOrSuper || !["Joining", "Payout", "All"].includes(activeTab) || companies.length === 0) {
+      const isAdminOrSuper = ["admin", "superadmin"].includes(
+        userRole?.toLowerCase(),
+      );
+
+      if (
+        !isAdminOrSuper ||
+        !["Joining", "Payout", "All"].includes(activeTab) ||
+        companies.length === 0
+      ) {
         setTotalPayout(0);
         return;
       }
 
       let sum = 0;
-      
-      // Sirf wo candidates lo jo Joining ya Payout me hain (current filtered list me se)
       const eligibleEmps = tableFilteredData.filter(
-        (e) => e.status === "Joining" || e.status === "Payout"
+        (e) => e.status === "Joining" || e.status === "Payout",
       );
 
       eligibleEmps.forEach((emp) => {
@@ -186,9 +190,11 @@ export default function RecruiterDashboard() {
         const company = companies.find((c) => c._id === emp.assignedCompanyId);
         if (!company) return;
 
-        const candidateProcess = String(emp.assignedProcess).toLowerCase().trim();
+        const candidateProcess = String(emp.assignedProcess)
+          .toLowerCase()
+          .trim();
         const opening = company.openings?.find(
-          (o) => String(o.title).toLowerCase().trim() === candidateProcess
+          (o) => String(o.title).toLowerCase().trim() === candidateProcess,
         );
 
         if (opening) {
@@ -197,13 +203,19 @@ export default function RecruiterDashboard() {
 
           if (type === "Flat Amount") {
             amount = opening.flatAmount || 0;
-          } 
-          else if (type === "Percentage") {
-            const rawStr = String(emp.actualSalary || "0").toLowerCase().trim();
+          } else if (type === "Percentage") {
+            const rawStr = String(emp.actualSalary || "0")
+              .toLowerCase()
+              .trim();
             let actual = parseFloat(rawStr.replace(/[^0-9.]/g, "")) || 0;
             let isAnnual = false;
-            
-            if (rawStr.includes("l") || rawStr.includes("lac") || rawStr.includes("lpa") || rawStr.includes("pa")) {
+
+            if (
+              rawStr.includes("l") ||
+              rawStr.includes("lac") ||
+              rawStr.includes("lpa") ||
+              rawStr.includes("pa")
+            ) {
               actual = actual * 100000;
               isAnnual = true;
             } else if (rawStr.includes("k")) {
@@ -216,28 +228,29 @@ export default function RecruiterDashboard() {
               isAnnual = true;
             }
 
-            const annualCTC = isAnnual ? actual : (actual * 12);
+            const annualCTC = isAnnual ? actual : actual * 12;
             const percent = Number(opening.percentageValue) || 0;
-            amount = Math.round((annualCTC * percent) / 100); 
-          } 
-          else if (type === "Slab Wise") {
-            // Slab ke liye total count nikalna zaroori hai usi company/process ka
+            amount = Math.round((annualCTC * percent) / 100);
+          } else if (type === "Slab Wise") {
             const joinedEmps = employees.filter(
-              (e) => 
+              (e) =>
                 e.assignedCompanyId === emp.assignedCompanyId &&
-                String(e.assignedProcess).toLowerCase().trim() === candidateProcess &&
-                (e.status === "Joining" || e.status === "Payout")
+                String(e.assignedProcess).toLowerCase().trim() ===
+                  candidateProcess &&
+                (e.status === "Joining" || e.status === "Payout"),
             );
 
             let totalJoinedCount = joinedEmps.length || 1;
 
             let matchedSlab = opening.slabs?.find(
-              (s) => totalJoinedCount >= s.minJoinees && totalJoinedCount <= s.maxJoinees
+              (s) =>
+                totalJoinedCount >= s.minJoinees &&
+                totalJoinedCount <= s.maxJoinees,
             );
 
             if (!matchedSlab && opening.slabs?.length > 0) {
-              matchedSlab = opening.slabs.reduce((prev, current) => 
-                (prev.maxJoinees > current.maxJoinees) ? prev : current
+              matchedSlab = opening.slabs.reduce((prev, current) =>
+                prev.maxJoinees > current.maxJoinees ? prev : current,
               );
             }
 
@@ -245,8 +258,8 @@ export default function RecruiterDashboard() {
               amount = matchedSlab.amount;
             }
           }
-          
-          sum += amount; // Amount jodd lo
+
+          sum += amount;
         }
       });
 
@@ -304,11 +317,22 @@ export default function RecruiterDashboard() {
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     const colWidths = [
-      { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
     ];
     worksheet["!cols"] = colWidths;
     XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Report");
-    XLSX.writeFile(workbook, `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`,
+    );
     toast.success("Detailed Excel Report Exported!");
   };
 
@@ -327,77 +351,14 @@ export default function RecruiterDashboard() {
         setActiveTab={setActiveTab}
       />
 
-      {/* 🚀 NAYA: Payout Total (Left) & Search Bar (Right) */}
-      <div className="mb-6 flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
-        
-        {/* LEFT SIDE: TOTAL PAYOUT WIDGET (Only for Admin/SuperAdmin on relevant tabs) */}
-        <div className="w-full sm:w-auto h-full flex items-center">
-          {["admin", "superadmin"].includes(userRole?.toLowerCase()) && ["Joining", "Payout", "All"].includes(activeTab) && totalPayout > 0 && (
-            <div className="flex items-center gap-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 px-5 py-3 rounded-2xl shadow-sm w-full sm:w-auto">
-              <div className="p-2.5 bg-purple-100 text-purple-700 rounded-lg shadow-sm border border-purple-200/50">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Total Candidate Payout</p>
-                <h3 className="text-xl sm:text-2xl font-black text-purple-900 tracking-tight leading-none">
-                  ₹{totalPayout.toLocaleString('en-IN')}
-                </h3>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT SIDE: SEARCH BAR */}
-        <div className="relative w-full sm:max-w-lg">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-            <svg
-              className="w-5 h-5 text-gray-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </div> 
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name, email, phone, skills, salary..."
-            className="w-full p-4 pl-12 text-base font-medium text-[#092a49] bg-white border-2 border-gray-200 rounded-2xl shadow-md hover:shadow-lg hover:border-blue-300 focus:bg-blue-50/30 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition-all duration-300 placeholder-gray-400 tracking-wide"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          )}
-        </div>
-
-      </div>
+      {/* 🚀 MODULAR COMPONENT: Search aur Payout alag kar diya */}
+      <DashboardToolbar
+        userRole={userRole}
+        activeTab={activeTab}
+        totalPayout={totalPayout}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
 
       <TabsFilter
         tabs={tabs}

@@ -127,8 +127,9 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to top, #092A49,#092A49);
+  background: linear-gradient(to top, #ffffff,#c8d1da);
   border-radius: 5px;
+  cursor: pointer;
 }
 
 @layer base {

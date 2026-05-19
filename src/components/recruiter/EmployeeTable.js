@@ -14,19 +14,16 @@ export default function EmployeeTable({
   setSelectedRemark,
   role = "admin",
 }) {
-  // 🚀 PAGINATION FIX: 10 ki jagah ab 20 kar diya hai
   const [visibleCount, setVisibleCount] = useState(20);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
   const isAdminOrSuper = ["admin", "superadmin"].includes(role?.toLowerCase());
 
-  // 🚀 TABS FIX: "All" hata diya. Ab sirf Joining aur Payout me dikhega
   const showPayoutColumn =
     isAdminOrSuper && ["Joining", "Payout"].includes(activeTab);
 
   useEffect(() => {
-    // 🚀 Tab change hone par wapas 20 set hoga
     setVisibleCount(20);
   }, [activeTab, filteredData.length]);
 
@@ -59,7 +56,6 @@ export default function EmployeeTable({
   const loadMoreData = () => {
     setIsFetchingMore(true);
     setTimeout(() => {
-      // 🚀 SCROLL KARNE PE: Ab +20 naye candidates layega
       setVisibleCount((prev) => prev + 20);
       setIsFetchingMore(false);
     }, 800);
@@ -91,6 +87,22 @@ export default function EmployeeTable({
     }
   };
 
+  // Helper function to extract name from email
+  const getRecruiterName = (addedBy) => {
+    if (!addedBy) return "Unknown";
+    if (addedBy.email) return addedBy.email.split("@")[0];
+    if (typeof addedBy === "string" && addedBy.includes("@")) return addedBy.split("@")[0];
+    return "Unknown";
+  };
+
+  // Calculate dynamic colspan based on visible columns
+  const getColSpan = () => {
+    let span = 6; // Default columns (ID, Details, Contact, Company, Process, Actions)
+    if (isAdminOrSuper) span += 1; // Added By
+    if (showPayoutColumn) span += 1; // Payout
+    return span;
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
@@ -102,9 +114,11 @@ export default function EmployeeTable({
               <th className="px-6 py-4">Contact</th>
               <th className="px-6 py-4">Placement Company</th>
               <th className="px-6 py-4">Process / Opening</th>
-              <th className="px-6 py-4">Status</th>
-
-              {/* 🚀 CONDITIONAL COLUMN */}
+              
+              {/* 🚀 NAYA COLUMN: Added By (Sirf Admin/Superadmin ko dikhega) */}
+              {isAdminOrSuper && <th className="px-6 py-4">Added By</th>}
+              
+              {/* 🚀 CONDITIONAL COLUMN: Payout */}
               {showPayoutColumn && <th className="px-6 py-4">Payout</th>}
 
               <th className="px-6 py-4 text-right">Actions</th>
@@ -114,7 +128,7 @@ export default function EmployeeTable({
             {loading ? (
               <tr>
                 <td
-                  colSpan={showPayoutColumn ? "8" : "7"}
+                  colSpan={getColSpan()}
                   className="text-center py-10 font-bold text-[#092a49]"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
@@ -138,27 +152,46 @@ export default function EmployeeTable({
                       <div className="text-xs text-gray-500 mt-0.5">
                         Exp: {emp.experience || "N/A"}
                       </div>
+                      <div className="mt-1.5 inline-flex flex-wrap gap-1">
+                        <span
+                          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border 
+                          ${emp.status === "Selected" ? "bg-green-50 text-green-700 border-green-200" : ""}
+                          ${emp.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" : ""}
+                          ${emp.status === "Attendees" ? "bg-orange-50 text-orange-700 border-orange-200" : ""}
+                          ${emp.status === "LineUp" ? "bg-blue-50 text-blue-700 border-blue-200" : ""}
+                          ${emp.status === "On Hold" ? "bg-yellow-50 text-yellow-700 border-yellow-300" : ""}
+                          ${emp.status === "Joining" ? "bg-teal-50 text-teal-700 border-teal-300" : ""}
+                          ${emp.status === "Payout" ? "bg-purple-50 text-purple-700 border-purple-300" : ""}
+                        `}
+                        >
+                          {emp.status}
+                        </span>
 
-                      {/* Final Salary Badge */}
-                      {emp.status === "Joining" && emp.actualSalary && (
-                        <div className="mt-1.5 inline-flex items-center gap-1 bg-teal-50 border border-teal-200 text-teal-700 px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wide">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2.5}
-                            stroke="currentColor"
-                            className="w-3 h-3"
+                        {emp.status === "Joining" && emp.actualSalary && (
+                          <div className="inline-flex items-center gap-1 bg-teal-50 border border-teal-200 text-teal-700 px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wide">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            FINAL: ₹{emp.actualSalary}
+                          </div>
+                        )}
+                        {emp.remark && (
+                          <button
+                            onClick={() =>
+                              setSelectedRemark({
+                                name: emp.name,
+                                text: emp.remark,
+                              })
+                            }
+                            className="inline-flex items-center gap-1 text-[10px] bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 px-2 py-0.5 rounded shadow-sm transition-colors cursor-pointer"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                            />
-                          </svg>
-                          FINAL: ₹{emp.actualSalary}
-                        </div>
-                      )}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+                            </svg>
+                            View Remark
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-m text-gray-800">
                       <div className="font-medium whitespace-nowrap">
@@ -174,52 +207,19 @@ export default function EmployeeTable({
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {emp.assignedProcess}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col items-start gap-2">
-                        <span
-                          className={`px-4 py-1.5 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-full border 
-                          ${emp.status === "Selected" ? "bg-green-50 text-green-700 border-green-200" : ""}
-                          ${emp.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" : ""}
-                          ${emp.status === "Attendees" ? "bg-orange-50 text-orange-700 border-orange-200" : ""}
-                          ${emp.status === "LineUp" ? "bg-blue-50 text-blue-700 border-blue-200" : ""}
-                          ${emp.status === "On Hold" ? "bg-yellow-50 text-yellow-700 border-yellow-300" : ""}
-                          ${emp.status === "Joining" ? "bg-teal-50 text-teal-700 border-teal-300" : ""}
-                          ${emp.status === "Payout" ? "bg-purple-50 text-purple-700 border-purple-300" : ""}
-                        `}
-                        >
-                          {emp.status}
-                        </span>
-                        {emp.remark && (
-                          <button
-                            onClick={() =>
-                              setSelectedRemark({
-                                name: emp.name,
-                                text: emp.remark,
-                              })
-                            }
-                            className="flex items-center gap-1.5 text-[10px] bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 px-2.5 py-1.5 rounded shadow-sm transition-colors cursor-pointer"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2.5}
-                              stroke="currentColor"
-                              className="w-3.5 h-3.5"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z"
-                              />
-                            </svg>
-                            View Remark
-                          </button>
-                        )}
-                      </div>
-                    </td>
 
-                    {/* 🚀 CONDITIONAL DATA CELL */}
+                    {/* 🚀 NAYA DATA CELL: Added By */}
+                    {isAdminOrSuper && (
+                      <td className="px-6 py-4">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold capitalize shadow-sm">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                          </svg>
+                          {getRecruiterName(emp.addedBy)}
+                        </div>
+                      </td>
+                    )}
+
                     {showPayoutColumn && (
                       <td className="px-6 py-4">
                         {emp.status === "Joining" || emp.status === "Payout" ? (
@@ -258,7 +258,7 @@ export default function EmployeeTable({
                 {visibleCount < filteredData.length && (
                   <tr ref={loaderRef}>
                     <td
-                      colSpan={showPayoutColumn ? "8" : "7"}
+                      colSpan={getColSpan()}
                       className="text-center py-6"
                     >
                       <div className="flex justify-center items-center gap-2 text-gray-500 font-medium text-sm">
@@ -272,7 +272,7 @@ export default function EmployeeTable({
             ) : (
               <tr>
                 <td
-                  colSpan={showPayoutColumn ? "8" : "7"}
+                  colSpan={getColSpan()}
                   className="text-center py-10 text-gray-400 italic"
                 >
                   No {activeTab} employees found.
