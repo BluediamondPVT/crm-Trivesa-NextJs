@@ -12,7 +12,7 @@ import MetricsMatrix from "@/components/recruiter/MetricsMatrix";
 import TabsFilter from "@/components/recruiter/TabsFilter";
 import EmployeeTable from "@/components/recruiter/EmployeeTable";
 import RemarkModal from "@/components/recruiter/RemarkModal";
-import DashboardToolbar from "@/components/recruiter/DashboardToolbar"; // 🚀 NAYA IMPORT
+import DashboardToolbar from "@/components/recruiter/DashboardToolbar";
 
 export default function RecruiterDashboard() {
   const searchParams = useSearchParams();
@@ -41,6 +41,9 @@ export default function RecruiterDashboard() {
 
   const [userRole, setUserRole] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
+
+  // 🚀 NAYA: Ab sirf ek hi Custom Date store karenge
+  const [customStartDate, setCustomStartDate] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -105,7 +108,8 @@ export default function RecruiterDashboard() {
     ).getTime();
 
     filteredData = filteredData.filter((emp) => {
-      const empDate = new Date(emp.createdAt).getTime();
+      const dateToUse = emp.updatedAt ? emp.updatedAt : emp.createdAt;
+      const empDate = new Date(dateToUse).getTime();
 
       if (dateFilter === "Today") {
         return empDate >= today;
@@ -118,6 +122,22 @@ export default function RecruiterDashboard() {
       } else if (dateFilter === "30Days") {
         const thirtyDaysAgo = today - 30 * 24 * 60 * 60 * 1000;
         return empDate >= thirtyDaysAgo;
+      }
+      // 🚀 CUSTOM DATE LOGIC: Picked Date se leke Aak tak (Today)
+      else if (dateFilter === "Custom") {
+        if (!customStartDate) return true; // Jab tak select na ho, sab dikhao
+
+        const pickedDate = new Date(customStartDate);
+        pickedDate.setHours(0, 0, 0, 0); // Start of picked date
+
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999); // End of today
+
+        // Taki agar user galti se future date daal de toh bhi range sahi kaam kare
+        const rangeStart = Math.min(pickedDate.getTime(), endOfToday.getTime());
+        const rangeEnd = Math.max(pickedDate.getTime(), endOfToday.getTime());
+
+        return empDate >= rangeStart && empDate <= rangeEnd;
       }
       return true;
     });
@@ -343,6 +363,9 @@ export default function RecruiterDashboard() {
         dateFilter={dateFilter}
         setDateFilter={setDateFilter}
         handleDownload={handleDownloadExcel}
+        // 🚀 NAYA: Sirf ek Custom Start Date pass kiya
+        customStartDate={customStartDate}
+        setCustomStartDate={setCustomStartDate}
       />
 
       <MetricsMatrix
@@ -351,7 +374,6 @@ export default function RecruiterDashboard() {
         setActiveTab={setActiveTab}
       />
 
-      {/* 🚀 MODULAR COMPONENT: Search aur Payout alag kar diya */}
       <DashboardToolbar
         userRole={userRole}
         activeTab={activeTab}

@@ -128,8 +128,86 @@
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(to top, #ffffff,#c8d1da);
-  border-radius: 5px;
+  border-radius: 0px;   
   cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to top, #092A49,#092A49);
+  border-radius: 0px;
+  cursor: pointer;
+}
+
+
+/* 🚀 PREMIUM AIRBNB STYLE CALENDAR OVERRIDES */
+.react-datepicker {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  font-family: inherit !important;
+  padding: 12px !important;
+  background-color: #ffffff !important;
+}
+
+.react-datepicker__header {
+  background-color: #ffffff !important;
+  border-bottom: none !important;
+  padding-bottom: 10px !important;
+}
+
+.react-datepicker__current-month {
+  text-align: left !important;
+  padding-left: 10px;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.react-datepicker__day-name {
+  color: #9ca3af !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+  margin: 0.2rem !important;
+  width: 2rem !important;
+}
+
+.react-datepicker__day {
+  border-radius: 50% !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  margin: 0.2rem !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background-color: #f3f4f6 !important;
+  color: #000 !important;
+}
+
+/* 🔥 THE YELLOW HIGHLIGHT BETWEEN PICKED DATE AND TODAY */
+.react-datepicker__day--in-range {
+  background-color: #eaf167 !important; /* Lemon Yellow from your image */
+  color: #000000 !important;
+  border-radius: 0 !important; /* Flat edges for the continuous block */
+}
+
+/* 🔥 THE BLACK CIRCLES FOR SELECTED DATE & TODAY */
+.react-datepicker__day--selected,
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background-color: #1f2937 !important; /* Dark Black/Grey */
+  color: #ffffff !important;
+  border-radius: 50% !important; /* Round circle overrides the flat edge */
+  font-weight: bold !important;
+}
+
+/* Remove blue outline on click */
+.react-datepicker__day:focus,
+.react-datepicker__day:active {
+  outline: none !important;
 }
 
 @layer base {
