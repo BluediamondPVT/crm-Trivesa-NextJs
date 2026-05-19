@@ -17,6 +17,7 @@ import DashboardToolbar from "@/components/recruiter/DashboardToolbar";
 export default function RecruiterDashboard() {
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
+  const recruiterId = searchParams.get("recruiterId");
 
   const tabs = [
     "All",
@@ -187,6 +188,16 @@ export default function RecruiterDashboard() {
         .toLowerCase();
 
       return searchString.includes(lowerSearch);
+    });
+  }
+
+  if (recruiterId) {
+    filteredData = filteredData.filter((emp) => {
+      const addedBy = emp.addedBy;
+      return (
+        (addedBy?._id && String(addedBy._id) === recruiterId) ||
+        (typeof addedBy === "string" && addedBy === recruiterId)
+      );
     });
   }
 

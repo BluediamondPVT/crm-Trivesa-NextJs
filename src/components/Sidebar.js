@@ -20,6 +20,13 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
   const [isRecruiterOpen, setIsRecruiterOpen] = useState(false);
 
   const [userRole, setUserRole] = useState(null);
+  const [recruiters, setRecruiters] = useState([]);
+  const [recruitersLoading, setRecruitersLoading] = useState(false);
+
+  const recruiterIdFromUrl = searchParams.get("recruiterId");
+  const isAdminOrSuper = ["admin", "superadmin"].includes(
+    userRole?.toLowerCase(),
+  );
 
   // 🚀 Fetch Role from Secure API
   useEffect(() => {
@@ -38,6 +45,31 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
     fetchUserRole();
   }, []);
+
+  useEffect(() => {
+    const fetchRecruiters = async () => {
+      if (!isAdminOrSuper) return;
+      setRecruitersLoading(true);
+
+      try {
+        const res = await fetch("/api/users?role=recruiter");
+        const data = await res.json();
+
+        if (data.success) {
+          setRecruiters(data.data || []);
+        } else {
+          setRecruiters([]);
+        }
+      } catch (error) {
+        console.error("Failed to load recruiter dropdown items:", error);
+        setRecruiters([]);
+      } finally {
+        setRecruitersLoading(false);
+      }
+    };
+
+    fetchRecruiters();
+  }, [isAdminOrSuper]);
 
   const handleMobileClose = () => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -177,12 +209,27 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
   }));
 
   // 3. Recruiter Dropdown Items
-  const recruiterSubItems = [
-    { name: "HR701", color: "bg-cyan-500", href: "#hr701" },
-    { name: "HR702", color: "bg-cyan-500", href: "#hr702" },
-    { name: "HR703", color: "bg-cyan-500", href: "#hr703" },
-    { name: "HR704", color: "bg-cyan-500", href: "#hr704" },
-  ].map((item) => ({ ...item, isActive: pathname === item.href }));
+  const recruiterSubItems = recruiters.length > 0
+    ? recruiters.map((item) => {
+        const trimmedName = item.email
+          ? item.email.split("@")[0]
+          : "Recruiter";
+
+        return {
+          name: trimmedName,
+          color: "bg-cyan-500",
+          href: null,
+          isActive: false,
+        };
+      })
+    : [
+        {
+          name: recruitersLoading ? "Loading recruiters..." : "No recruiters found",
+          color: "bg-cyan-500",
+          href: null,
+          isActive: false,
+        },
+      ];
 
   return (
     <>
@@ -284,7 +331,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
               label="Recruiters"
               isOpen={isRecruiterOpen}
               toggleOpen={() => setIsRecruiterOpen(!isRecruiterOpen)}
-              isActive={pathname.includes("/dashboard/admin/hr")}
+              isActive={pathname.includes("/dashboard/admin/recruiters")}
               subItems={recruiterSubItems}
               pathname={pathname}
               onSubItemClick={handleMobileClose}

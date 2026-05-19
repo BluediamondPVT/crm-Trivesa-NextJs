@@ -63,13 +63,13 @@ export default function SidebarDropdown({
             className="overflow-hidden ml-6 mt-1 space-y-1 border-l border-white/10"
           >
             {subItems.map((sub, idx) => (
+            sub.href ? (
               <Link
                 key={idx}
                 href={sub.href}
                 onClick={onSubItemClick}
                 className="block"
               >
-                {/* NAYA FIX: Yahan ab hum 'sub.isActive' check kar rahe hain */}
                 <motion.div
                   className={`flex items-center gap-3 px-6 py-2 text-sm font-medium hover:text-white hover:bg-white/5 rounded-r-lg transition-all ${sub.isActive ? "text-white bg-white/5" : "text-gray-400"}`}
                   whileHover={{ x: 5 }}
@@ -78,7 +78,16 @@ export default function SidebarDropdown({
                   {sub.name}
                 </motion.div>
               </Link>
-            ))}
+            ) : (
+              <div
+                key={idx}
+                className={`flex items-center gap-3 px-6 py-2 text-sm font-medium rounded-r-lg transition-all ${sub.isActive ? "text-white bg-white/5" : "text-gray-400"}`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${sub.color}`} />
+                {sub.name}
+              </div>
+            )
+          ))}
           </motion.div>
         )}
       </AnimatePresence>

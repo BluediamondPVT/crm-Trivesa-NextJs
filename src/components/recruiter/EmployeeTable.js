@@ -1,11 +1,39 @@
 // src/components/recruiter/EmployeeTable.js
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "sonner";
 import PayoutBadge from "./PayoutBadge";
+
+// ✅ Sort Icon Component
+function SortIcon({ column, sortConfig }) {
+  const isActive = sortConfig.key === column;
+  const isAsc = isActive && sortConfig.direction === "asc";
+  const isDesc = isActive && sortConfig.direction === "desc";
+
+  return (
+    <span className="inline-flex flex-col ml-1.5 gap-[2px] align-middle">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 8 5"
+        className={`w-2 h-2 transition-colors ${isAsc ? "text-blue-600" : "text-gray-300"}`}
+        fill="currentColor"
+      >
+        <path d="M4 0L8 5H0L4 0Z" />
+      </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 8 5"
+        className={`w-2 h-2 transition-colors ${isDesc ? "text-blue-600" : "text-gray-300"}`}
+        fill="currentColor"
+      >
+        <path d="M4 5L0 0H8L4 5Z" />
+      </svg>
+    </span>
+  );
+}
 
 export default function EmployeeTable({
   filteredData,
@@ -18,8 +46,10 @@ export default function EmployeeTable({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const loaderRef = useRef(null);
 
-  const isAdminOrSuper = ["admin", "superadmin"].includes(role?.toLowerCase());
+  // ✅ Sort State: key = column name, direction = "asc" | "desc" | null
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
+  const isAdminOrSuper = ["admin", "superadmin"].includes(role?.toLowerCase());
   const showPayoutColumn =
     isAdminOrSuper && ["Joining", "Payout"].includes(activeTab);
 
@@ -41,15 +71,9 @@ export default function EmployeeTable({
       },
       { threshold: 0.1 },
     );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
+    if (loaderRef.current) observer.observe(loaderRef.current);
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
-      }
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
   }, [visibleCount, filteredData.length, isFetchingMore]);
 
@@ -61,7 +85,66 @@ export default function EmployeeTable({
     }, 800);
   };
 
-  const visibleData = filteredData.slice(0, visibleCount);
+  // ✅ Sort Handler: 3-state cycle → asc → desc → none
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key !== key) return { key, direction: "asc" };
+      if (prev.direction === "asc") return { key, direction: "desc" };
+      return { key: null, direction: null };
+    });
+  };
+
+  const getRecruiterName = (addedBy) => {
+    if (!addedBy) return "Unknown";
+    if (addedBy.email) return addedBy.email.split("@")[0];
+    if (typeof addedBy === "string" && addedBy.includes("@"))
+      return addedBy.split("@")[0];
+    return "Unknown";
+  };
+
+  // ✅ Sorted Data (memoized for performance)
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) return filteredData;
+
+    return [...filteredData].sort((a, b) => {
+      let aVal = "";
+      let bVal = "";
+
+      switch (sortConfig.key) {
+        case "name":
+          aVal = a.name || "";
+          bVal = b.name || "";
+          break;
+        case "phone":
+          aVal = a.phone || "";
+          bVal = b.phone || "";
+          break;
+        case "company":
+          aVal = a.assignedCompanyName || "";
+          bVal = b.assignedCompanyName || "";
+          break;
+        case "process":
+          aVal = a.assignedProcess || "";
+          bVal = b.assignedProcess || "";
+          break;
+        case "status":
+          aVal = a.status || "";
+          bVal = b.status || "";
+          break;
+        case "addedBy":
+          aVal = getRecruiterName(a.addedBy);
+          bVal = getRecruiterName(b.addedBy);
+          break;
+        default:
+          return 0;
+      }
+
+      const cmp = String(aVal).toLowerCase().localeCompare(String(bVal).toLowerCase());
+      return sortConfig.direction === "asc" ? cmp : -cmp;
+    });
+  }, [filteredData, sortConfig]);
+
+  const visibleData = sortedData.slice(0, visibleCount);
 
   const getActionPath = (actionType, id) => {
     const basePath =
@@ -87,21 +170,25 @@ export default function EmployeeTable({
     }
   };
 
-  // Helper function to extract name from email
-  const getRecruiterName = (addedBy) => {
-    if (!addedBy) return "Unknown";
-    if (addedBy.email) return addedBy.email.split("@")[0];
-    if (typeof addedBy === "string" && addedBy.includes("@")) return addedBy.split("@")[0];
-    return "Unknown";
-  };
-
-  // Calculate dynamic colspan based on visible columns
   const getColSpan = () => {
-    let span = 6; // Default columns (ID, Details, Contact, Company, Process, Actions)
-    if (isAdminOrSuper) span += 1; // Added By
-    if (showPayoutColumn) span += 1; // Payout
+    let span = 6;
+    if (isAdminOrSuper) span += 1;
+    if (showPayoutColumn) span += 1;
     return span;
   };
+
+  // ✅ Reusable sortable TH
+  const SortableTh = ({ label, column, className = "" }) => (
+    <th
+      className={`px-6 py-4 cursor-pointer select-none hover:text-blue-600 hover:bg-blue-50/50 transition-colors ${className}`}
+      onClick={() => handleSort(column)}
+    >
+      <span className="inline-flex items-center gap-0.5">
+        {label}
+        <SortIcon column={column} sortConfig={sortConfig} />
+      </span>
+    </th>
+  );
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -110,15 +197,16 @@ export default function EmployeeTable({
           <thead>
             <tr className="bg-gray-50/80 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
               <th className="px-6 py-4 w-12 text-center">ID</th>
-              <th className="px-6 py-4">Employee Details</th>
-              <th className="px-6 py-4">Contact</th>
-              <th className="px-6 py-4">Placement Company</th>
-              <th className="px-6 py-4">Process / Opening</th>
-              
-              {/* 🚀 NAYA COLUMN: Added By (Sirf Admin/Superadmin ko dikhega) */}
-              {isAdminOrSuper && <th className="px-6 py-4">Added By</th>}
-              
-              {/* 🚀 CONDITIONAL COLUMN: Payout */}
+
+              <SortableTh label="Employee Details" column="name" />
+              <SortableTh label="Contact" column="phone" />
+              <SortableTh label="Placement Company" column="company" />
+              <SortableTh label="Process / Opening" column="process" />
+
+              {isAdminOrSuper && (
+                <SortableTh label="Added By" column="addedBy" />
+              )}
+
               {showPayoutColumn && <th className="px-6 py-4">Payout</th>}
 
               <th className="px-6 py-4 text-right">Actions</th>
@@ -208,7 +296,6 @@ export default function EmployeeTable({
                       {emp.assignedProcess}
                     </td>
 
-                    {/* 🚀 NAYA DATA CELL: Added By */}
                     {isAdminOrSuper && (
                       <td className="px-6 py-4">
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold capitalize shadow-sm">
@@ -236,13 +323,11 @@ export default function EmployeeTable({
                           View
                         </button>
                       </Link>
-
                       <Link href={getActionPath("edit", emp._id)}>
                         <button className="px-4 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md cursor-pointer text-xs font-bold transition-colors">
                           Edit
                         </button>
                       </Link>
-
                       {role === "superadmin" && (
                         <button
                           onClick={() => confirmDelete(emp._id, emp.name)}
@@ -257,10 +342,7 @@ export default function EmployeeTable({
 
                 {visibleCount < filteredData.length && (
                   <tr ref={loaderRef}>
-                    <td
-                      colSpan={getColSpan()}
-                      className="text-center py-6"
-                    >
+                    <td colSpan={getColSpan()} className="text-center py-6">
                       <div className="flex justify-center items-center gap-2 text-gray-500 font-medium text-sm">
                         <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                         Loading more candidates...
