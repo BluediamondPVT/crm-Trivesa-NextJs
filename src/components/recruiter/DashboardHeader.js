@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // 🚀 NAYA: Calendar ki Premium CSS
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function DashboardHeader({
   role,
@@ -11,6 +11,8 @@ export default function DashboardHeader({
   handleDownload,
   customStartDate,
   setCustomStartDate,
+  customEndDate,
+  setCustomEndDate,
 }) {
   console.log("Current Role in Header:", role);
 
@@ -19,8 +21,8 @@ export default function DashboardHeader({
       ? "/dashboard/recruiter/recruiters/add"
       : "/dashboard/admin/recruiters/add";
 
-  // 🚀 JADOO: React Datepicker ke liye Custom Button (Design wahi purana premium wala)
-  const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
+  // ✅ Custom Input Button for DatePicker — reusable for both Start & End
+  const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <div
       onClick={onClick}
       ref={ref}
@@ -31,7 +33,7 @@ export default function DashboardHeader({
           value ? "text-[#092a49]" : "text-gray-400"
         }`}
       >
-        {value || "Select Date"}
+        {value || placeholder || "Select Date"}
       </span>
 
       <div
@@ -73,12 +75,15 @@ export default function DashboardHeader({
 
       <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
         <div className="flex flex-wrap items-center gap-2">
+          {/* Date Filter Dropdown */}
           <select
             value={dateFilter}
             onChange={(e) => {
               setDateFilter(e.target.value);
+              // ✅ Dono dates reset ho jaayein jab Custom se switch karein
               if (e.target.value !== "Custom") {
-                if (setCustomStartDate) setCustomStartDate("");
+                setCustomStartDate("");
+                setCustomEndDate("");
               }
             }}
             className="bg-white border border-gray-300 text-gray-700 text-sm px-4 py-2.5 rounded-lg font-medium focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"
@@ -91,37 +96,108 @@ export default function DashboardHeader({
             <option value="Custom">Custom Date</option>
           </select>
 
-          {/* 🚀 THIRD-PARTY DATE PICKER COMPONENT */}
+          {/* ✅ UPDATED: Start Date → End Date Range Picker */}
           {dateFilter === "Custom" && (
             <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm animate-in fade-in zoom-in duration-300 overflow-visible z-50">
+
+              {/* --- START DATE --- */}
               <div className="px-3 py-2 bg-gray-50 border-r border-gray-200">
                 <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">
                   From
                 </span>
               </div>
 
-              {/* 🚀 Pura Calendar Magic Idhar Hai */}
               <DatePicker
                 selected={customStartDate ? new Date(customStartDate) : null}
-                onChange={(date) => setCustomStartDate(date ? date.toISOString() : "")}
-                
-                // 🚀 MAGIC: In dono lines ki wajah se Picked Date aur Today ke beech YELLOW line aayegi!
-                startDate={customStartDate ? new Date(customStartDate) : null} 
-                endDate={new Date()} 
-
-                customInput={<CustomDateInput />}
+                onChange={(date) => {
+                  const iso = date ? date.toISOString() : "";
+                  setCustomStartDate(iso);
+                  // ✅ Agar start date end date ke baad hai toh end date clear kar do
+                  if (customEndDate && date && new Date(customEndDate) < date) {
+                    setCustomEndDate("");
+                  }
+                }}
+                selectsStart
+                startDate={customStartDate ? new Date(customStartDate) : null}
+                endDate={customEndDate ? new Date(customEndDate) : null}
+                customInput={<CustomDateInput placeholder="Start Date" />}
                 dateFormat="dd-MM-yyyy"
-                maxDate={new Date()} // Aaj ke aage ki date block kar di
-                showMonthDropdown 
-                showYearDropdown 
+                maxDate={new Date()}
+                showMonthDropdown
+                showYearDropdown
                 dropdownMode="select"
+                placeholderText="Start Date"
               />
 
-              <div className="px-3 py-2 border-l border-gray-200 bg-blue-50/50">
-                <span className="text-blue-700 font-black text-[10px] uppercase tracking-wider">
-                  To Today
+              {/* --- ARROW SEPARATOR --- */}
+              <div className="px-2 text-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                  />
+                </svg>
+              </div>
+
+              {/* --- END DATE --- */}
+              <div className="px-3 py-2 bg-gray-50 border-l border-r border-gray-200">
+                <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider">
+                  To
                 </span>
               </div>
+
+              <DatePicker
+                selected={customEndDate ? new Date(customEndDate) : null}
+                onChange={(date) => {
+                  setCustomEndDate(date ? date.toISOString() : "");
+                }}
+                selectsEnd
+                startDate={customStartDate ? new Date(customStartDate) : null}
+                endDate={customEndDate ? new Date(customEndDate) : null}
+                minDate={customStartDate ? new Date(customStartDate) : null}
+                customInput={<CustomDateInput placeholder="End Date" />}
+                dateFormat="dd-MM-yyyy"
+                maxDate={new Date()}
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                placeholderText="End Date"
+              />
+
+              {/* ✅ Clear Button — dono dates ek saath reset */}
+              {(customStartDate || customEndDate) && (
+                <button
+                  onClick={() => {
+                    setCustomStartDate("");
+                    setCustomEndDate("");
+                  }}
+                  className="px-2 py-1.5 mr-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                  title="Clear dates"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-3.5 h-3.5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           )}
         </div>

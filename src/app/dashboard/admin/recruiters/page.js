@@ -42,8 +42,9 @@ export default function RecruiterDashboard() {
   const [userRole, setUserRole] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
 
-  // 🚀 NAYA: Ab sirf ek hi Custom Date store karenge
+  // ✅ UPDATED: Ab Start Date aur End Date dono store honge
   const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -123,21 +124,34 @@ export default function RecruiterDashboard() {
         const thirtyDaysAgo = today - 30 * 24 * 60 * 60 * 1000;
         return empDate >= thirtyDaysAgo;
       }
-      // 🚀 CUSTOM DATE LOGIC: Picked Date se leke Aak tak (Today)
+      // ✅ UPDATED: Custom Date Range — Start Date se End Date tak
       else if (dateFilter === "Custom") {
-        if (!customStartDate) return true; // Jab tak select na ho, sab dikhao
+        if (!customStartDate && !customEndDate) return true; // Kuch select nahi hua toh sab dikhao
 
-        const pickedDate = new Date(customStartDate);
-        pickedDate.setHours(0, 0, 0, 0); // Start of picked date
+        const rangeStart = customStartDate
+          ? (() => {
+              const d = new Date(customStartDate);
+              d.setHours(0, 0, 0, 0);
+              return d.getTime();
+            })()
+          : null;
 
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999); // End of today
+        const rangeEnd = customEndDate
+          ? (() => {
+              const d = new Date(customEndDate);
+              d.setHours(23, 59, 59, 999);
+              return d.getTime();
+            })()
+          : null;
 
-        // Taki agar user galti se future date daal de toh bhi range sahi kaam kare
-        const rangeStart = Math.min(pickedDate.getTime(), endOfToday.getTime());
-        const rangeEnd = Math.max(pickedDate.getTime(), endOfToday.getTime());
-
-        return empDate >= rangeStart && empDate <= rangeEnd;
+        if (rangeStart && rangeEnd) {
+          return empDate >= rangeStart && empDate <= rangeEnd;
+        } else if (rangeStart) {
+          return empDate >= rangeStart; // Sirf start date select hua
+        } else if (rangeEnd) {
+          return empDate <= rangeEnd; // Sirf end date select hua
+        }
+        return true;
       }
       return true;
     });
@@ -363,9 +377,11 @@ export default function RecruiterDashboard() {
         dateFilter={dateFilter}
         setDateFilter={setDateFilter}
         handleDownload={handleDownloadExcel}
-        // 🚀 NAYA: Sirf ek Custom Start Date pass kiya
+        // ✅ UPDATED: Both Start & End Date pass kiye
         customStartDate={customStartDate}
         setCustomStartDate={setCustomStartDate}
+        customEndDate={customEndDate}
+        setCustomEndDate={setCustomEndDate}
       />
 
       <MetricsMatrix
