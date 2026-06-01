@@ -9,7 +9,7 @@ import DashboardHeader from "@/components/admin/DashboardHeader";
 import MetricsGrid from "@/components/admin/MetricsGrid";
 import CRMTable from "@/components/admin/CRMTable";
 
-export default function AdminDashboard() {
+export default function AdminDashboard() { 
   const [tableData, setTableData] = useState([]);
   const [counts, setCounts] = useState({
     total: 0,

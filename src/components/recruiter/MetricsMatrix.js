@@ -136,11 +136,26 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
         />
       ),
     },
+    {
+      label: "Abscond",
+      tab: "Abscond",
+      count: counts["Abscond"] || 0,
+      borderColor: "border-slate-500",
+      textColor: "text-slate-700",
+      bgHover: "hover:bg-slate-50",
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+        />
+      ),
+    },
     
   ];
 
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-1">
+  return (    
+    <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-5 gap-3 mb-1">
       {metricCards.map((card) => (
         <div
           key={card.tab}

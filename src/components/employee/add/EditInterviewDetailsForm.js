@@ -9,8 +9,7 @@ export default function EditInterviewDetailsForm({
 }) {
   const isFuture = formData.status === "future";
 
-  // Saare Status Options Edit ke liye
-  const allStatuses = [
+  const baseStatuses = [
     "LineUp",
     "future",
     "Attendees",
@@ -20,6 +19,10 @@ export default function EditInterviewDetailsForm({
     "Joining",
     "Payout"
   ];
+
+  const allStatuses = (formData.status === "Joining" || formData.status === "Selected" || formData.status === "Abscond")
+    ? [...baseStatuses, "Abscond"]
+    : baseStatuses;
 
   return (
     <>

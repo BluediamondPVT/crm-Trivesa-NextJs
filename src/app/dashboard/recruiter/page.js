@@ -28,6 +28,7 @@ function RecruiterContent() {
     "Rejected",
     "Payout",
     "future",
+    "Abscond"
   ];
 
   const isCandidateView = tabFromUrl && tabs.includes(tabFromUrl);
@@ -171,6 +172,7 @@ function RecruiterContent() {
       Joining: 0,
       Payout: 0,
       future: 0,
+      Abscond: 0,
     };
     filteredData.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;

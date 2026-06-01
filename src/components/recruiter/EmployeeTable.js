@@ -250,6 +250,7 @@ export default function EmployeeTable({
                           ${emp.status === "On Hold" ? "bg-yellow-50 text-yellow-700 border-yellow-300" : ""}
                           ${emp.status === "Joining" ? "bg-teal-50 text-teal-700 border-teal-300" : ""}
                           ${emp.status === "Payout" ? "bg-purple-50 text-purple-700 border-purple-300" : ""}
+                          ${emp.status === "Abscond" ? "bg-slate-50 text-slate-700 border-slate-300" : ""}
                         `}
                         >
                           {emp.status}

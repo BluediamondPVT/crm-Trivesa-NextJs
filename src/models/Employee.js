@@ -50,6 +50,7 @@ const EmployeeSchema = new mongoose.Schema(
         "Joining",
         "Payout",
         "future",
+        "Abscond",
       ],
       default: "LineUp",
     },

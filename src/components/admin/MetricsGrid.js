@@ -27,7 +27,7 @@ export default function MetricsGrid({ counts }) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 mb-10">
-      
+
       {/* 1. Total Clients (No Link) */}
       <div className="bg-white rounded-2xl shadow-sm border-l-[6px] border-[#092a49] p-5 flex justify-between items-center">
         <div>
