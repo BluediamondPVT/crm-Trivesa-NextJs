@@ -1,9 +1,27 @@
 export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
+  const c = {
+    All: counts["All"] || 0,
+    LineUp: counts["LineUp"] || 0,
+    Attendees: counts["Attendees"] || 0,
+    OnHold: counts["On Hold"] || 0,
+    Selected: counts["Selected"] || 0,
+    Joining: counts["Joining"] || 0,
+    Rejected: counts["Rejected"] || 0,
+    Payout: counts["Payout"] || 0,
+    future: counts["future"] || 0,
+    Abscond: counts["Abscond"] || 0,
+  };
+
+  const matrixLineUp = c.All;
+  const matrixAttendees = c.Attendees + c.OnHold + c.Selected + c.Rejected + c.Joining + c.Payout + c.Abscond;
+  const matrixSelected = c.Selected + c.Joining + c.Payout + c.Abscond;
+  const matrixJoining = c.Joining + c.Payout + c.Abscond;
+
   const metricCards = [
     {
       label: "Total All",
       tab: "All",
-      count: counts["All"],
+      count: c.All,
       borderColor: "border-gray-800",
       textColor: "text-gray-800",
       bgHover: "hover:bg-gray-50",
@@ -18,7 +36,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "LineUp",
       tab: "LineUp",
-      count: counts["LineUp"],
+      count: matrixLineUp,
       borderColor: "border-blue-500",
       textColor: "text-blue-700",
       bgHover: "hover:bg-blue-50",
@@ -33,7 +51,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Attendees",
       tab: "Attendees",
-      count: counts["Attendees"],
+      count: matrixAttendees,
       borderColor: "border-orange-500",
       textColor: "text-orange-700",
       bgHover: "hover:bg-orange-50",
@@ -48,7 +66,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "On Hold",
       tab: "On Hold",
-      count: counts["On Hold"],
+      count: c.OnHold,
       borderColor: "border-yellow-400",
       textColor: "text-yellow-700",
       bgHover: "hover:bg-yellow-50",
@@ -63,7 +81,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Selected",
       tab: "Selected",
-      count: counts["Selected"],
+      count: matrixSelected,
       borderColor: "border-green-500",
       textColor: "text-green-700",
       bgHover: "hover:bg-green-50",
@@ -78,7 +96,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Joining",
       tab: "Joining",
-      count: counts["Joining"],
+      count: matrixJoining,
       borderColor: "border-teal-500",
       textColor: "text-teal-700",
       bgHover: "hover:bg-teal-50",
@@ -93,7 +111,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Rejected",
       tab: "Rejected",
-      count: counts["Rejected"],
+      count: c.Rejected,
       borderColor: "border-red-500",
       textColor: "text-red-700",
       bgHover: "hover:bg-red-50",
@@ -108,7 +126,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Payout",
       tab: "Payout",
-      count: counts["Payout"],
+      count: c.Payout,
       borderColor: "border-purple-500",
       textColor: "text-purple-700",
       bgHover: "hover:bg-purple-50",
@@ -124,7 +142,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "future",
       tab: "future",
-      count: counts["future"],
+      count: c.future,
       borderColor: "border-blue-500",
       textColor: "text-blue-700",
       bgHover: "hover:bg-blue-50",
@@ -139,7 +157,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     {
       label: "Abscond",
       tab: "Abscond",
-      count: counts["Abscond"] || 0,
+      count: c.Abscond,
       borderColor: "border-slate-500",
       textColor: "text-slate-700",
       bgHover: "hover:bg-slate-50",

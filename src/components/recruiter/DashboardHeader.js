@@ -66,10 +66,12 @@ export default function DashboardHeader({
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
       <div>
         <h1 className="text-3xl font-bold text-[#092a49]">
-          Candidates / LineUps
+          {role === "admin" ? "Recruiters" : "Candidates / LineUps"}
         </h1>
         <p className="text-gray-500 mt-1">
-          Manage Candidates pipelines and Attendees
+          {role === "admin"
+            ? "Manage Recruiters"
+            : "Manage Candidates pipelines and Attendees"}
         </p>
       </div>
 

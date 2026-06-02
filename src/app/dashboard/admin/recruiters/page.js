@@ -415,6 +415,7 @@ export default function RecruiterDashboard() {
         tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        counts={getCounts()}
       />
 
       <EmployeeTable

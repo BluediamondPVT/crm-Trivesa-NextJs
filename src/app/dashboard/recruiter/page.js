@@ -327,6 +327,7 @@ function RecruiterContent() {
                 tabs={tabs}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                counts={getCounts()}
               />
 
               <EmployeeTable

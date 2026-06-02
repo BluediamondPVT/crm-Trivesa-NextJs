@@ -10,7 +10,7 @@ export default function LoginForm() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  
+
   // Ab auth ka saara heavy lifting tera middleware karega!
 
   const validateForm = () => {
@@ -30,83 +30,83 @@ export default function LoginForm() {
     return true;
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.toLowerCase(),
-        password,
-      }),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          password,
+        }),
+      });
 
-    const responseData = await res.json();
+      const responseData = await res.json();
 
-    if (!res.ok) {
-      throw new Error(responseData.message || "Invalid credentials");
-    }
-
-    // 🕵️‍♂️ Debugging ke liye: Console mein check kar role kya aa raha hai
-    const role = responseData.data?.role;
-    console.log("User Role Detected:", role);
-
-    if (!role) {
-      throw new Error("Role data missing from server");
-    }
-
-    setSuccess("Login successful! Redirecting to your layout...");
-
-    // 🚀 MASTER REDIRECT LOGIC: Har role ke liye alag rasta
-    setTimeout(() => {
-      let redirectPath = "/dashboard"; // Base fallback
-
-      switch (role) {
-        case "superadmin":
-          redirectPath = "/dashboard/super";
-          break;
-        case "admin":
-          redirectPath = "/dashboard/admin";
-          break;
-        case "recruiter":
-          redirectPath = "/dashboard/recruiter";
-          break;
-        // case "ta_head":
-        //   redirectPath = "/dashboard/ta_head";
-        //   break;
-        // case "hr":
-        //   redirectPath = "/dashboard/hr";
-        //   break;
-        // case "finance":
-        //   redirectPath = "/dashboard/finance";
-        //   break;
-        // case "executive":
-        //   redirectPath = "/dashboard/executive";
-        //   break;
-        default:
-          // Agar koi naya role aaye toh uska folder check karega
-          redirectPath = `/dashboard/${role}`;
+      if (!res.ok) {
+        throw new Error(responseData.message || "Invalid credentials");
       }
 
-      console.log("Redirecting to:", redirectPath);
-      window.location.href = redirectPath;
-    }, 800);
+      // 🕵️‍♂️ Debugging ke liye: Console mein check kar role kya aa raha hai
+      const role = responseData.data?.role;
+      console.log("User Role Detected:", role);
 
-  } catch (err) {
-    setError(err.message || "An unexpected error occurred.");
-    console.error("Login Error Details:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!role) {
+        throw new Error("Role data missing from server");
+      }
+
+      setSuccess("Login successful! Redirecting to your layout...");
+
+      // 🚀 MASTER REDIRECT LOGIC: Har role ke liye alag rasta
+      setTimeout(() => {
+        let redirectPath = "/dashboard"; // Base fallback
+
+        switch (role) {
+          case "superadmin":
+            redirectPath = "/dashboard/super";
+            break;
+          case "admin":
+            redirectPath = "/dashboard/admin";
+            break;
+          case "recruiter":
+            redirectPath = "/dashboard/recruiter";
+            break;
+          // case "ta_head":
+          //   redirectPath = "/dashboard/ta_head";
+          //   break;
+          // case "hr":
+          //   redirectPath = "/dashboard/hr";
+          //   break;
+          // case "finance":
+          //   redirectPath = "/dashboard/finance";
+          //   break;
+          // case "executive":
+          //   redirectPath = "/dashboard/executive";
+          //   break;
+          default:
+            // Agar koi naya role aaye toh uska folder check karega
+            redirectPath = `/dashboard/${role}`;
+        }
+
+        console.log("Redirecting to:", redirectPath);
+        window.location.href = redirectPath;
+      }, 800);
+
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred.");
+      console.error("Login Error Details:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f8f6f4] p-4">
