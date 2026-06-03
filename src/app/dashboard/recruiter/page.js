@@ -39,9 +39,11 @@ function RecruiterContent() {
   };
 
   const [employees, setEmployees] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedRemark, setSelectedRemark] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
+  const [companyTypeFilter, setCompanyTypeFilter] = useState("All");
   const [userData, setUserData] = useState(null);
 
   // 🚀 NAYA: Search State
@@ -54,9 +56,15 @@ function RecruiterContent() {
     const fetchCandidates = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/employees`);
-        if (res.data.success) {
-          setEmployees(res.data.data);
+        const [empRes, compRes] = await Promise.all([
+          axios.get(`/api/employees`),
+          axios.get(`/api/companies`).catch(() => ({ data: { success: false, data: [] } })),
+        ]);
+        if (empRes.data.success) {
+          setEmployees(empRes.data.data);
+        }
+        if (compRes.data?.success) {
+          setCompanies(compRes.data.data);
         }
       } catch (error) {
         toast.error("Failed to load your candidates");
@@ -118,6 +126,15 @@ function RecruiterContent() {
         return empDate >= thirtyDaysAgo;
       }
       return true;
+    });
+  }
+
+  // 1.5 COMPANY TYPE FILTER
+  if (companyTypeFilter !== "All" && companies.length > 0) {
+    filteredData = filteredData.filter((emp) => {
+      if (!emp.assignedCompanyId) return false;
+      const company = companies.find((c) => String(c._id) === String(emp.assignedCompanyId));
+      return company && company.companyType === companyTypeFilter;
     });
   }
 
@@ -266,6 +283,8 @@ function RecruiterContent() {
                 role="recruiter"
                 dateFilter={dateFilter}
                 setDateFilter={setDateFilter}
+                companyTypeFilter={companyTypeFilter}
+                setCompanyTypeFilter={setCompanyTypeFilter}
                 handleDownload={handleDownloadExcel}
               />
 

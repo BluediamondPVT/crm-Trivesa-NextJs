@@ -8,6 +8,8 @@ export default function DashboardHeader({
   role,
   dateFilter,
   setDateFilter,
+  companyTypeFilter,
+  setCompanyTypeFilter,
   handleDownload,
   customStartDate,
   setCustomStartDate,
@@ -66,17 +68,30 @@ export default function DashboardHeader({
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
       <div>
         <h1 className="text-3xl font-bold text-[#092a49]">
-          {role === "admin" ? "Recruiters" : "Candidates / LineUps"}
+          {role === "admin" ? "All Recruiters" : "Recruiters"}
         </h1>
         <p className="text-gray-500 mt-1">
-          {role === "admin"
-            ? "Manage Recruiters"
-            : "Manage Candidates pipelines and Attendees"}
+          {role === "admin" ? "Manage Recruiters" : "Manage Recruiters"}
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
         <div className="flex flex-wrap items-center gap-2">
+          {/* Company Type Filter Dropdown */}
+          {companyTypeFilter !== undefined && setCompanyTypeFilter && (
+            <select
+              value={companyTypeFilter}
+              onChange={(e) => setCompanyTypeFilter(e.target.value)}
+              className="bg-white border border-gray-300 text-gray-700 text-sm px-4 py-2.5 rounded-lg font-medium focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"
+            >
+              <option value="All">All Company Types</option>
+              <option value="BPO">BPO</option>
+              <option value="Non BPO">Non BPO</option>
+              <option value="IT">IT</option>
+              <option value="KPO">KPO</option>
+            </select>
+          )}
+
           {/* Date Filter Dropdown */}
           <select
             value={dateFilter}

@@ -43,6 +43,7 @@ export default function RecruiterDashboard() {
 
   const [userRole, setUserRole] = useState(null);
   const [dateFilter, setDateFilter] = useState("All");
+  const [companyTypeFilter, setCompanyTypeFilter] = useState("All");
 
   // ✅ UPDATED: Ab Start Date aur End Date dono store honge
   const [customStartDate, setCustomStartDate] = useState("");
@@ -156,6 +157,14 @@ export default function RecruiterDashboard() {
         return true;
       }
       return true;
+    });
+  }
+
+  if (companyTypeFilter !== "All" && companies.length > 0) {
+    filteredData = filteredData.filter((emp) => {
+      if (!emp.assignedCompanyId) return false;
+      const company = companies.find((c) => String(c._id) === String(emp.assignedCompanyId));
+      return company && company.companyType === companyTypeFilter;
     });
   }
 
@@ -389,6 +398,8 @@ export default function RecruiterDashboard() {
         role={userRole}
         dateFilter={dateFilter}
         setDateFilter={setDateFilter}
+        companyTypeFilter={companyTypeFilter}
+        setCompanyTypeFilter={setCompanyTypeFilter}
         handleDownload={handleDownloadExcel}
         // ✅ UPDATED: Both Start & End Date pass kiye
         customStartDate={customStartDate}
