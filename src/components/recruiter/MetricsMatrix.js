@@ -2,11 +2,12 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
   const c = {
     All: counts["All"] || 0,
     LineUp: counts["LineUp"] || 0,
+    TodayLineUp: counts["Today LineUp"] || 0,
     Attendees: counts["Attendees"] || 0,
     OnHold: counts["On Hold"] || 0,
     Selected: counts["Selected"] || 0,
     Joining: counts["Joining"] || 0,
-    Rejected: counts["Rejected"] || 0,
+    Rejected: counts["Rejected"] || 0, 
     Payout: counts["Payout"] || 0,
     future: counts["future"] || 0,
     Abscond: counts["Abscond"] || 0,
@@ -45,6 +46,21 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+        />
+      ),
+    },
+    {
+      label: "Today LineUp",
+      tab: "Today LineUp",
+      count: c.TodayLineUp,
+      borderColor: "border-cyan-500",
+      textColor: "text-cyan-700",
+      bgHover: "hover:bg-cyan-50",
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
         />
       ),
     },
@@ -176,7 +192,7 @@ export default function MetricsMatrix({ counts, activeTab, setActiveTab }) {
     <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-5 gap-3 mb-1">
       {metricCards.map((card) => (
         <div
-          key={card.tab}
+          key={card.label}
           onClick={() => setActiveTab(card.tab)}
           className={`bg-white rounded-xl shadow-sm border-b-4 ${card.borderColor} p-4 cursor-pointer transition-all duration-200 transform hover:-translate-y-1 ${card.bgHover} ${activeTab === card.tab ? "ring-2 ring-gray-200 shadow-md" : ""}`}
         >

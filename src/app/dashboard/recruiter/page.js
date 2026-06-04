@@ -21,6 +21,7 @@ function RecruiterContent() {
   const tabs = [
     "All",
     "LineUp",
+    "Today LineUp",
     "Attendees",
     "On Hold",
     "Selected",
@@ -173,15 +174,25 @@ function RecruiterContent() {
   }
 
   // 3. TAB FILTER (For Table Only)
-  const tableData =
-    activeTab === "All"
-      ? filteredData
-      : filteredData.filter((emp) => emp.status === activeTab);
+  let tableData = filteredData;
+  if (activeTab !== "All") {
+    if (activeTab === "Today LineUp") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startOfToday = today.getTime();
+      tableData = tableData.filter(
+        (emp) => emp.status === "LineUp" && new Date(emp.createdAt).getTime() >= startOfToday
+      );
+    } else {
+      tableData = tableData.filter((emp) => emp.status === activeTab);
+    }
+  }
 
   const getCounts = () => {
     const counts = {
       All: filteredData.length,
       LineUp: 0,
+      "Today LineUp": 0,
       Attendees: 0,
       "On Hold": 0,
       Selected: 0,
@@ -191,8 +202,20 @@ function RecruiterContent() {
       future: 0,
       Abscond: 0,
     };
+ 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startOfToday = today.getTime();
+
     filteredData.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;
+
+      if (emp.status === "LineUp") {
+        const empDate = new Date(emp.createdAt).getTime();
+        if (empDate >= startOfToday) {
+          counts["Today LineUp"]++;
+        }
+      }
     });
     return counts;
   };

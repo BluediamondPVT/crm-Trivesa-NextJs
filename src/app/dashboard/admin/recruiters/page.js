@@ -22,6 +22,7 @@ export default function RecruiterDashboard() {
   const tabs = [
     "All",
     "LineUp",
+    "Today LineUp",
     "Attendees",
     "On Hold",
     "Selected",
@@ -213,9 +214,18 @@ export default function RecruiterDashboard() {
 
   let tableFilteredData = filteredData;
   if (activeTab !== "All") {
-    tableFilteredData = tableFilteredData.filter(
-      (emp) => emp.status === activeTab,
-    );
+    if (activeTab === "Today LineUp") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startOfToday = today.getTime();
+      tableFilteredData = tableFilteredData.filter(
+        (emp) => emp.status === "LineUp" && new Date(emp.createdAt).getTime() >= startOfToday
+      );
+    } else {
+      tableFilteredData = tableFilteredData.filter(
+        (emp) => emp.status === activeTab,
+      );
+    }
   }
 
   // GRAND TOTAL PAYOUT CALCULATOR
@@ -328,17 +338,30 @@ export default function RecruiterDashboard() {
     const counts = {
       All: filteredData.length,
       LineUp: 0,
+      "Today LineUp": 0,
       Attendees: 0,
       "On Hold": 0,
       Selected: 0,
-      Rejected: 0,
+      Rejected: 0, 
       Joining: 0,
       Payout: 0,
       future: 0,
       Abscond: 0,
     };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startOfToday = today.getTime();
+
     filteredData.forEach((emp) => {
       if (counts[emp.status] !== undefined) counts[emp.status]++;
+      
+      if (emp.status === "LineUp") {
+        const empDate = new Date(emp.createdAt).getTime();
+        if (empDate >= startOfToday) {
+          counts["Today LineUp"]++;
+        }
+      }
     });
     return counts;
   };
