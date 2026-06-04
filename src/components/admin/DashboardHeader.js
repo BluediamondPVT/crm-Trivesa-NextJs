@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function DashboardHeader() {
+export default function DashboardHeader({ companyTypeFilter, setCompanyTypeFilter }) {
   const [userRole, setUserRole] = useState(null);
 
   
@@ -27,15 +27,34 @@ export default function DashboardHeader() {
         <p className="text-gray-500 mt-1">Overview of your system performance</p>
       </div>
 
-      {/* Sirf Admin aur Superadmin ko dikhega */}
-      {userRole && userRole !== "recruiter" && (
-        <Link
-          href="/dashboard/admin/add-client"
-          className="bg-[#183e61] inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors"
-        >
-          + Add Clients
-        </Link>
-      )}
+      <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Company Type Filter Dropdown */} 
+          {companyTypeFilter !== undefined && setCompanyTypeFilter && (
+            <select
+              value={companyTypeFilter}
+              onChange={(e) => setCompanyTypeFilter(e.target.value)}
+              className="bg-white border border-gray-300 text-gray-700 text-sm px-4 py-2.5 rounded-lg font-medium focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer"
+            >
+              <option value="All">All Company Types</option>
+              <option value="BPO">BPO</option>
+              <option value="Non BPO">Non BPO</option>
+              <option value="IT">IT</option>
+              <option value="KPO">KPO</option>
+            </select>
+          )}
+        </div>
+
+        {/* Sirf Admin aur Superadmin ko dikhega */}
+        {userRole && userRole !== "recruiter" && (
+          <Link
+            href="/dashboard/admin/add-client"
+            className="bg-[#183e61] inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors"
+          >
+            + Add Clients
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

@@ -77,7 +77,7 @@ export default function DashboardHeader({
 
       <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Company Type Filter Dropdown */}
+          {/* Company Type Filter Dropdown */} 
           {companyTypeFilter !== undefined && setCompanyTypeFilter && (
             <select
               value={companyTypeFilter}

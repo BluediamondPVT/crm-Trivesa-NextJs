@@ -11,6 +11,8 @@ import CRMTable from "@/components/admin/CRMTable";
 
 export default function AdminDashboard() { 
   const [tableData, setTableData] = useState([]);
+  const [rawCompanies, setRawCompanies] = useState([]); // Store raw data for metrics & filtering
+  const [companyTypeFilter, setCompanyTypeFilter] = useState("All");
   const [counts, setCounts] = useState({
     total: 0,
     active: 0,
@@ -28,56 +30,7 @@ export default function AdminDashboard() {
       const response = await axios.get("/api/companies");
 
       if (response.data.success) {
-        const allCompanies = response.data.data;
-
-        let active = 0,
-          nonActive = 0,
-          process = 0,
-          listed = 0;
-        let activeOpeningsCount = 0,
-          nonActiveOpeningsCount = 0;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        allCompanies.forEach((company) => {
-          if (company.status === "Active") active++;
-          if (company.status === "Non Active") nonActive++;
-          if (company.status === "Process") process++;
-          if (company.status === "Listed") listed++;
-
-          if (company.openings && Array.isArray(company.openings)) {
-            company.openings.forEach((op) => {
-              if (!op.expiryDate) {
-                activeOpeningsCount++;
-              } else {
-                const expDate = new Date(op.expiryDate);
-                if (expDate >= today) {
-                  activeOpeningsCount++;
-                } else {
-                  nonActiveOpeningsCount++;
-                }
-              }
-            });
-          }
-        });
-
-        setCounts({
-          total: allCompanies.length,
-          active,
-          nonActive,
-          process,
-          listed,
-          activeOpenings: activeOpeningsCount,
-          nonActiveOpenings: nonActiveOpeningsCount,
-        });
-
-        // Pura filtered data Table ko denge, ab wahan Pagination hogi (slice nahi kiya)
-        const filteredForTable = allCompanies.filter(
-          (company) =>
-            company.status !== "Listed" && company.status !== "Process",
-        );
-        setTableData(filteredForTable);
+        setRawCompanies(response.data.data);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -90,6 +43,63 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    let filteredCompanies = rawCompanies;
+    if (companyTypeFilter !== "All") {
+      filteredCompanies = rawCompanies.filter(
+        (c) => c.companyType === companyTypeFilter
+      );
+    }
+
+    let active = 0,
+      nonActive = 0,
+      process = 0,
+      listed = 0;
+    let activeOpeningsCount = 0,
+      nonActiveOpeningsCount = 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    filteredCompanies.forEach((company) => {
+      if (company.status === "Active") active++;
+      if (company.status === "Non Active") nonActive++;
+      if (company.status === "Process") process++;
+      if (company.status === "Listed") listed++;
+
+      if (company.openings && Array.isArray(company.openings)) {
+        company.openings.forEach((op) => {
+          if (!op.expiryDate) {
+            activeOpeningsCount++;
+          } else {
+            const expDate = new Date(op.expiryDate);
+            if (expDate >= today) {
+              activeOpeningsCount++;
+            } else {
+              nonActiveOpeningsCount++;
+            }
+          }
+        });
+      }
+    });
+
+    setCounts({
+      total: filteredCompanies.length,
+      active,
+      nonActive,
+      process,
+      listed,
+      activeOpenings: activeOpeningsCount,
+      nonActiveOpenings: nonActiveOpeningsCount,
+    });
+
+    const filteredForTable = filteredCompanies.filter(
+      (company) =>
+        company.status !== "Listed" && company.status !== "Process",
+    );
+    setTableData(filteredForTable);
+  }, [companyTypeFilter, rawCompanies]);
 
   const handleDelete = async (id, companyName) => {
     if (
@@ -124,7 +134,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8 md:p-10">
-      <DashboardHeader />
+      <DashboardHeader 
+        companyTypeFilter={companyTypeFilter} 
+        setCompanyTypeFilter={setCompanyTypeFilter} 
+      />
       <MetricsGrid counts={counts} />
       <CRMTable data={tableData} onDelete={handleDelete} />
     </div>

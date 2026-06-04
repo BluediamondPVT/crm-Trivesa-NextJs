@@ -9,7 +9,7 @@ export default function OpeningsForm({
     const currentSlabs = formData.openings[openingIndex].slabs || [];
     const newSlabs = [
       ...currentSlabs,
-      { minJoinees: "", maxJoinees: "", amount: "" }, // 🚀 Naya Schema Format
+      { minJoinees: "", maxJoinees: "", minSalary: "", maxSalary: "", amount: "" }, // 🚀 Naya Schema Format
     ];
     handleChange(
       { target: { value: newSlabs } },
@@ -18,7 +18,7 @@ export default function OpeningsForm({
       "slabs",
     );
   };
-
+ 
   const handleRemoveSlab = (openingIndex, slabIndex) => {
     const currentSlabs = formData.openings[openingIndex].slabs || [];
     const newSlabs = currentSlabs.filter((_, i) => i !== slabIndex);
@@ -221,6 +221,24 @@ export default function OpeningsForm({
                   </div>
                 )}
 
+                {job.payoutType === "Slab Wise" && (
+                  <div className="md:col-span-1">
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      Slab Type *
+                    </label>
+                    <select
+                      value={job.slabType || "Candidate"}
+                      onChange={(e) =>
+                        handleChange(e, "openings", index, "slabType")
+                      }
+                      className="w-full p-2.5 border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50"
+                    >
+                      <option value="Candidate">Number of Candidates</option>
+                      <option value="Amount">Salary Amount</option>
+                    </select>
+                  </div>
+                )}
+
                 {/* 🚀 FIXED SLAB UI (Min, Max, Amount) */}
                 {job.payoutType === "Slab Wise" && (
                   <div className="md:col-span-3 mt-2">
@@ -246,21 +264,21 @@ export default function OpeningsForm({
                           >
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                               <span className="text-xs font-bold text-gray-500">
-                                Min
+                                {job.slabType === "Amount" ? "Min Sal (₹)" : "Min"}
                               </span>
                               <input
                                 type="number"
-                                value={slab.minJoinees || ""}
+                                value={job.slabType === "Amount" ? slab.minSalary || "" : slab.minJoinees || ""}
                                 onChange={(e) =>
                                   handleSlabChangeData(
                                     e,
                                     index,
                                     slabIdx,
-                                    "minJoinees",
+                                    job.slabType === "Amount" ? "minSalary" : "minJoinees",
                                   )
                                 }
-                                className="w-full sm:w-20 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium"
-                                placeholder="e.g. 1"
+                                className="w-full sm:w-24 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium"
+                                placeholder={job.slabType === "Amount" ? "e.g. 10000" : "e.g. 1"}
                               />
                             </div>
 
@@ -270,21 +288,21 @@ export default function OpeningsForm({
 
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                               <span className="text-xs font-bold text-gray-500">
-                                Max
+                                {job.slabType === "Amount" ? "Max Sal (₹)" : "Max"}
                               </span>
                               <input
                                 type="number"
-                                value={slab.maxJoinees || ""}
+                                value={job.slabType === "Amount" ? slab.maxSalary || "" : slab.maxJoinees || ""}
                                 onChange={(e) =>
                                   handleSlabChangeData(
                                     e,
                                     index,
                                     slabIdx,
-                                    "maxJoinees",
+                                    job.slabType === "Amount" ? "maxSalary" : "maxJoinees",
                                   )
                                 }
-                                className="w-full sm:w-20 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium"
-                                placeholder="e.g. 5"
+                                className="w-full sm:w-24 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium"
+                                placeholder={job.slabType === "Amount" ? "e.g. 20000" : "e.g. 5"}
                               />
                             </div>
 

@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 const SlabSchema = new mongoose.Schema({
   minJoinees: Number,
   maxJoinees: Number,
+  minSalary: Number,
+  maxSalary: Number,
   amount: Number,
 });
 
@@ -29,6 +31,11 @@ const OpeningSchema = new mongoose.Schema({
     type: String,
     enum: ["Flat Amount", "Percentage", "Slab Wise"],
     default: "Flat Amount",
+  },
+  slabType: {
+    type: String,
+    enum: ["Candidate", "Amount"],
+    default: "Candidate",
   },
   flatAmount: Number,
   percentageValue: Number,

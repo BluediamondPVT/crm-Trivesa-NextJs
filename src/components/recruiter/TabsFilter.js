@@ -12,7 +12,7 @@ export default function TabsFilter({ tabs, activeTab, setActiveTab, counts }) {
           }`}
         > 
           <span>{tab}</span>
-          {counts && counts[tab] !== undefined && (
+          {/* {counts && counts[tab] !== undefined && (
             <span
               className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full ${
                 activeTab === tab
@@ -22,7 +22,7 @@ export default function TabsFilter({ tabs, activeTab, setActiveTab, counts }) {
             >
               {counts[tab]}
             </span>
-          )}
+          )} */}
         </button>
       ))}
     </div>

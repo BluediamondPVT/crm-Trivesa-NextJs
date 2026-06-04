@@ -171,7 +171,9 @@ function OpeningCard({ job, payoutDetails, userRole }) {
                           </div>
                           <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
-                              {slab.minJoinees || 0} to {slab.maxJoinees || "∞"} Candidates
+                              {job.slabType === "Amount" 
+                                ? `₹${slab.minSalary || 0} to ₹${slab.maxSalary || "∞"} Salary` 
+                                : `${slab.minJoinees || 0} to ${slab.maxJoinees || "∞"} Candidates`}
                             </span>
                             <span className="text-sm font-black text-emerald-700">
                               ₹ {slab.amount || 0} <span className="text-xs font-medium text-gray-500">/ each</span>

@@ -71,35 +71,65 @@ export default function PayoutBadge({ emp }) {
             }
             // 🟢 LOGIC 3: SLAB WISE (RETROACTIVE)
             else if (type === "Slab Wise") {
-              const empRes = await axios.get("/api/employees");
-              if (empRes.data.success) {
-                const allEmps = empRes.data.data;
+              if (opening.slabType === "Amount") {
+                const rawStr = String(emp.actualSalary || "0").toLowerCase().trim();
+                let salaryToCompare = parseFloat(rawStr.replace(/[^0-9.]/g, "")) || 0;
 
-                const joinedEmps = allEmps.filter(
-                  (e) =>
-                    e.assignedCompanyId === emp.assignedCompanyId &&
-                    String(e.assignedProcess).toLowerCase().trim() ===
-                      candidateProcess &&
-                    (e.status === "Joining" || e.status === "Payout"),
-                );
-
-                let totalJoinedCount = joinedEmps.length;
-                if (totalJoinedCount === 0) totalJoinedCount = 1;
+                if (
+                  rawStr.includes("l") ||
+                  rawStr.includes("lac") ||
+                  rawStr.includes("lpa") ||
+                  rawStr.includes("pa")
+                ) {
+                  salaryToCompare = salaryToCompare * 100000;
+                } else if (rawStr.includes("k")) {
+                  salaryToCompare = salaryToCompare * 1000;
+                }
 
                 let matchedSlab = opening.slabs?.find(
-                  (s) =>
-                    totalJoinedCount >= s.minJoinees &&
-                    totalJoinedCount <= s.maxJoinees,
+                  (s) => salaryToCompare >= (s.minSalary || 0) && salaryToCompare <= (s.maxSalary || Infinity)
                 );
 
                 if (!matchedSlab && opening.slabs?.length > 0) {
                   matchedSlab = opening.slabs.reduce((prev, current) =>
-                    prev.maxJoinees > current.maxJoinees ? prev : current,
+                    (prev.maxSalary || 0) > (current.maxSalary || 0) ? prev : current,
                   );
                 }
 
                 if (matchedSlab) {
                   amount = matchedSlab.amount;
+                }
+              } else {
+                const empRes = await axios.get("/api/employees");
+                if (empRes.data.success) {
+                  const allEmps = empRes.data.data;
+
+                  const joinedEmps = allEmps.filter(
+                    (e) =>
+                      e.assignedCompanyId === emp.assignedCompanyId &&
+                      String(e.assignedProcess).toLowerCase().trim() ===
+                        candidateProcess &&
+                      (e.status === "Joining" || e.status === "Payout"),
+                  );
+
+                  let totalJoinedCount = joinedEmps.length;
+                  if (totalJoinedCount === 0) totalJoinedCount = 1;
+
+                  let matchedSlab = opening.slabs?.find(
+                    (s) =>
+                      totalJoinedCount >= s.minJoinees &&
+                      totalJoinedCount <= s.maxJoinees,
+                  );
+
+                  if (!matchedSlab && opening.slabs?.length > 0) {
+                    matchedSlab = opening.slabs.reduce((prev, current) =>
+                      prev.maxJoinees > current.maxJoinees ? prev : current,
+                    );
+                  }
+
+                  if (matchedSlab) {
+                    amount = matchedSlab.amount;
+                  }
                 }
               }
             }

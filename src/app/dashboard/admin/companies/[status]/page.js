@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import Link from "next/link";
 import CompanyStatusTable from "@/components/admin/CompanyStatusTable"; // Table Component Import kiya
 
 export default function CompanyStatusPage() {
@@ -103,14 +104,24 @@ export default function CompanyStatusPage() {
         Back to Dashboard
       </button>
 
-      <div className="mb-8 border-l-[6px] pl-4 rounded-sm border-gray-800">
-        <h1 className="text-3xl font-extrabold text-[#092a49]">
-          {currentStatus} <span className="font-light">Companies</span>
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Showing all companies currently marked as{" "}
-          {currentStatus.toLowerCase()}.
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="border-l-[6px] pl-4 rounded-sm border-gray-800">
+          <h1 className="text-3xl font-extrabold text-[#092a49]">
+            {currentStatus} <span className="font-light">Companies</span>
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Showing all companies currently marked as{" "}
+            {currentStatus.toLowerCase()}.
+          </p>
+        </div>
+
+        {/* Add Clients Button */}
+        <Link
+          href="/dashboard/admin/add-client"
+          className="bg-[#183e61] shrink-0 inline-block text-white cursor-pointer px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#061a2e] shadow-sm transition-colors whitespace-nowrap"
+        >
+          + Add Clients
+        </Link>
       </div>
 
       {/* Child Component Jisme Infinite Scroll Hai */}
