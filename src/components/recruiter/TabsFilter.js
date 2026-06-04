@@ -1,4 +1,27 @@
-export default function TabsFilter({ tabs, activeTab, setActiveTab, counts }) {
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function TabsFilter({ tabs, activeTab, setActiveTab, counts, role }) {
+  const [userRole, setUserRole] = useState(role || null);
+
+  useEffect(() => {
+    if (!role) {
+      const fetchRole = async () => {
+        try {
+          const res = await fetch("/api/auth/me");
+          const data = await res.json();
+          if (data.success && data.data?.role) {
+            setUserRole(data.data.role);
+          }
+        } catch (error) {
+          console.error("Failed to fetch role:", error);
+        }
+      };
+      fetchRole();
+    }
+  }, [role]);
+
   return (
     <div className="flex space-x-2 border-b border-gray-200 mb-6 overflow-x-auto pb-1">
       {tabs.map((tab) => (
@@ -12,7 +35,7 @@ export default function TabsFilter({ tabs, activeTab, setActiveTab, counts }) {
           }`}
         > 
           <span>{tab}</span>
-          {counts && counts[tab] !== undefined && (
+          {userRole === "admin" && counts && counts[tab] !== undefined && (
             <span
               className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full ${
                 activeTab === tab
