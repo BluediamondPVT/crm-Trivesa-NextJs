@@ -87,8 +87,8 @@ export default function DashboardHeader({
               <option value="All">All Company Types</option>
               <option value="BPO">BPO</option>
               <option value="Non BPO">Non BPO</option>
-              <option value="IT">IT</option>
-              <option value="KPO">KPO</option>
+              {/* <option value="IT">IT</option>
+              <option value="KPO">KPO</option> */}
             </select>
           )}
 
