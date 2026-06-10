@@ -20,21 +20,11 @@ export default function RecruiterDashboard() {
   const recruiterId = searchParams.get("recruiterId");
 
   const tabs = [
-    "All",
-    "LineUp",
-    "Today LineUp",
-    "Attendees",
-    "On Hold",
-    "Selected",
-    "Joining",
-    "Rejected",
-    "Payout",
-    "future",
-    "Abscond",
+    "All", "LineUp", "Attendees", "On Hold", "Selected",
+    "Joining", "Rejected", "Payout", "future", "Abscond",
   ];
 
-  const initialTab =
-    tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
+  const initialTab = tabFromUrl && tabs.includes(tabFromUrl) ? tabFromUrl : "LineUp";
 
   const [employees, setEmployees] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -46,7 +36,6 @@ export default function RecruiterDashboard() {
   const [dateFilter, setDateFilter] = useState("All");
   const [companyTypeFilter, setCompanyTypeFilter] = useState("All");
 
-  // ✅ UPDATED: Ab Start Date aur End Date dono store honge
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
 
@@ -74,9 +63,7 @@ export default function RecruiterDashboard() {
 
         const [empRes, compRes] = await Promise.all([
           axios.get("/api/employees"),
-          axios
-            .get("/api/companies")
-            .catch(() => ({ data: { success: false, data: [] } })),
+          axios.get("/api/companies").catch(() => ({ data: { success: false, data: [] } })),
         ]);
 
         if (empRes.data.success) {
@@ -101,63 +88,52 @@ export default function RecruiterDashboard() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // ====== FILTERING LOGIC ======
+  // ====== 🚀 BULLETPROOF TIMELINE FILTERING LOGIC ======
+  const isWithinDateRange = (timestamp, filterType = dateFilter) => {
+    if (!timestamp) return false;
+    if (filterType === "All") return true;
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const empDate = new Date(timestamp).getTime();
+
+    if (filterType === "Today") {
+      return empDate >= todayStart;
+    } else if (filterType === "Yesterday") {
+      const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
+      return empDate >= yesterdayStart && empDate < todayStart;
+    } else if (filterType === "7Days") {
+      const sevenDaysAgo = todayStart - 7 * 24 * 60 * 60 * 1000;
+      return empDate >= sevenDaysAgo;
+    } else if (filterType === "30Days") {
+      const thirtyDaysAgo = todayStart - 30 * 24 * 60 * 60 * 1000;
+      return empDate >= thirtyDaysAgo;
+    } else if (filterType === "Custom") {
+      if (!customStartDate && !customEndDate) return true;
+      const rangeStart = customStartDate ? new Date(customStartDate).setHours(0, 0, 0, 0) : null;
+      const rangeEnd = customEndDate ? new Date(customEndDate).setHours(23, 59, 59, 999) : null;
+
+      if (rangeStart && rangeEnd) return empDate >= rangeStart && empDate <= rangeEnd;
+      if (rangeStart) return empDate >= rangeStart;
+      if (rangeEnd) return empDate <= rangeEnd;
+    }
+    return true;
+  };
+
   let filteredData = employees;
 
   if (dateFilter !== "All") {
-    const now = new Date();
-    const today = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).getTime();
-
     filteredData = filteredData.filter((emp) => {
-      const dateToUse = emp.updatedAt ? emp.updatedAt : emp.createdAt;
-      const empDate = new Date(dateToUse).getTime();
+      // 1. Agar date range mein add hua hai toh rakh lo
+      if (isWithinDateRange(emp.createdAt)) return true;
 
-      if (dateFilter === "Today") {
-        return empDate >= today;
-      } else if (dateFilter === "Yesterday") {
-        const yesterday = today - 24 * 60 * 60 * 1000;
-        return empDate >= yesterday && empDate < today;
-      } else if (dateFilter === "7Days") {
-        const sevenDaysAgo = today - 7 * 24 * 60 * 60 * 1000;
-        return empDate >= sevenDaysAgo;
-      } else if (dateFilter === "30Days") {
-        const thirtyDaysAgo = today - 30 * 24 * 60 * 60 * 1000;
-        return empDate >= thirtyDaysAgo;
+      // 2. Agar koi history match karti hai toh rakh lo
+      if (emp.statusHistory && emp.statusHistory.length > 0) {
+        return emp.statusHistory.some((h) => isWithinDateRange(h.timestamp));
       }
-      // ✅ UPDATED: Custom Date Range — Start Date se End Date tak
-      else if (dateFilter === "Custom") {
-        if (!customStartDate && !customEndDate) return true; // Kuch select nahi hua toh sab dikhao
 
-        const rangeStart = customStartDate
-          ? (() => {
-              const d = new Date(customStartDate);
-              d.setHours(0, 0, 0, 0);
-              return d.getTime();
-            })()
-          : null;
-
-        const rangeEnd = customEndDate
-          ? (() => {
-              const d = new Date(customEndDate);
-              d.setHours(23, 59, 59, 999);
-              return d.getTime();
-            })()
-          : null;
-
-        if (rangeStart && rangeEnd) {
-          return empDate >= rangeStart && empDate <= rangeEnd;
-        } else if (rangeStart) {
-          return empDate >= rangeStart; // Sirf start date select hua
-        } else if (rangeEnd) {
-          return empDate <= rangeEnd; // Sirf end date select hua
-        }
-        return true;
-      }
-      return true;
+      // 3. Purane data ke liye fallback
+      return isWithinDateRange(emp.updatedAt);
     });
   }
 
@@ -173,30 +149,12 @@ export default function RecruiterDashboard() {
     const lowerSearch = debouncedSearch.toLowerCase();
     filteredData = filteredData.filter((emp) => {
       const searchString = [
-        emp.name,
-        emp.email,
-        emp.phone,
-        emp.address,
-        emp.age,
-        emp.qualification,
-        emp.specialization,
-        emp.experience,
-        emp.lastSalary,
-        emp.expectedSalary,
-        emp.actualSalary,
-        emp.source,
-        emp.assignedCompanyName,
-        emp.assignedProcess,
-        emp.remark,
-        emp.status,
-        ...(emp.skills || []),
-        ...(emp.assignmentHistory?.map(
-          (h) => `${h.companyName} ${h.process} ${h.status} ${h.remark}`,
-        ) || []),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+        emp.name, emp.email, emp.phone, emp.address, emp.age, emp.qualification,
+        emp.specialization, emp.experience, emp.lastSalary, emp.expectedSalary,
+        emp.actualSalary, emp.source, emp.assignedCompanyName, emp.assignedProcess,
+        emp.remark, emp.status, ...(emp.skills || []),
+        ...(emp.assignmentHistory?.map((h) => `${h.companyName} ${h.process} ${h.status} ${h.remark}`) || []),
+      ].filter(Boolean).join(" ").toLowerCase();
 
       return searchString.includes(lowerSearch);
     });
@@ -212,42 +170,79 @@ export default function RecruiterDashboard() {
     });
   }
 
+  // ====== TAB DATA (Taaki LineUp table tab mein bhi sahi log dikhein) ======
   let tableFilteredData = filteredData;
   if (activeTab !== "All") {
-    if (activeTab === "Today LineUp") {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const startOfToday = today.getTime();
-      tableFilteredData = tableFilteredData.filter(
-        (emp) => emp.status === "LineUp" && new Date(emp.createdAt).getTime() >= startOfToday
-      );
-    } else {
-      tableFilteredData = tableFilteredData.filter(
-        (emp) => emp.status === activeTab,
-      );
-    }
+    tableFilteredData = tableFilteredData.filter((emp) => {
+      if (dateFilter === "All") return emp.status === activeTab;
+
+      // Agar LineUp hai aur us din add hua tha, toh dikhao
+      if (activeTab === "LineUp" && isWithinDateRange(emp.createdAt)) return true;
+
+      // Baaki history check
+      if (emp.statusHistory && emp.statusHistory.length > 0) {
+        return emp.statusHistory.some((h) => h.status === activeTab && isWithinDateRange(h.timestamp));
+      }
+      return emp.status === activeTab && isWithinDateRange(emp.updatedAt);
+    });
   }
+
+  // ====== 🚀 GRAND COUNTER (Ye kabhi LineUp ka number minus nahi hone dega) ======
+  const getCounts = () => {
+    const counts = {
+      All: filteredData.length,
+      LineUp: 0, Attendees: 0, "On Hold": 0, Selected: 0,
+      Joining: 0, Rejected: 0, Payout: 0, future: 0, Abscond: 0,
+    };
+
+    filteredData.forEach((emp) => {
+      if (dateFilter === "All") {
+        if (counts[emp.status] !== undefined) counts[emp.status]++;
+      } else {
+        const countedStatuses = new Set();
+
+        // 1. LineUp Fixed Rule
+        if (isWithinDateRange(emp.createdAt)) {
+          counts["LineUp"]++;
+          countedStatuses.add("LineUp");
+        }
+
+        // 2. Timeline Status Changes
+        if (emp.statusHistory && emp.statusHistory.length > 0) {
+          emp.statusHistory.forEach((history) => {
+            if (isWithinDateRange(history.timestamp)) {
+              if (counts[history.status] !== undefined && !countedStatuses.has(history.status)) {
+                counts[history.status]++;
+                countedStatuses.add(history.status);
+              }
+            }
+          });
+        } else {
+          // Fallback
+          if (isWithinDateRange(emp.updatedAt)) {
+            if (counts[emp.status] !== undefined && !countedStatuses.has(emp.status)) {
+              counts[emp.status]++;
+              countedStatuses.add(emp.status);
+            }
+          }
+        }
+      }
+    });
+    return counts;
+  };
 
   // GRAND TOTAL PAYOUT CALCULATOR
   useEffect(() => {
     const calculateTotalPayout = () => {
-      const isAdminOrSuper = ["admin", "superadmin"].includes(
-        userRole?.toLowerCase(),
-      );
+      const isAdminOrSuper = ["admin", "superadmin"].includes(userRole?.toLowerCase());
 
-      if (
-        !isAdminOrSuper ||
-        !["Joining", "Payout", "All"].includes(activeTab) ||
-        companies.length === 0
-      ) {
+      if (!isAdminOrSuper || !["Joining", "Payout", "All"].includes(activeTab) || companies.length === 0) {
         setTotalPayout(0);
         return;
       }
 
       let sum = 0;
-      const eligibleEmps = tableFilteredData.filter(
-        (e) => e.status === "Joining" || e.status === "Payout",
-      );
+      const eligibleEmps = tableFilteredData.filter((e) => e.status === "Joining" || e.status === "Payout");
 
       eligibleEmps.forEach((emp) => {
         if (!emp.assignedCompanyId || !emp.assignedProcess) return;
@@ -255,12 +250,8 @@ export default function RecruiterDashboard() {
         const company = companies.find((c) => c._id === emp.assignedCompanyId);
         if (!company) return;
 
-        const candidateProcess = String(emp.assignedProcess)
-          .toLowerCase()
-          .trim();
-        const opening = company.openings?.find(
-          (o) => String(o.title).toLowerCase().trim() === candidateProcess,
-        );
+        const candidateProcess = String(emp.assignedProcess).toLowerCase().trim();
+        const opening = company.openings?.find((o) => String(o.title).toLowerCase().trim() === candidateProcess);
 
         if (opening) {
           let type = opening.payoutType || "Flat Amount";
@@ -269,18 +260,11 @@ export default function RecruiterDashboard() {
           if (type === "Flat Amount") {
             amount = opening.flatAmount || 0;
           } else if (type === "Percentage") {
-            const rawStr = String(emp.actualSalary || "0")
-              .toLowerCase()
-              .trim();
+            const rawStr = String(emp.actualSalary || "0").toLowerCase().trim();
             let actual = parseFloat(rawStr.replace(/[^0-9.]/g, "")) || 0;
             let isAnnual = false;
 
-            if (
-              rawStr.includes("l") ||
-              rawStr.includes("lac") ||
-              rawStr.includes("lpa") ||
-              rawStr.includes("pa")
-            ) {
+            if (rawStr.includes("l") || rawStr.includes("lac") || rawStr.includes("lpa") || rawStr.includes("pa")) {
               actual = actual * 100000;
               isAnnual = true;
             } else if (rawStr.includes("k")) {
@@ -297,74 +281,22 @@ export default function RecruiterDashboard() {
             const percent = Number(opening.percentageValue) || 0;
             amount = Math.round((annualCTC * percent) / 100);
           } else if (type === "Slab Wise") {
-            const joinedEmps = employees.filter(
-              (e) =>
-                e.assignedCompanyId === emp.assignedCompanyId &&
-                String(e.assignedProcess).toLowerCase().trim() ===
-                  candidateProcess &&
-                (e.status === "Joining" || e.status === "Payout"),
-            );
-
+            const joinedEmps = employees.filter((e) => e.assignedCompanyId === emp.assignedCompanyId && String(e.assignedProcess).toLowerCase().trim() === candidateProcess && (e.status === "Joining" || e.status === "Payout"));
             let totalJoinedCount = joinedEmps.length || 1;
-
-            let matchedSlab = opening.slabs?.find(
-              (s) =>
-                totalJoinedCount >= s.minJoinees &&
-                totalJoinedCount <= s.maxJoinees,
-            );
+            let matchedSlab = opening.slabs?.find((s) => totalJoinedCount >= s.minJoinees && totalJoinedCount <= s.maxJoinees);
 
             if (!matchedSlab && opening.slabs?.length > 0) {
-              matchedSlab = opening.slabs.reduce((prev, current) =>
-                prev.maxJoinees > current.maxJoinees ? prev : current,
-              );
+              matchedSlab = opening.slabs.reduce((prev, current) => prev.maxJoinees > current.maxJoinees ? prev : current);
             }
-
-            if (matchedSlab) {
-              amount = matchedSlab.amount;
-            }
+            if (matchedSlab) amount = matchedSlab.amount;
           }
-
           sum += amount;
         }
       });
-
       setTotalPayout(sum);
     };
-
     calculateTotalPayout();
   }, [tableFilteredData, employees, companies, userRole, activeTab]);
-
-  const getCounts = () => {
-    const counts = {
-      All: filteredData.length,
-      LineUp: 0,
-      "Today LineUp": 0,
-      Attendees: 0,
-      "On Hold": 0,
-      Selected: 0,
-      Rejected: 0, 
-      Joining: 0,
-      Payout: 0,
-      future: 0,
-      Abscond: 0,
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startOfToday = today.getTime();
-
-    filteredData.forEach((emp) => {
-      if (counts[emp.status] !== undefined) counts[emp.status]++;
-      
-      if (emp.status === "LineUp") {
-        const empDate = new Date(emp.createdAt).getTime();
-        if (empDate >= startOfToday) {
-          counts["Today LineUp"]++;
-        }
-      }
-    });
-    return counts;
-  };
 
   const handleDownloadExcel = () => {
     if (!tableFilteredData || tableFilteredData.length === 0) {
@@ -395,23 +327,10 @@ export default function RecruiterDashboard() {
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    const colWidths = [
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 25 },
-      { wch: 20 },
-      { wch: 25 },
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 20 },
-      { wch: 15 },
-    ];
+    const colWidths = [{ wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }];
     worksheet["!cols"] = colWidths;
     XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates_Report");
-    XLSX.writeFile(
-      workbook,
-      `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`,
-    );
+    XLSX.writeFile(workbook, `Recruitment_Report_${dateFilter}_${activeTab}.xlsx`);
     toast.success("Detailed Excel Report Exported!");
   };
 
@@ -424,7 +343,6 @@ export default function RecruiterDashboard() {
         companyTypeFilter={companyTypeFilter}
         setCompanyTypeFilter={setCompanyTypeFilter}
         handleDownload={handleDownloadExcel}
-        // ✅ UPDATED: Both Start & End Date pass kiye
         customStartDate={customStartDate}
         setCustomStartDate={setCustomStartDate}
         customEndDate={customEndDate}

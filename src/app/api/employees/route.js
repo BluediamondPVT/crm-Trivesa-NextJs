@@ -6,12 +6,12 @@ import dbConnect from "@/lib/mongodb";
 import Employee from "@/models/Employee";
 
 // 🚀 BINGO: Ye rahi wo magic line jo missing thi! Iske bina populate crash hota hai.
-import User from "@/models/User"; 
+import User from "@/models/User";
 
 export async function GET(request) {
   try {
     await dbConnect();
-    
+
     const userId = request.headers.get("x-user-id");
     const userRole = request.headers.get("x-user-role");
 
@@ -24,7 +24,7 @@ export async function GET(request) {
       return NextResponse.json({ success: true, data: [] });
     }
 
-    let query = {}; 
+    let query = {};
     if (userRole === "recruiter") {
       query = { addedBy: userId };
     }

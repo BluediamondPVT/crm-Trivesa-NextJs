@@ -106,14 +106,22 @@ export default function PersonalDetailsForm({
             <option value="LinkedIn">LinkedIn</option>
             <option value="Direct Message">Direct Message</option>
             <option value="Candidate">Candidate</option>
-            <option value="Refrence">Refrence</option>
+            <option value="Reference">Reference</option>
             <option value="Social Media">Social Media</option>
             <option value="Mumbai Job Group">Mumbai Job Group</option>
-            <option value="Time Job">Time Job</option>
-          </select>
-        </div>
+            <option value="Instagram">Instagram</option>
+            <option value="google">Google</option> 
+            <option value="Whatsapp Group">Whatsapp Group</option>
+            <option value="Found it">Found it</option>
+            <option value="Whatsapp channel">Whatsapp channel</option>
+            <option value="Advertisement">Advertisement</option>
+            <option value="Other">Other</option>
+            
 
-      </div>
-    </>
-  );
+          </select>
+        </div> 
+  
+      </div> 
+    </> 
+  ); 
 }

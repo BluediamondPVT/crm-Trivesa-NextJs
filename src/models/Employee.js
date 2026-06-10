@@ -10,7 +10,7 @@ const EmployeeSchema = new mongoose.Schema(
     age: { type: String },
     qualification: { type: String },
     specialization: { type: String },
-    skills: [{ type: String }], 
+    skills: [{ type: String }],
     experience: { type: String },
     lastSalary: { type: String },
     expectedSalary: { type: String },
