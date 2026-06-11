@@ -33,16 +33,41 @@ export default function RecruiterDashboard() {
   const [selectedRemark, setSelectedRemark] = useState(null);
 
   const [userRole, setUserRole] = useState(null);
-  const [dateFilter, setDateFilter] = useState("All");
-  const [companyTypeFilter, setCompanyTypeFilter] = useState("All");
 
-  const [customStartDate, setCustomStartDate] = useState("");
-  const [customEndDate, setCustomEndDate] = useState("");
+  // ====== 🚀 SMART FILTER PERSISTENCE (Save filters on page change) ======
+  const [dateFilter, setDateFilter] = useState(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("dateFilter") || "All";
+    return "All";
+  });
+  
+  const [companyTypeFilter, setCompanyTypeFilter] = useState(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("companyTypeFilter") || "All";
+    return "All";
+  });
+
+  const [customStartDate, setCustomStartDate] = useState(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("customStartDate") || "";
+    return "";
+  });
+
+  const [customEndDate, setCustomEndDate] = useState(() => {
+    if (typeof window !== "undefined") return sessionStorage.getItem("customEndDate") || "";
+    return "";
+  });
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-
   const [totalPayout, setTotalPayout] = useState(0);
+
+  // 🚀 UPDATE SESSION STORAGE WHENEVER FILTERS CHANGE
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("dateFilter", dateFilter);
+      sessionStorage.setItem("companyTypeFilter", companyTypeFilter);
+      sessionStorage.setItem("customStartDate", customStartDate);
+      sessionStorage.setItem("customEndDate", customEndDate);
+    }
+  }, [dateFilter, companyTypeFilter, customStartDate, customEndDate]);
 
   useEffect(() => {
     if (tabFromUrl && tabs.includes(tabFromUrl)) {
@@ -88,7 +113,7 @@ export default function RecruiterDashboard() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // ====== 🚀 BULLETPROOF TIMELINE FILTERING LOGIC ======
+  // ====== 🚀 HELPER: DATE CHECKER ======
   const isWithinDateRange = (timestamp, filterType = dateFilter) => {
     if (!timestamp) return false;
     if (filterType === "All") return true;
@@ -124,15 +149,15 @@ export default function RecruiterDashboard() {
 
   if (dateFilter !== "All") {
     filteredData = filteredData.filter((emp) => {
-      // 1. Agar date range mein add hua hai toh rakh lo
+      // 1. Lined up in date range
       if (isWithinDateRange(emp.createdAt)) return true;
 
-      // 2. Agar koi history match karti hai toh rakh lo
+      // 2. Achieved ANY other status in date range
       if (emp.statusHistory && emp.statusHistory.length > 0) {
         return emp.statusHistory.some((h) => isWithinDateRange(h.timestamp));
       }
 
-      // 3. Purane data ke liye fallback
+      // 3. Fallback for old data
       return isWithinDateRange(emp.updatedAt);
     });
   }
@@ -170,24 +195,28 @@ export default function RecruiterDashboard() {
     });
   }
 
-  // ====== TAB DATA (Taaki LineUp table tab mein bhi sahi log dikhein) ======
+  // ====== 🚀 STRICT TAB DATA (Filter data by what happened that day) ======
   let tableFilteredData = filteredData;
   if (activeTab !== "All") {
     tableFilteredData = tableFilteredData.filter((emp) => {
       if (dateFilter === "All") return emp.status === activeTab;
 
-      // Agar LineUp hai aur us din add hua tha, toh dikhao
-      if (activeTab === "LineUp" && isWithinDateRange(emp.createdAt)) return true;
+      // Agar LineUp hai toh ONLY unko dikhao jo sach me us din create hue the
+      if (activeTab === "LineUp") {
+        return isWithinDateRange(emp.createdAt);
+      }
 
-      // Baaki history check
+      // Baaki kisi tab ke liye, history mein check karo ki kya wo is din us tab wale status me tha
       if (emp.statusHistory && emp.statusHistory.length > 0) {
         return emp.statusHistory.some((h) => h.status === activeTab && isWithinDateRange(h.timestamp));
       }
+
+      // Fallback
       return emp.status === activeTab && isWithinDateRange(emp.updatedAt);
     });
   }
 
-  // ====== 🚀 GRAND COUNTER (Ye kabhi LineUp ka number minus nahi hone dega) ======
+  // ====== 🚀 STRICT MULTI-EVENT TRACKER COUNTER ======
   const getCounts = () => {
     const counts = {
       All: filteredData.length,
@@ -197,32 +226,35 @@ export default function RecruiterDashboard() {
 
     filteredData.forEach((emp) => {
       if (dateFilter === "All") {
+        // Snapshot snapshot of all time current status
         if (counts[emp.status] !== undefined) counts[emp.status]++;
       } else {
-        const countedStatuses = new Set();
-
-        // 1. LineUp Fixed Rule
+        // 1. STRICT LINEUP: Sirf jis din create hua, us din LineUp count hoga
         if (isWithinDateRange(emp.createdAt)) {
           counts["LineUp"]++;
-          countedStatuses.add("LineUp");
         }
 
-        // 2. Timeline Status Changes
+        // 2. OTHER STATUSES: Us selected din pe candidate ne kya kya naye status achieve kiye?
         if (emp.statusHistory && emp.statusHistory.length > 0) {
-          emp.statusHistory.forEach((history) => {
-            if (isWithinDateRange(history.timestamp)) {
-              if (counts[history.status] !== undefined && !countedStatuses.has(history.status)) {
-                counts[history.status]++;
-                countedStatuses.add(history.status);
+          // Find ALL history events that happened on the filtered date
+          const eventsInDateRange = emp.statusHistory.filter(h => isWithinDateRange(h.timestamp));
+          
+          if (eventsInDateRange.length > 0) {
+            // Get unique statuses achieved on that specific day
+            const statusesAchievedThatDay = new Set(eventsInDateRange.map(h => h.status));
+
+            statusesAchievedThatDay.forEach((status) => {
+              // LineUp humne createdAt se gin liya hai, so don't double count it here
+              if (status !== "LineUp" && counts[status] !== undefined) {
+                counts[status]++;
               }
-            }
-          });
+            });
+          }
         } else {
-          // Fallback
+          // Fallback for old legacy data without history array
           if (isWithinDateRange(emp.updatedAt)) {
-            if (counts[emp.status] !== undefined && !countedStatuses.has(emp.status)) {
+            if (emp.status !== "LineUp" && counts[emp.status] !== undefined) {
               counts[emp.status]++;
-              countedStatuses.add(emp.status);
             }
           }
         }
