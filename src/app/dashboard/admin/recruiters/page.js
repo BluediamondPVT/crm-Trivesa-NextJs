@@ -34,7 +34,7 @@ export default function RecruiterDashboard() {
 
   const [userRole, setUserRole] = useState(null);
 
-  // ====== 🚀 SMART FILTER PERSISTENCE (Save filters on page change) ======
+  // ====== 🚀 SMART FILTER PERSISTENCE ======
   const [dateFilter, setDateFilter] = useState(() => {
     if (typeof window !== "undefined") return sessionStorage.getItem("dateFilter") || "All";
     return "All";
@@ -59,7 +59,6 @@ export default function RecruiterDashboard() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [totalPayout, setTotalPayout] = useState(0);
 
-  // 🚀 UPDATE SESSION STORAGE WHENEVER FILTERS CHANGE
   useEffect(() => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem("dateFilter", dateFilter);
@@ -145,19 +144,48 @@ export default function RecruiterDashboard() {
     return true;
   };
 
-  let filteredData = employees;
+  // ====== 🧹 PRE-PROCESSOR: REMOVE FAKE EDIT LOGS ======
+  // Backend se aaye duplicate history events ko clean karta hai
+  const cleanedEmployees = employees.map((emp) => {
+    let cleanStatusHist = [];
+    if (emp.statusHistory && emp.statusHistory.length > 0) {
+      const sorted = [...emp.statusHistory].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      let lastStatus = "LineUp"; // Har candidate initially LineUp hota hai
+      sorted.forEach((h) => {
+        if (h.status !== lastStatus) {
+          cleanStatusHist.push(h);
+          lastStatus = h.status;
+        }
+      });
+    }
+
+    let cleanAssignHist = [];
+    if (emp.assignmentHistory && emp.assignmentHistory.length > 0) {
+      const sorted = [...emp.assignmentHistory].sort((a, b) => new Date(a.date) - new Date(b.date));
+      let lastStatus = null;
+      sorted.forEach((h) => {
+        if (h.status !== lastStatus) {
+          cleanAssignHist.push(h);
+          lastStatus = h.status;
+        }
+      });
+    }
+
+    return {
+      ...emp,
+      cleanStatusHistory: cleanStatusHist,
+      cleanAssignmentHistory: cleanAssignHist,
+    };
+  });
+
+  // Ab yahan se sab kuch cleaned data par chalega!
+  let filteredData = cleanedEmployees;
 
   if (dateFilter !== "All") {
     filteredData = filteredData.filter((emp) => {
-      // 1. Lined up in date range
       if (isWithinDateRange(emp.createdAt)) return true;
-
-      // 2. Achieved ANY other status in date range
-      if (emp.statusHistory && emp.statusHistory.length > 0) {
-        return emp.statusHistory.some((h) => isWithinDateRange(h.timestamp));
-      }
-
-      // 3. Fallback for old data
+      if (emp.cleanStatusHistory.some((h) => isWithinDateRange(h.timestamp))) return true;
+      if (emp.cleanAssignmentHistory.some((h) => isWithinDateRange(h.date))) return true;
       return isWithinDateRange(emp.updatedAt);
     });
   }
@@ -195,28 +223,31 @@ export default function RecruiterDashboard() {
     });
   }
 
-  // ====== 🚀 STRICT TAB DATA (Filter data by what happened that day) ======
+  // ====== 🚀 STRICT TAB DATA ======
   let tableFilteredData = filteredData;
   if (activeTab !== "All") {
     tableFilteredData = tableFilteredData.filter((emp) => {
       if (dateFilter === "All") return emp.status === activeTab;
 
-      // Agar LineUp hai toh ONLY unko dikhao jo sach me us din create hue the
+      const isFresh = isWithinDateRange(emp.createdAt);
+      const inStatusHist = emp.cleanStatusHistory.some((h) => h.status === activeTab && isWithinDateRange(h.timestamp));
+      const inAssignHist = emp.cleanAssignmentHistory.some((h) => h.status === activeTab && isWithinDateRange(h.date));
+
       if (activeTab === "LineUp") {
-        return isWithinDateRange(emp.createdAt);
+        return isFresh || inStatusHist || inAssignHist;
       }
 
-      // Baaki kisi tab ke liye, history mein check karo ki kya wo is din us tab wale status me tha
-      if (emp.statusHistory && emp.statusHistory.length > 0) {
-        return emp.statusHistory.some((h) => h.status === activeTab && isWithinDateRange(h.timestamp));
-      }
+      if (inStatusHist || inAssignHist) return true;
 
       // Fallback
-      return emp.status === activeTab && isWithinDateRange(emp.updatedAt);
+      const hasHistory = (emp.cleanStatusHistory.length > 0) || (emp.cleanAssignmentHistory.length > 0);
+      if (!hasHistory && emp.status === activeTab && isWithinDateRange(emp.updatedAt)) return true;
+
+      return false;
     });
   }
 
-  // ====== 🚀 STRICT MULTI-EVENT TRACKER COUNTER ======
+  // ====== 🚀 STRICT COUNTER ======
   const getCounts = () => {
     const counts = {
       All: filteredData.length,
@@ -226,36 +257,44 @@ export default function RecruiterDashboard() {
 
     filteredData.forEach((emp) => {
       if (dateFilter === "All") {
-        // Snapshot snapshot of all time current status
         if (counts[emp.status] !== undefined) counts[emp.status]++;
       } else {
-        // 1. STRICT LINEUP: Sirf jis din create hua, us din LineUp count hoga
+        const countedStatuses = new Set();
+
+        // 1. Fresh Add = LineUp
         if (isWithinDateRange(emp.createdAt)) {
           counts["LineUp"]++;
+          countedStatuses.add("LineUp");
         }
 
-        // 2. OTHER STATUSES: Us selected din pe candidate ne kya kya naye status achieve kiye?
-        if (emp.statusHistory && emp.statusHistory.length > 0) {
-          // Find ALL history events that happened on the filtered date
-          const eventsInDateRange = emp.statusHistory.filter(h => isWithinDateRange(h.timestamp));
-          
-          if (eventsInDateRange.length > 0) {
-            // Get unique statuses achieved on that specific day
-            const statusesAchievedThatDay = new Set(eventsInDateRange.map(h => h.status));
+        // 2. Track real status changes
+        let hasHistory = false;
 
-            statusesAchievedThatDay.forEach((status) => {
-              // LineUp humne createdAt se gin liya hai, so don't double count it here
-              if (status !== "LineUp" && counts[status] !== undefined) {
-                counts[status]++;
-              }
-            });
-          }
-        } else {
-          // Fallback for old legacy data without history array
-          if (isWithinDateRange(emp.updatedAt)) {
-            if (emp.status !== "LineUp" && counts[emp.status] !== undefined) {
-              counts[emp.status]++;
+        if (emp.cleanStatusHistory.length > 0) {
+          hasHistory = true;
+          emp.cleanStatusHistory.forEach((h) => {
+            if (isWithinDateRange(h.timestamp) && counts[h.status] !== undefined && !countedStatuses.has(h.status)) {
+              counts[h.status]++;
+              countedStatuses.add(h.status);
             }
+          });
+        }
+
+        if (emp.cleanAssignmentHistory.length > 0) {
+          hasHistory = true;
+          emp.cleanAssignmentHistory.forEach((h) => {
+            if (isWithinDateRange(h.date) && counts[h.status] !== undefined && !countedStatuses.has(h.status)) {
+              counts[h.status]++;
+              countedStatuses.add(h.status);
+            }
+          });
+        }
+
+        // 3. Fallback for legacy updates without tracking arrays
+        if (!hasHistory && isWithinDateRange(emp.updatedAt)) {
+          if (emp.status !== "LineUp" && counts[emp.status] !== undefined && !countedStatuses.has(emp.status)) {
+            counts[emp.status]++;
+            countedStatuses.add(emp.status);
           }
         }
       }
