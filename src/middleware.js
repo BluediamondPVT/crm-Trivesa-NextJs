@@ -19,7 +19,6 @@ const ROUTE_PERMISSIONS = {
   "/dashboard/admin/recruiters": ["superadmin", "admin"],
   // Protected API routes
   "/api/protected": ["superadmin", "admin", "recruiter"],
-  // 🚀 FIX: Recruiter ko companies fetch karne ki permission di taaki Add Candidate page chale
   "/api/companies": ["superadmin", "admin", "recruiter"], 
   "/api/employees": ["superadmin", "admin", "recruiter"],
   "/api/users": ["superadmin", "admin"],
@@ -49,6 +48,15 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
   const method = request.method; 
+
+  // 🚀 PUBLIC ROUTE BYPASS: Ye routes bina login ke open rahenge
+  const isPublicRoute = 
+    pathname.startsWith("/apply") || 
+    pathname.startsWith("/api/public");
+
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
 
   // 🚀 SMART FEATURE: Logged in user redirection
   if ((pathname === "/login" || pathname === "/dashboard" || pathname === "/") && token) {
@@ -125,6 +133,8 @@ export const config = {
     '/dashboard/:path*',
     '/api/employees/:path*',
     '/api/companies/:path*',
-    '/api/auth/me'
+    '/api/auth/me',
+    '/apply',
+    '/api/public/:path*'
   ],
 };
