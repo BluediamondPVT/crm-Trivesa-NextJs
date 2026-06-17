@@ -1,11 +1,39 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { toPng } from "html-to-image"; // 🚀 NAYI LIBRARY IMPORT KI HAI
+import { useRef, useState, useEffect } from "react";
+import { toPng } from "html-to-image";
+import axios from "axios"; // 🚀 NAYA: Axios import kiya API call ke liye
 
 export default function CandidateSlipDownload({ candidate }) {
   const slipRef = useRef(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [companyAddress, setCompanyAddress] = useState("Fetching address..."); // 🚀 NAYA STATE
+
+  // 🚀 NAYA LOGIC: Candidate jis company mein assigned hai, uska address fetch karo
+  useEffect(() => {
+    const fetchCompanyAddress = async () => {
+      if (!candidate?.assignedCompanyId) {
+        setCompanyAddress("No Company Assigned");
+        return;
+      }
+      try {
+        const res = await axios.get("/api/companies");
+        if (res.data?.success) {
+          const matchedCompany = res.data.data.find(
+            (c) => String(c._id) === String(candidate.assignedCompanyId)
+          );
+          setCompanyAddress(matchedCompany?.address || "Address not added in CRM");
+        } else {
+          setCompanyAddress("N/A");
+        }
+      } catch (error) {
+        console.error("Error fetching company address:", error);
+        setCompanyAddress("N/A");
+      }
+    };
+
+    fetchCompanyAddress();
+  }, [candidate]);
 
   const handleDownload = async () => {
     if (isGenerating) return;
@@ -13,12 +41,10 @@ export default function CandidateSlipDownload({ candidate }) {
 
     try {
       const element = slipRef.current;
-      
-      // 🚀 Using html-to-image to generate the PNG
       const dataUrl = await toPng(element, {
-        pixelRatio: 2, // High quality image
+        pixelRatio: 2,
         backgroundColor: "#ffffff",
-        cacheBust: true, // Prevents caching issues with fonts/images
+        cacheBust: true,
       });
 
       const link = document.createElement("a");
@@ -35,7 +61,6 @@ export default function CandidateSlipDownload({ candidate }) {
     }
   };
 
-  // Safe formatting of dates
   const formattedDate = candidate?.createdAt 
     ? new Date(candidate.createdAt).toLocaleString("en-IN", {
         day: "2-digit",
@@ -49,7 +74,6 @@ export default function CandidateSlipDownload({ candidate }) {
 
   return (
     <div>
-      {/* 🟢 VISIBLE DOWNLOAD BUTTON */}
       <button
         onClick={handleDownload}
         disabled={isGenerating}
@@ -61,14 +85,14 @@ export default function CandidateSlipDownload({ candidate }) {
         {isGenerating ? "Generating Slip..." : "Download Candidate Details"}
       </button>
 
-      {/* 🔴 HIDDEN SLIP TEMPLATE */}
+      {/* HIDDEN SLIP TEMPLATE */}
       <div className="absolute top-[-9999px] left-[-9999px]">
         <div
           ref={slipRef}
           style={{ width: "750px" }}
           className="bg-white p-12 flex flex-col font-sans border border-gray-100"
         >
-          {/* Logo Brand Header */}
+          {/* Logo Header */}
           <div className="flex flex-col items-center justify-center text-center mb-6">
             <h1 className="text-4xl font-black tracking-tight text-[#0066cc] m-0">
               Trivesa<span className="text-xs font-normal align-super text-gray-400">TM</span>
@@ -81,43 +105,43 @@ export default function CandidateSlipDownload({ candidate }) {
             </p>
           </div>
 
-          {/* Record Title */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-[#0066cc] tracking-wide">
               Recruitment Record
             </h2>
           </div>
 
-          {/* Data Grid Table */}
+          {/* Table */}
           <div className="flex flex-col border border-gray-100 rounded-lg overflow-hidden text-sm mb-8">
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Hiring Partner</div>
-              <div className="w-2/3 text-gray-800">{candidate?.source || "N/A"}</div>
+              <div className="w-2/3 text-gray-800">{candidate?.source || "-"}</div>
             </div>
 
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Candidate Name</div>
-              <div className="w-2/3 text-gray-800 font-medium">{candidate?.name || "N/A"}</div>
+              <div className="w-2/3 text-gray-800 font-medium">{candidate?.name || "-"}</div>
             </div>
 
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Phone</div>
-              <div className="w-2/3 text-gray-800">{candidate?.phone || "N/A"}</div>
+              <div className="w-2/3 text-gray-800">{candidate?.phone || "-"}</div>
             </div>
 
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Email</div>
-              <div className="w-2/3 text-gray-800">{candidate?.email || "N/A"}</div>
+              <div className="w-2/3 text-gray-800">{candidate?.email || "-"}</div>
             </div>
 
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Company</div>
-              <div className="w-2/3 text-gray-800">{candidate?.assignedCompanyName || "N/A"}</div>
+              <div className="w-2/3 text-gray-800">{candidate?.assignedCompanyName || "-"}</div>
             </div>
 
+            {/* 🚀 YAHAN COMPANY KA ADDRESS RENDER HOGA */}
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Address</div>
-              <div className="w-2/3 text-gray-800">{candidate?.address || "N/A"}</div>
+              <div className="w-2/3 text-gray-800">{companyAddress}</div>
             </div>
 
             <div className="flex items-center px-6 py-4">
@@ -140,10 +164,8 @@ export default function CandidateSlipDownload({ candidate }) {
             </div>
           </div>
 
-          {/* Divider Line */}
           <div className="border-t border-dashed border-gray-300 my-4"></div>
 
-          {/* Legal/Disclaimer Footer Text */}
           <div className="text-[11px] leading-relaxed text-gray-600 text-justify px-2">
             <span className="font-bold text-gray-800">Note:</span> We act solely as a recruitment facilitator between candidates and clients. While we work with reputed clients, we are not responsible for any acts, omissions, representations, or consequences arising from interactions between candidates and clients before, during, or after the interview process.
           </div>
