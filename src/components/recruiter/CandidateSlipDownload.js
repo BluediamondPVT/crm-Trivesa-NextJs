@@ -2,14 +2,19 @@
 
 import { useRef, useState, useEffect } from "react";
 import { toPng } from "html-to-image";
-import axios from "axios"; // 🚀 NAYA: Axios import kiya API call ke liye
+import axios from "axios";
 
 export default function CandidateSlipDownload({ candidate }) {
   const slipRef = useRef(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [companyAddress, setCompanyAddress] = useState("Fetching address..."); // 🚀 NAYA STATE
+  const [companyAddress, setCompanyAddress] = useState("Fetching address...");
 
-  // 🚀 NAYA LOGIC: Candidate jis company mein assigned hai, uska address fetch karo
+  // 🚀 NAYE STATES: Recruiter aur HR ka naam dynamic lene ke liye
+  const [recruiterName, setRecruiterName] = useState(
+    candidate?.addedBy?.name || candidate?.addedBy?.email?.split('@')[0] || ""
+  );
+  const [meetHR, setMeetHR] = useState("");
+
   useEffect(() => {
     const fetchCompanyAddress = async () => {
       if (!candidate?.assignedCompanyId) {
@@ -73,11 +78,31 @@ export default function CandidateSlipDownload({ candidate }) {
     : "N/A";
 
   return (
-    <div>
+    <div className="flex flex-col items-end gap-3">
+      
+      {/* 🚀 NAYE INPUT FIELDS: Download se pehle custom naam dalne ke liye */}
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <input
+          type="text"
+          placeholder="Trivesa Recruiter Name"
+          value={recruiterName}
+          onChange={(e) => setRecruiterName(e.target.value)}
+          className="text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#092a49] transition-all w-full sm:w-48"
+        />
+        <input
+          type="text"
+          placeholder="Meet HR Name"
+          value={meetHR}
+          onChange={(e) => setMeetHR(e.target.value)}
+          className="text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#092a49] transition-all w-full sm:w-48"
+        />
+      </div>
+
+      {/* VISIBLE DOWNLOAD BUTTON */}
       <button
         onClick={handleDownload}
         disabled={isGenerating}
-        className="bg-[#092a49] hover:bg-blue-900 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2 cursor-pointer"
+        className="bg-[#092a49] hover:bg-blue-900 text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -86,23 +111,19 @@ export default function CandidateSlipDownload({ candidate }) {
       </button>
 
       {/* HIDDEN SLIP TEMPLATE */}
-      <div className="absolute top-[-9999px] left-[-9999px]">
+      <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none">
         <div
           ref={slipRef}
           style={{ width: "750px" }}
           className="bg-white p-12 flex flex-col font-sans border border-gray-100"
         >
-          {/* Logo Header */}
+          {/* Logo Header using Local Image */}
           <div className="flex flex-col items-center justify-center text-center mb-6">
-            <h1 className="text-4xl font-black tracking-tight text-[#0066cc] m-0">
-              Trivesa<span className="text-xs font-normal align-super text-gray-400">TM</span>
-            </h1>
-            <p className="text-[9px] font-extrabold tracking-[0.25em] text-gray-500 uppercase m-0 mt-0.5">
-              HR Inspired Partnerships
-            </p>
-            <p className="text-[10px] font-black tracking-wider text-[#092a49] uppercase m-0 mt-1">
-              Trivesa HR Consultant Pvt. Ltd.
-            </p>
+            <img 
+              src="/main-logo.png" 
+              alt="Trivesa Logo" 
+              className="max-h-24 object-contain"
+            />
           </div>
 
           <div className="text-center mb-8">
@@ -115,7 +136,7 @@ export default function CandidateSlipDownload({ candidate }) {
           <div className="flex flex-col border border-gray-100 rounded-lg overflow-hidden text-sm mb-8">
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Hiring Partner</div>
-              <div className="w-2/3 text-gray-800">{candidate?.source || "-"}</div>
+              <div className="w-2/3 text-gray-800 font-medium">Trivesa HR Consultant Pvt. Ltd.</div>
             </div>
 
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
@@ -138,7 +159,6 @@ export default function CandidateSlipDownload({ candidate }) {
               <div className="w-2/3 text-gray-800">{candidate?.assignedCompanyName || "-"}</div>
             </div>
 
-            {/* 🚀 YAHAN COMPANY KA ADDRESS RENDER HOGA */}
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Address</div>
               <div className="w-2/3 text-gray-800">{companyAddress}</div>
@@ -149,17 +169,18 @@ export default function CandidateSlipDownload({ candidate }) {
               <div className="w-2/3 text-gray-800">{formattedDate}</div>
             </div>
 
+            {/* 🚀 YAHAN DYNAMIC STATE VALUES PRINT HONGI */}
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Trivesa Recruiter</div>
               <div className="w-2/3 text-gray-800">
-                {candidate?.addedBy?.email ? candidate.addedBy.email.split("@")[0] : "System"}
+                {recruiterName || "System"}
               </div>
             </div>
 
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Meet HR</div>
               <div className="w-2/3 text-gray-800">
-                {candidate?.addedBy?.name || "HR Team"}
+                {meetHR || "HR Team"}
               </div>
             </div>
           </div>
