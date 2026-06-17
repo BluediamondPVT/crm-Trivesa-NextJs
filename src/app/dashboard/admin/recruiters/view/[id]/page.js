@@ -11,7 +11,8 @@ import ProfileHeader from "@/components/employee/ProfileHeader";
 import ContactInfo from "@/components/employee/ContactInfo";
 import ProfessionalDetailsView from "@/components/employee/ProfessionalDetailsView";
 import PlacementAssignmentView from "@/components/employee/PlacementAssignmentView";
-import PlacementHistoryTimeline from "@/components/employee/PlacementHistoryTimeline"; // <--- NAYA COMPONENT
+import PlacementHistoryTimeline from "@/components/employee/PlacementHistoryTimeline";
+import CandidateSlipDownload from "@/components/recruiter/CandidateSlipDownload"; // 🚀 NAYA IMPORT
 
 export default function ViewEmployeePage() {
   const { id } = useParams();
@@ -67,12 +68,26 @@ export default function ViewEmployeePage() {
       {/* 1. Top Navigation Component */}
       <EmployeeTopNav employeeId={employee._id} />
 
-      {/* 2. Profile Header Component */}
+      {/* 🚀 2. ACTION ROW: Profile Heading & Download Slip Button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center my-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-[#092a49]">
+            Candidate Profile Details
+          </h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            View full details and download formal recruitment records
+          </p>
+        </div>
+        {/* Pass the complete employee object here */}
+        <CandidateSlipDownload candidate={employee} />
+      </div>
+
+      {/* 3. Profile Header Component */}
       <ProfileHeader employee={employee} />
 
       {/* CANDIDATE SOURCE BADGE */}
       {employee.source && (
-        <div className="mb-6 inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-700 shadow-sm transition-all hover:bg-indigo-100">
+        <div className="my-6 inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-700 shadow-sm transition-all hover:bg-indigo-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -94,7 +109,7 @@ export default function ViewEmployeePage() {
         </div>
       )}
 
-      {/* 3. Details Grid */}
+      {/* 4. Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 flex">
           <ContactInfo employee={employee} />
@@ -110,7 +125,7 @@ export default function ViewEmployeePage() {
         </div>
       </div>
 
-      {/* 4. Placement History Timeline Component (NAYA) */}
+      {/* 5. Placement History Timeline Component */}
       <PlacementHistoryTimeline history={employee.assignmentHistory} />
     </div>
   );
