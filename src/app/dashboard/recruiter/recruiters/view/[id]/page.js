@@ -12,6 +12,7 @@ import ContactInfo from "@/components/employee/ContactInfo";
 import ProfessionalDetailsView from "@/components/employee/ProfessionalDetailsView";
 import PlacementAssignmentView from "@/components/employee/PlacementAssignmentView";
 import PlacementHistoryTimeline from "@/components/employee/PlacementHistoryTimeline"; // <--- NAYA COMPONENT
+import CandidateSlipDownload from "@/components/recruiter/CandidateSlipDownload";
 
 export default function ViewEmployeePage() {
   const { id } = useParams();
@@ -67,7 +68,21 @@ export default function ViewEmployeePage() {
       {/* 1. Top Navigation Component */}
       <EmployeeTopNav employeeId={employee._id} />
 
-      {/* 2. Profile Header Component */}
+      {/* 🚀 2. ACTION ROW: Profile Heading & Download Slip Button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center my-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-[#092a49]">
+            Candidate Profile Details
+          </h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            View full details and download formal recruitment records
+          </p>
+        </div>
+        {/* Pass the complete employee object here */}
+        <CandidateSlipDownload candidate={employee} />
+      </div>
+
+      {/* 3. Profile Header Component */}
       <ProfileHeader employee={employee} />
 
       {/* CANDIDATE SOURCE BADGE */}

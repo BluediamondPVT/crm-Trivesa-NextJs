@@ -9,13 +9,18 @@ export default function CandidateSlipDownload({ candidate }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [companyAddress, setCompanyAddress] = useState("Fetching address...");
 
-  // 🚀 NAYE STATES: Recruiter aur HR ka naam dynamic lene ke liye
   const [recruiterName, setRecruiterName] = useState(
     candidate?.addedBy?.name || candidate?.addedBy?.email?.split('@')[0] || ""
   );
   const [meetHR, setMeetHR] = useState("");
+  
+  // 🚀 NAYA STATE: Current Date & Time ke liye
+  const [downloadTime, setDownloadTime] = useState("");
 
   useEffect(() => {
+    // Initial page load pe current time set kar denge (Hydration error bachane ke liye)
+    setDownloadTime(getFormattedCurrentTime());
+
     const fetchCompanyAddress = async () => {
       if (!candidate?.assignedCompanyId) {
         setCompanyAddress("No Company Assigned");
@@ -40,47 +45,53 @@ export default function CandidateSlipDownload({ candidate }) {
     fetchCompanyAddress();
   }, [candidate]);
 
+  // 🚀 NAYA FUNCTION: Har baar fresh time nikalne ke liye
+  const getFormattedCurrentTime = () => {
+    return new Date().toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  };
+
   const handleDownload = async () => {
     if (isGenerating) return;
     setIsGenerating(true);
 
-    try {
-      const element = slipRef.current;
-      const dataUrl = await toPng(element, {
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-      });
+    // 🚀 STEP 1: Click karte hi exact fresh time state mein daalo
+    setDownloadTime(getFormattedCurrentTime());
 
-      const link = document.createElement("a");
-      const fileName = `${candidate?.name?.replace(/\s+/g, "_") || "Candidate"}_Recruitment_Record.png`;
-      
-      link.download = fileName;
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error("Slip Generation Failed:", error);
-      alert("Failed to generate the image. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
+    // 🚀 STEP 2: Thoda sa (100ms) wait karo taaki React DOM mein time update kar de
+    setTimeout(async () => {
+      try {
+        const element = slipRef.current;
+        const dataUrl = await toPng(element, {
+          pixelRatio: 2,
+          backgroundColor: "#ffffff",
+          cacheBust: true,
+        });
+
+        const link = document.createElement("a");
+        const fileName = `${candidate?.name?.replace(/\s+/g, "_") || "Candidate"}_Recruitment_Record.png`;
+        
+        link.download = fileName;
+        link.href = dataUrl;
+        link.click();
+      } catch (error) {
+        console.error("Slip Generation Failed:", error);
+        alert("Failed to generate the image. Please try again.");
+      } finally {
+        setIsGenerating(false);
+      }
+    }, 100); // 100 millisecond delay for perfect render
   };
-
-  const formattedDate = candidate?.createdAt 
-    ? new Date(candidate.createdAt).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
-      })
-    : "N/A";
 
   return (
     <div className="flex flex-col items-end gap-3">
       
-      {/* 🚀 NAYE INPUT FIELDS: Download se pehle custom naam dalne ke liye */}
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <input
           type="text"
@@ -164,12 +175,12 @@ export default function CandidateSlipDownload({ candidate }) {
               <div className="w-2/3 text-gray-800">{companyAddress}</div>
             </div>
 
+            {/* 🚀 YAHAN FRESH CURRENT TIME PRINT HOGA */}
             <div className="flex items-center px-6 py-4">
               <div className="w-1/3 font-bold text-[#0066cc]">Date & Time</div>
-              <div className="w-2/3 text-gray-800">{formattedDate}</div>
+              <div className="w-2/3 text-gray-800">{downloadTime}</div>
             </div>
 
-            {/* 🚀 YAHAN DYNAMIC STATE VALUES PRINT HONGI */}
             <div className="flex items-center px-6 py-4 bg-[#f0f7ff]">
               <div className="w-1/3 font-bold text-[#0066cc]">Trivesa Recruiter</div>
               <div className="w-2/3 text-gray-800">
