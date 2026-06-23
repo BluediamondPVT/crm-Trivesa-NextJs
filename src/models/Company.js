@@ -46,7 +46,7 @@ const OpeningSchema = new mongoose.Schema({
 const CompanySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String },
     phone: { type: String, required: true },
     website: { type: String },
     address: { type: String },

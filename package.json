@@ -4,7 +4,7 @@
   "private": true,
   "description": "Trivesa CRM - HR Management System Frontend",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx",
