@@ -115,6 +115,7 @@ export default function PersonalDetailsForm({
             <option value="Found it">Found it</option>
             <option value="Whatsapp channel">Whatsapp channel</option>
             <option value="Advertisement">Advertisement</option>
+            <option value="Trivesa Channel">Trivesa Channel</option>
             <option value="Other">Other</option>
             
 

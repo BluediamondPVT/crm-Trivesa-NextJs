@@ -3,23 +3,146 @@
 import { useState, useEffect } from "react";
 
 const specializationData = {
-  "Business, Management & Strategy": ["Business Management", "Operations Management", "Project Management", "Product Management", "Business Analysis", "Strategy & Consulting", "Entrepreneurship / Startup Management", "Other"],
-  "Information Technology (IT)": ["Software Development", "IT Services & Support", "Systems Administration", "Network Engineering", "Cloud & DevOps", "Cybersecurity", "Data Science & Analytics", "Other"],
-  "Finance & Accounting": ["Accounting", "Financial Planning & Analysis", "Auditing & Taxation", "Banking & Financial Services", "Investment & Wealth Management", "Risk & Compliance", "Other"],
-  "Sales, Marketing & Growth": ["Sales (B2B / B2C)", "Business Development", "Digital Marketing", "Brand Management", "Market Research", "Performance Marketing", "Public Relations (PR)", "Other"],
-  "Human Resources (HR)": ["Talent Acquisition / Recruitment", "HR Operations", "Payroll & Compliance", "Learning & Development (L&D)", "Employee Engagement", "Organizational Development", "Other"],
-  "Healthcare & Life Sciences": ["Clinical Practice", "Nursing & Patient Care", "Pharmacy", "Medical Administration", "Healthcare Management", "Clinical Research & Trials", "Other"],
-  "Engineering & Manufacturing": ["Civil Engineering", "Mechanical Engineering", "Electrical & Electronics", "Industrial Engineering", "Production & Manufacturing", "Quality Control & Assurance", "Other"],
-  "Operations, Supply Chain & Logistics": ["Supply Chain Management", "Logistics & Transportation", "Procurement & Sourcing", "Inventory & Warehouse Management", "Operations Execution", "Other"],
-  "Customer Service & BPO": ["Customer Support (Voice / Non-Voice)", "Telecalling / Telesales", "Customer Experience (CX)", "Technical Support", "Client Relationship Management", "Other"],
-  "Hospitality, Travel & Tourism": ["Hotel Management", "Travel & Tourism", "Event Management", "Food & Beverage Service", "Guest Relations", "Other"],
-  "Creative, Media & Design": ["Graphic Design", "Content Creation", "Copywriting", "Video Production & Editing", "Animation & Multimedia", "UI/UX Design", "Other"],
-  "Legal & Compliance": ["Legal Advisory", "Corporate Law", "Compliance & Regulatory Affairs", "Contract Management", "Intellectual Property (IP)", "Other"],
-  "Education & Training": ["Teaching & Academics", "Training & Development", "Academic Counselling", "Instructional Design", "EdTech", "Other"],
-  "Real Estate & Construction": ["Real Estate Sales", "Property Management", "Construction Management", "Site Engineering", "Architecture & Planning", "Other"],
-  "Retail & E-commerce": ["Retail Operations", "Store Management", "Merchandising", "E-commerce Operations", "Marketplace Management", "Other"],
-  "Skilled Trades & Blue-Collar": ["Technical Services (Electrician, Plumber, etc.)", "Machine Operations", "Maintenance Services", "Driving & Delivery", "Security Services", "Other"],
-  "Custom / Unlisted": ["Other"] 
+  "Business, Management & Strategy": [
+    "Business Management",
+    "Operations Management",
+    "Project Management",
+    "Product Management",
+    "Business Analysis",
+    "Strategy & Consulting",
+    "Entrepreneurship / Startup Management",
+    "Other",
+  ],
+  "Information Technology (IT)": [
+    "Software Development",
+    "IT Services & Support",
+    "Systems Administration",
+    "Network Engineering",
+    "Cloud & DevOps",
+    "Cybersecurity",
+    "Data Science & Analytics",
+    "Other",
+  ],
+  "Finance & Accounting": [
+    "Accounting",
+    "Financial Planning & Analysis",
+    "Auditing & Taxation",
+    "Banking & Financial Services",
+    "Investment & Wealth Management",
+    "Risk & Compliance",
+    "Other",
+  ],
+  "Sales, Marketing & Growth": [
+    "Sales (B2B / B2C)",
+    "Business Development",
+    "Digital Marketing",
+    "Brand Management",
+    "Market Research",
+    "Performance Marketing",
+    "Public Relations (PR)",
+    "Other",
+  ],
+  "Human Resources (HR)": [
+    "Talent Acquisition / Recruitment",
+    "HR Operations",
+    "Payroll & Compliance",
+    "Learning & Development (L&D)",
+    "Employee Engagement",
+    "Organizational Development",
+    "Other",
+  ],
+  "Healthcare & Life Sciences": [
+    "Clinical Practice",
+    "Nursing & Patient Care",
+    "Pharmacy",
+    "Medical Administration",
+    "Healthcare Management",
+    "Clinical Research & Trials",
+    "Other",
+  ],
+  "Engineering & Manufacturing": [
+    "Civil Engineering",
+    "Mechanical Engineering",
+    "Electrical & Electronics",
+    "Industrial Engineering",
+    "Production & Manufacturing",
+    "Quality Control & Assurance",
+    "Other",
+  ],
+  "Operations, Supply Chain & Logistics": [
+    "Supply Chain Management",
+    "Logistics & Transportation",
+    "Procurement & Sourcing",
+    "Inventory & Warehouse Management",
+    "Operations Execution",
+    "Other",
+  ],
+  "Customer Service & BPO": [
+    "Customer Support (Voice / Non-Voice)",
+    "Telecalling / Telesales",
+    "Customer Experience (CX)",
+    "Technical Support",
+    "Client Relationship Management",
+    "Other",
+  ],
+  "Hospitality, Travel & Tourism": [
+    "Hotel Management",
+    "Travel & Tourism",
+    "Event Management",
+    "Food & Beverage Service",
+    "Guest Relations",
+    "Other",
+  ],
+  "Creative, Media & Design": [
+    "Graphic Design",
+    "Content Creation",
+    "Copywriting",
+    "Video Production & Editing",
+    "Animation & Multimedia",
+    "UI/UX Design",
+    "Other",
+  ],
+  "Legal & Compliance": [
+    "Legal Advisory",
+    "Corporate Law",
+    "Compliance & Regulatory Affairs",
+    "Contract Management",
+    "Intellectual Property (IP)",
+    "Other",
+  ],
+  "Education & Training": [
+    "Teaching & Academics",
+    "Training & Development",
+    "Academic Counselling",
+    "Instructional Design",
+    "EdTech",
+    "Other",
+  ],
+  "Real Estate & Construction": [
+    "Real Estate Sales",
+    "Property Management",
+    "Construction Management",
+    "Site Engineering",
+    "Architecture & Planning",
+    "Other",
+  ],
+  "Retail & E-commerce": [
+    "Retail Operations",
+    "Store Management",
+    "Merchandising",
+    "E-commerce Operations",
+    "Marketplace Management",
+    "Other",
+  ],
+  "Skilled Trades & Blue-Collar": [
+    "Technical Services (Electrician, Plumber, etc.)",
+    "Machine Operations",
+    "Maintenance Services",
+    "Driving & Delivery",
+    "Security Services",
+    "Other",
+  ],
+  "Custom / Unlisted": ["Other"],
 };
 
 export default function ProfessionalDetailsForm({
@@ -38,7 +161,10 @@ export default function ProfessionalDetailsForm({
       let foundSub = "";
 
       for (const [cat, subs] of Object.entries(specializationData)) {
-        if (subs.includes(formData.specialization) && formData.specialization !== "Other") {
+        if (
+          subs.includes(formData.specialization) &&
+          formData.specialization !== "Other"
+        ) {
           foundCat = cat;
           foundSub = formData.specialization;
           break;
@@ -79,7 +205,6 @@ export default function ProfessionalDetailsForm({
         Professional Details
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
         {/* Qualification */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -110,14 +235,18 @@ export default function ProfessionalDetailsForm({
           >
             <option value="">-- Select Domain --</option>
             {Object.keys(specializationData).map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Sub-Category Dropdown */}
         {specCategory && (
-          <div className={`${specSubCategory === "Other" ? "" : "md:col-span-2"} transition-all`}>
+          <div
+            className={`${specSubCategory === "Other" ? "" : "md:col-span-2"} transition-all`}
+          >
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Role / Specialization *
             </label>
@@ -128,7 +257,9 @@ export default function ProfessionalDetailsForm({
             >
               <option value="">-- Select Specialization --</option>
               {specializationData[specCategory].map((sub) => (
-                <option key={sub} value={sub}>{sub}</option>
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
               ))}
             </select>
           </div>
@@ -136,7 +267,7 @@ export default function ProfessionalDetailsForm({
 
         {/* Custom Input Box */}
         {specSubCategory === "Other" && (
-          <div className="md:col-span-1 animate-in fade-in zoom-in duration-200"> 
+          <div className="md:col-span-1 animate-in fade-in zoom-in duration-200">
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Type Custom Specialization *
             </label>
@@ -158,26 +289,36 @@ export default function ProfessionalDetailsForm({
             Skills (Type & Press Enter)
           </label>
           <div className="p-2 border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-blue-500 flex flex-wrap gap-2 items-center">
-            {formData.skills && formData.skills.map((skill, index) => (
-              <span
-                key={index}
-                className="bg-blue-100 text-[#092a49] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-sm"
-              >
-                {skill}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="text-blue-500 hover:text-red-500 focus:outline-none transition-colors"
+            {formData.skills &&
+              formData.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="bg-blue-100 text-[#092a49] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 shadow-sm"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                  </svg>
-                </button>
-              </span>
-            ))}
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="text-blue-500 hover:text-red-500 focus:outline-none transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
             <input
               type="text"
-              placeholder={formData.skills?.length === 0 ? "e.g. React, Node.js, Sales" : "Add more..."}
+              placeholder={
+                formData.skills?.length === 0
+                  ? "e.g. React, Node.js, Sales"
+                  : "Add more..."
+              }
               className="flex-1 outline-none bg-transparent min-w-[120px] text-sm"
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === ",") {
@@ -258,7 +399,6 @@ export default function ProfessionalDetailsForm({
             />
           </div>
         )}
-
       </div>
     </>
   );
