@@ -201,8 +201,11 @@ export default function CandidateSlipDownload({ candidate }) {
           <div className="text-[11px] leading-relaxed text-gray-600 text-justify px-2">
             <span className="font-bold text-gray-800">Note:</span> We act solely as a recruitment facilitator between candidates and clients. While we work with reputed clients, we are not responsible for any acts, omissions, representations, or consequences arising from interactions between candidates and clients before, during, or after the interview process.
           </div>
+          <div className="text-[11px] leading-relaxed text-gray-600 text-justify px-2">
+            <span className="font-bold text-gray-800">Note:</span> Our recruitment services are completely free. Neither we nor our client charge or accept any payment from candidates at any stage of the hiring process.
+          </div>
         </div>
       </div>
     </div>
-  );
+  ); 
 }

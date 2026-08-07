@@ -23,7 +23,6 @@ export default function AddClientPage() {
     description: "",
     status: "Active",
     payoutDetails: {
-      // 🚀 Commercial slabs removed from here (now managed inside openings)
       payoutDuration: "",
       replacementTime: "",
       paymentTerms: "",

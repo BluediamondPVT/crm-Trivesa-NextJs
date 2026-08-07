@@ -16,12 +16,12 @@ export async function POST(req) {
          { status: 500 }
        );
     }
-
+ 
     const candidateData = {
       ...data,
-      status: "future", // Direct "future" bucket mein jayega
-      source: "Web Form", // 🚀 Pata chal jayega ki ye bahar se aaya hai
-      addedBy: defaultUser._id, // 🚀 VALID ObjectId assign hogi taaki crash na ho
+      status: "future",
+      source: "Web Form", 
+      addedBy: defaultUser._id,
     };
 
     const newCandidate = await Employee.create(candidateData);

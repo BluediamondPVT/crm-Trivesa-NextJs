@@ -131,21 +131,6 @@ class APIError extends Error {
 // Export singleton instance
 export const apiClient = new APIClient();
 
-/**
- * Custom API Error class
- */
-class APIError extends Error {
-  constructor(message, status, details) {
-    super(message);
-    this.name = "APIError";
-    this.status = status;
-    this.details = details;
-  }
-}
-
-// Export singleton instance
-export const apiClient = new APIClient();
-
 // Auth API methods (now uses HTTP-only cookies - no need to handle tokens)
 export const authAPI = {
   login: (email, password) =>

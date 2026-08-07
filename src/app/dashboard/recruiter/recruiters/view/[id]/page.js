@@ -11,7 +11,7 @@ import ProfileHeader from "@/components/employee/ProfileHeader";
 import ContactInfo from "@/components/employee/ContactInfo";
 import ProfessionalDetailsView from "@/components/employee/ProfessionalDetailsView";
 import PlacementAssignmentView from "@/components/employee/PlacementAssignmentView";
-import PlacementHistoryTimeline from "@/components/employee/PlacementHistoryTimeline"; // <--- NAYA COMPONENT
+import PlacementHistoryTimeline from "@/components/employee/PlacementHistoryTimeline"; 
 import CandidateSlipDownload from "@/components/recruiter/CandidateSlipDownload";
 
 export default function ViewEmployeePage() {

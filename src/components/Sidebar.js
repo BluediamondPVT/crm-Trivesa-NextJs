@@ -33,6 +33,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
     const fetchUserRole = async () => {
       try {
         const res = await fetch("/api/auth/me");
+        if (!res.ok) return;
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) return;
         const data = await res.json();
 
         if (data.success && data.data?.role) {
@@ -53,6 +56,15 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
       try {
         const res = await fetch("/api/users?role=recruiter");
+        if (!res.ok) {
+          setRecruiters([]);
+          return;
+        }
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          setRecruiters([]);
+          return;
+        }
         const data = await res.json();
 
         if (data.success) {

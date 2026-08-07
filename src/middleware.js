@@ -52,7 +52,8 @@ export async function middleware(request) {
   // 🚀 PUBLIC ROUTE BYPASS: Ye routes bina login ke open rahenge
   const isPublicRoute = 
     pathname.startsWith("/apply") || 
-    pathname.startsWith("/api/public");
+    pathname.startsWith("/api/public") ||
+    pathname.startsWith("/api/auth/login");
 
   if (isPublicRoute) {
     return NextResponse.next();
@@ -73,10 +74,7 @@ export async function middleware(request) {
 
   const isProtectedRoute = 
     pathname.startsWith("/dashboard") || 
-    pathname.startsWith("/api/protected") ||
-    pathname.startsWith("/api/companies") ||
-    pathname.startsWith("/api/employees") ||
-    pathname.startsWith("/api/users");
+    pathname.startsWith("/api");
 
   if (!isProtectedRoute) return NextResponse.next();
 
@@ -90,6 +88,11 @@ export async function middleware(request) {
   const payload = await verifyAuth(token);
 
   if (!payload) {
+    if (pathname.startsWith("/api")) {
+      const response = NextResponse.json({ success: false, message: "Unauthorized: Invalid or expired token" }, { status: 401 });
+      response.cookies.delete("token");
+      return response;
+    }
     const response = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.delete("token");
     return response;
@@ -131,10 +134,7 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/api/employees/:path*',
-    '/api/companies/:path*',
-    '/api/auth/me',
-    '/apply',
-    '/api/public/:path*'
+    '/api/:path*',
+    '/apply'
   ],
 };

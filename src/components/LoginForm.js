@@ -49,10 +49,17 @@ export default function LoginForm() {
         }),
       });
 
-      const responseData = await res.json();
+      const contentType = res.headers.get("content-type");
+      let responseData;
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`Server returned unexpected response (${res.status}). Please try again.`);
+      }
 
       if (!res.ok) {
-        throw new Error(responseData.message || "Invalid credentials");
+        throw new Error(responseData?.message || "Invalid credentials");
       }
 
       // 🕵️‍♂️ Debugging ke liye: Console mein check kar role kya aa raha hai

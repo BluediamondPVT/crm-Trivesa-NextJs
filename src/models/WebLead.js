@@ -8,11 +8,11 @@ const WebLeadSchema = new mongoose.Schema(
     },
     businessEmail: {
       type: String,
-      required: true, // Email sabme hai, toh isko required kar sakte hain
+      required: true, 
     },
     phone: {
       type: String,
-      // required: true HATA DIYA HAI kyunki 2nd form mein phone number nahi hai
+     
     },
     message: {
       type: String,
